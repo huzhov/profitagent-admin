@@ -1,3 +1,4 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Bot,
@@ -10,9 +11,9 @@ import {
   TestTube,
   Smartphone,
 } from "lucide-react";
-import MainContentContainer from "./components/main-content/MainContentContainer";
-import SidebarContainer from "./components/sidebar/SidebarContainer";
-import type { ProgressStep } from "./types";
+import MainContentContainer from "../components/main-content/MainContentContainer";
+import SidebarContainer from "../components/sidebar/SidebarContainer";
+import type { ProgressStep } from "../types";
 
 const steps: ProgressStep[] = [
   { id: "agent", title: "AI Agent Attributes", icon: Bot },
@@ -26,7 +27,11 @@ const steps: ProgressStep[] = [
   { id: "integration", title: "WhatsApp Integration", icon: Smartphone },
 ];
 
-function App() {
+export const Route = createFileRoute("/")({
+  component: Index,
+});
+
+function Index() {
   const [activeSection, setActiveSection] = useState("builder");
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -93,5 +98,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
