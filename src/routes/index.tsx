@@ -35,50 +35,6 @@ function Index() {
   const [activeSection, setActiveSection] = useState("builder");
   const [currentStep, setCurrentStep] = useState(0);
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@company.com",
-      role: "Admin",
-      status: "Active",
-      lastLogin: "2024-01-15",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@company.com",
-      role: "Editor",
-      status: "Active",
-      lastLogin: "2024-01-14",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@company.com",
-      role: "Viewer",
-      status: "Inactive",
-      lastLogin: "2024-01-10",
-    },
-  ]);
-
-  const toggleUserStatus = (userId: number) => {
-    setUsers(
-      users.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === "Active" ? "Inactive" : "Active",
-            }
-          : user
-      )
-    );
-  };
-
-  const deleteUser = (userId: number) => {
-    setUsers(users.filter((user) => user.id !== userId));
-  };
-
   return (
     <div className="min-h-screen bg-background flex">
       <SidebarContainer
