@@ -25,6 +25,7 @@ import { Slider } from "../../ui/slider";
 import type { ProgressStep } from "@/types";
 import AgentBuilderHeader from "./AgentBuilderHeader";
 import AgentBuilderNavigationTabs from "./AgentBuilderNavigationTabs";
+import AgentBuilderProgressBar from "@/components/main-content/agent-builder/AgentBuilderProgressBar";
 
 const sections = [
   { id: "profile", title: "Agent Program", icon: Bot },
@@ -1380,6 +1381,9 @@ export default function AgentBuilderContainer({
               </div>
             </div>
           )}
+
+          {/* Progress Bar for Agent Builder */}
+          {/* <AgentBuilderProgressBar currentStep={currentStep} steps={steps} /> */}
 
           {/* Navigation Buttons */}
           <div className="flex justify-between pt-6 border-t">

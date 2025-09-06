@@ -40,8 +40,6 @@ function Index() {
       <SidebarContainer
         activeSection={activeSection}
         setActiveSection={setActiveSection}
-        currentStep={currentStep}
-        steps={steps}
       />
 
       <MainContentContainer
