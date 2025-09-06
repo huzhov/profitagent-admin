@@ -1,5 +1,5 @@
 import type { ProgressStep } from "../../types";
-import AgentBuilder from "./AgentBuilder";
+import AgentBuilderContainer from "./agent-builder/AgentBuilderContainer";
 import UsersManagement from "./UsersManagement";
 import Reporting from "./Reporting";
 import Agents from "./Agents";
@@ -30,7 +30,7 @@ export default function MainContentContainer({
     <main className="flex-1 overflow-auto">
       <div className="container mx-auto px-8 py-8">
         {activeSection === NavbarSection.Builder && (
-          <AgentBuilder
+          <AgentBuilderContainer
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
             steps={steps}

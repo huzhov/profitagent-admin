@@ -1,23 +1,17 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import React, { useState } from "react";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { Card, CardContent } from "../../ui/card";
+import { useState } from "react";
+import { Label } from "../../ui/label";
+import { Input } from "../../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
+} from "../../ui/select";
+import { Textarea } from "../../ui/textarea";
+import { Separator } from "../../ui/separator";
+import { Button } from "../../ui/button";
 import {
   Bot,
   MessageSquare,
@@ -27,8 +21,10 @@ import {
   TestTube,
   Upload,
 } from "lucide-react";
-import { Slider } from "../ui/slider";
+import { Slider } from "../../ui/slider";
 import type { ProgressStep } from "@/types";
+import AgentBuilderHeader from "./AgentBuilderHeader";
+import AgentBuilderNavigationTabs from "./AgentBuilderNavigationTabs";
 
 const sections = [
   { id: "profile", title: "Agent Program", icon: Bot },
@@ -37,7 +33,7 @@ const sections = [
   { id: "experience", title: "Experience", icon: Sparkles },
 ];
 
-export default function AgentBuilder({
+export default function AgentBuilderContainer({
   currentStep,
   setCurrentStep,
   steps,
@@ -151,60 +147,23 @@ export default function AgentBuilder({
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-balance mb-2">
-          Create AI Agent
-        </h2>
-        <p className="text-muted-foreground">
-          Build your WhatsApp commerce AI agent with advanced configuration
-          options
-        </p>
-      </div>
+      <AgentBuilderHeader />
 
       {/* Section Navigation Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8 p-1 bg-muted rounded-lg">
-        {sections.map((section) => {
-          const Icon = section.icon;
-          return (
-            <button
-              key={section.id}
-              onClick={() =>
-                setCurrentStep(sections.findIndex((s) => s.id === section.id))
-              }
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                sections[currentStep]?.id === section.id
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{section.title}</span>
-            </button>
-          );
-        })}
-      </div>
+      <AgentBuilderNavigationTabs
+        sections={sections}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+      />
 
       {/* Form Content */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            {sections[currentStep] && (
-              <>
-                {React.createElement(sections[currentStep].icon, {
-                  className: "h-5 w-5",
-                })}
-                <span>{sections[currentStep].title}</span>
-              </>
-            )}
-          </CardTitle>
-        </CardHeader>
         <CardContent className="space-y-6">
           {/* Section 1: Agent Program */}
           {currentStep === 0 && (
             <div className="space-y-8">
               {/* Profile */}
-              <div className="space-y-6">
+              {/* <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     1
@@ -388,13 +347,13 @@ export default function AgentBuilder({
                 </div>
               </div>
 
-              <Separator />
+              <Separator /> */}
 
               {/* Integrations */}
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    2
+                    1
                   </div>
                   <h3 className="text-xl font-semibold">Integrations</h3>
                 </div>
@@ -454,10 +413,10 @@ export default function AgentBuilder({
                 </div>
               </div>
 
-              <Separator />
+              {/* <Separator /> */}
 
               {/* AI Agent */}
-              <div className="space-y-6">
+              {/* <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     3
@@ -490,7 +449,7 @@ export default function AgentBuilder({
                     rows={6}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           )}
 

@@ -8,11 +8,11 @@ export default function SidebarNavigation({
   setActiveSection: (section: string) => void;
 }) {
   const mainSections = [
-    { id: "reporting", title: "Reporting", icon: BarChart3 },
-    { id: "agents", title: "Agents Hub", icon: Grid3X3 },
     { id: "builder", title: "Agent Builder", icon: Bot },
     { id: "messages", title: "Messages", icon: MessageSquare },
     { id: "admin", title: "User Admin", icon: Users },
+    { id: "reporting", title: "Reporting", icon: BarChart3 },
+    { id: "agents", title: "Agents Hub", icon: Grid3X3 },
   ];
 
   return (
