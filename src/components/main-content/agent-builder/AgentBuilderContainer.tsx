@@ -1,5 +1,6 @@
 import { Card, CardContent } from "../../ui/card";
 import { useState } from "react";
+import axios from "axios";
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
 import {
@@ -22,10 +23,25 @@ import {
   Upload,
 } from "lucide-react";
 import { Slider } from "../../ui/slider";
-import type { ProgressStep } from "@/types";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import AgentBuilderHeader from "./AgentBuilderHeader";
 import AgentBuilderNavigationTabs from "./AgentBuilderNavigationTabs";
-import AgentBuilderProgressBar from "@/components/main-content/agent-builder/AgentBuilderProgressBar";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  agentBuilderSchema,
+  defaultValues,
+  type AgentBuilderFormValues,
+} from "./schema";
+// import AgentBuilderProgressBar from "@/components/main-content/agent-builder/AgentBuilderProgressBar";
 
 const sections = [
   { id: "profile", title: "Agent Program", icon: Bot },
@@ -37,105 +53,17 @@ const sections = [
 export default function AgentBuilderContainer({
   currentStep,
   setCurrentStep,
-  steps,
 }: {
   currentStep: number;
   setCurrentStep: (step: number) => void;
-  steps: ProgressStep[];
 }) {
-  const [formData, setFormData] = useState({
-    // Section 1: Agent Program - Profile
-    profile: "",
-    template: "",
-    languages: [],
-    brandName: "",
-    websiteUrl: "",
-    category: "",
-    businessDescription: "",
-    socialMediaHandles: [],
-    eCommerceUrl: "",
-    clickOutUrl: "",
-
-    // Section 1: Agent Program - Integrations
-    oauthUserId: "",
-    clientSecret: "",
-    accessToken: "",
-    businessAccountId: "",
-
-    // Section 1: Agent Program - AI Agent
-    primaryGoalKPI: "",
-    tasksActions: "",
-
-    // Section 2: Agent Configuration - AI System Design
-    systemPromptCustomisation: "",
-    toneOfVoice: "professional",
-    defineSocialMedia: false,
-    targetAudience: "",
-    faqsBestAnswers: "",
-    conversationClosure: "",
-    newTopicsToLearn: "",
-
-    // Section 2: Agent Configuration - Governance
-    aiGuardrails: "",
-    brandGuardrails: "",
-    marketingOptInCopy: "",
-
-    // Section 2: Agent Configuration - Media & Personalisation
-    discoveryQuestions: "",
-
-    // Section 2: Agent Configuration - Content Catalogue
-    contentItems: [],
-
-    // Section 2: Agent Configuration - Product Catalogue
-    productPlans: "",
-
-    // Section 2: Agent Configuration - Contextual Signals
-    apiFeeds: [],
-
-    // Section 2: Agent Configuration - Generation Settings
-    toneVoiceSlider: [50],
-    emotionality: [50],
-    temperature: [50],
-    messageLength: [50],
-    chattyClinky: [50],
-
-    // WhatsApp Native Fields - Quick Reply Buttons
-    quickReplyId: "",
-    quickReplyHeader: "",
-    quickReplyBody: "",
-    quickReplyFooter: "",
-    quickReplyTitle: "",
-
-    // WhatsApp Native Fields - Call-To-Action Buttons
-    ctaHeader: "",
-    ctaBody: "",
-    ctaFooter: "",
-    ctaType: "",
-    ctaTitle: "",
-    ctaUrlNumber: "",
-
-    // WhatsApp Native Fields - List Messages
-    listId: "",
-    listHeader: "",
-    listBody: "",
-    listFooter: "",
-    listButtonLabel: "",
-    listSectionTitle: "",
-    listRowTitle: "",
-    listDescription: "",
-
-    // Experience
-    followUpFrequency: [],
-    dynamicPricing: "",
-    lastMessage71hrs: "",
+  const form = useForm<AgentBuilderFormValues>({
+    resolver: zodResolver(agentBuilderSchema),
+    defaultValues,
   });
 
-  const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < sections.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -144,6 +72,21 @@ export default function AgentBuilderContainer({
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const submitForm = async (values: AgentBuilderFormValues) => {
+    console.log("smth");
+    console.log("Submitting form values:", values);
+    return;
+    const payload = {
+      waAuthToken: values.waAuthToken,
+      wabaPhoneNumberId: values.wabaPhoneNumberId,
+      wabaId: values.wabaId,
+      name: values.brandName,
+      vertical: values.category,
+    };
+
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/clients`, payload);
   };
 
   return (
@@ -158,33 +101,43 @@ export default function AgentBuilderContainer({
       />
 
       {/* Form Content */}
-      <Card>
-        <CardContent className="space-y-6">
-          {/* Section 1: Agent Program */}
-          {currentStep === 0 && (
-            <div className="space-y-8">
-              {/* Profile */}
-              {/* <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    1
-                  </div>
-                  <h3 className="text-xl font-semibold">Profile</h3>
-                </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(submitForm)}>
+          <Card>
+            <CardContent className="space-y-6">
+              {/* Section 1: Agent Program */}
+              {currentStep === 0 && (
+                <div className="space-y-8">
+                  {/* Profile */}
+                  <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        1
+                      </div>
+                      <h3 className="text-xl font-semibold">Profile</h3>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="profile">Profile *</Label>
-                    <Input
-                      id="profile"
-                      value={formData.profile}
-                      onChange={(e) =>
-                        updateFormData("profile", e.target.value)
-                      }
-                      placeholder="Name or identifier for the agent"
-                    />
-                  </div>
-                  <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="agentName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="agent-name">
+                                Agent name *
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Name or identifier for the agent"
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      {/* <div className="space-y-2">
                     <Label htmlFor="template">Template</Label>
                     <Select
                       value={formData.template}
@@ -213,10 +166,10 @@ export default function AgentBuilderContainer({
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                </div>
+                  </div> */}
+                    </div>
 
-                <div className="space-y-2">
+                    {/* <div className="space-y-2">
                   <Label htmlFor="languages">Languages</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
@@ -241,21 +194,29 @@ export default function AgentBuilderContainer({
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="brandName">Brand Name *</Label>
-                    <Input
-                      id="brandName"
-                      value={formData.brandName}
-                      onChange={(e) =>
-                        updateFormData("brandName", e.target.value)
-                      }
-                      placeholder="Brand/company name"
-                    />
-                  </div>
-                  <div className="space-y-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="brandName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="brandName">
+                                Brand Name *
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="Brand/company name"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      {/* <div className="space-y-2">
                     <Label htmlFor="websiteUrl">Website URL</Label>
                     <Input
                       id="websiteUrl"
@@ -266,34 +227,56 @@ export default function AgentBuilderContainer({
                       }
                       placeholder="https://company.com"
                     />
-                  </div>
-                </div>
+                  </div> */}
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => updateFormData("category", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Industry category of the agent" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ecommerce">E-commerce</SelectItem>
-                      <SelectItem value="saas">SaaS</SelectItem>
-                      <SelectItem value="retail">Retail</SelectItem>
-                      <SelectItem value="healthcare">Healthcare</SelectItem>
-                      <SelectItem value="finance">Finance</SelectItem>
-                      <SelectItem value="education">Education</SelectItem>
-                      <SelectItem value="travel">
-                        Travel & Hospitality
-                      </SelectItem>
-                      <SelectItem value="realestate">Real Estate</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="space-y-2">
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel htmlFor="category">Category *</FormLabel>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Industry category of the agent" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="entertainment">
+                                  Entertainment
+                                </SelectItem>
+                                <SelectItem value="ecommerce">
+                                  E-commerce
+                                </SelectItem>
+                                <SelectItem value="saas">SaaS</SelectItem>
+                                <SelectItem value="retail">Retail</SelectItem>
+                                <SelectItem value="healthcare">
+                                  Healthcare
+                                </SelectItem>
+                                <SelectItem value="finance">Finance</SelectItem>
+                                <SelectItem value="education">
+                                  Education
+                                </SelectItem>
+                                <SelectItem value="travel">
+                                  Travel & Hospitality
+                                </SelectItem>
+                                <SelectItem value="realestate">
+                                  Real Estate
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                <div className="space-y-2">
+                    {/* <div className="space-y-2">
                   <Label htmlFor="businessDescription">
                     Business Description
                   </Label>
@@ -306,9 +289,9 @@ export default function AgentBuilderContainer({
                     placeholder="Short paragraph describing the business"
                     rows={3}
                   />
-                </div>
+                </div> */}
 
-                <div className="space-y-2">
+                    {/* <div className="space-y-2">
                   <Label>Social Media Handles</Label>
                   <div className="space-y-3">
                     <Input placeholder="Instagram: @username" />
@@ -316,9 +299,9 @@ export default function AgentBuilderContainer({
                     <Input placeholder="Facebook: facebook.com/page" />
                     <Input placeholder="LinkedIn: linkedin.com/company/name" />
                   </div>
-                </div>
+                </div> */}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="eCommerceUrl">E-Commerce URL</Label>
                     <Input
@@ -345,79 +328,108 @@ export default function AgentBuilderContainer({
                       placeholder="https://help.company.com"
                     />
                   </div>
-                </div>
-              </div>
-
-              <Separator /> */}
-
-              {/* Integrations */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    1
+                </div> */}
                   </div>
-                  <h3 className="text-xl font-semibold">Integrations</h3>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="oauthUserId">OAuth User ID</Label>
-                    <Input
-                      id="oauthUserId"
-                      value={formData.oauthUserId}
-                      onChange={(e) =>
-                        updateFormData("oauthUserId", e.target.value)
-                      }
-                      placeholder="User ID for OAuth integration"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="clientSecret">Client Secret</Label>
-                    <Input
-                      id="clientSecret"
-                      type="password"
-                      value={formData.clientSecret}
-                      onChange={(e) =>
-                        updateFormData("clientSecret", e.target.value)
-                      }
-                      placeholder="••••••••••••••••"
-                    />
-                  </div>
-                </div>
+                  <Separator />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="accessToken">Access Token</Label>
-                    <Input
-                      id="accessToken"
-                      type="password"
-                      value={formData.accessToken}
-                      onChange={(e) =>
-                        updateFormData("accessToken", e.target.value)
-                      }
-                      placeholder="••••••••••••••••"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="businessAccountId">
-                      Business Account ID
-                    </Label>
-                    <Input
-                      id="businessAccountId"
-                      value={formData.businessAccountId}
-                      onChange={(e) =>
-                        updateFormData("businessAccountId", e.target.value)
-                      }
-                      placeholder="ID for associated business account"
-                    />
-                  </div>
-                </div>
-              </div>
+                  {/* Integrations */}
+                  <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        2
+                      </div>
+                      <h3 className="text-xl font-semibold">Integrations</h3>
+                    </div>
 
-              {/* <Separator /> */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="waAuthToken"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="waAuthToken">
+                                WA Auth Token *
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="WhatsApp authentication token"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="wabaPhoneNumberId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="wabaPhoneNumberId">
+                                WABA Phone Number ID *
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="WhatsApp Business Account phone number ID"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
 
-              {/* AI Agent */}
-              {/* <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="wabaId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="wabaId">WABA ID *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="WhatsApp Business Account ID"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="waLinkUrl"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="waLinkUrl">
+                                WA Link URL *
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="WhatsApp Business Account URL user to be navigated to"
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* <Separator /> */}
+
+                  {/* <Separator /> */}
+
+                  {/* AI Agent */}
+                  {/* <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     3
@@ -451,526 +463,548 @@ export default function AgentBuilderContainer({
                   />
                 </div>
               </div> */}
-            </div>
-          )}
+                </div>
+              )}
 
-          {/* Section 2: Agent Configuration */}
-          {currentStep === 1 && (
-            <div className="space-y-8">
+              {/* Section 2: Agent Configuration */}
+              {/* {currentStep === 1 && (
+                <div className="space-y-8"> */}
               {/* AI System Design */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    1
-                  </div>
-                  <h3 className="text-xl font-semibold">AI System Design</h3>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="systemPromptCustomisation">
-                    System Prompt Customisation *
-                  </Label>
-                  <Textarea
-                    id="systemPromptCustomisation"
-                    value={formData.systemPromptCustomisation}
-                    onChange={(e) =>
-                      updateFormData(
-                        "systemPromptCustomisation",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Customize the base AI system prompt to define your agent's personality, behavior, and response style"
-                    rows={5}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="toneOfVoice">
-                    Tone of Voice / Communication Style
-                  </Label>
-                  <Select
-                    value={formData.toneOfVoice}
-                    onValueChange={(value) =>
-                      updateFormData("toneOfVoice", value)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="professional">Professional</SelectItem>
-                      <SelectItem value="friendly">Friendly</SelectItem>
-                      <SelectItem value="casual">Casual</SelectItem>
-                      <SelectItem value="humorous">Humorous</SelectItem>
-                      <SelectItem value="empathetic">Empathetic</SelectItem>
-                      <SelectItem value="authoritative">
-                        Authoritative
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="defineSocialMedia"
-                    checked={formData.defineSocialMedia}
-                    onChange={(e) =>
-                      updateFormData("defineSocialMedia", e.target.checked)
-                    }
-                    className="rounded border-gray-300"
-                  />
-                  <Label htmlFor="defineSocialMedia">
-                    Define using social media handles
-                  </Label>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="targetAudience">Target Audience *</Label>
-                  <Textarea
-                    id="targetAudience"
-                    value={formData.targetAudience}
-                    onChange={(e) =>
-                      updateFormData("targetAudience", e.target.value)
-                    }
-                    placeholder="Describe ideal users/customers"
-                    rows={4}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="faqsBestAnswers">FAQs & Best Answers</Label>
-                  <div className="space-y-3">
-                    <Textarea
-                      id="faqsBestAnswers"
-                      value={formData.faqsBestAnswers}
-                      onChange={(e) =>
-                        updateFormData("faqsBestAnswers", e.target.value)
-                      }
-                      placeholder="Enter questions and answers manually"
-                      rows={6}
-                    />
-                    <Button variant="outline" className="w-full bg-transparent">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload FAQ Document
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="conversationClosure">
-                    Conversation Closure Checklist
-                  </Label>
-                  <Textarea
-                    id="conversationClosure"
-                    value={formData.conversationClosure}
-                    onChange={(e) =>
-                      updateFormData("conversationClosure", e.target.value)
-                    }
-                    placeholder="Steps AI should follow to close a conversation appropriately"
-                    rows={4}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="newTopicsToLearn">
-                    New Topics for AI to Learn
-                  </Label>
-                  <div className="space-y-3">
-                    <Textarea
-                      id="newTopicsToLearn"
-                      value={formData.newTopicsToLearn}
-                      onChange={(e) =>
-                        updateFormData("newTopicsToLearn", e.target.value)
-                      }
-                      placeholder="Input new topics for AI learning"
-                      rows={3}
-                    />
-                    <Button variant="outline" className="w-full bg-transparent">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Learning Documents
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Governance */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    2
-                  </div>
-                  <h3 className="text-xl font-semibold">Governance</h3>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="aiGuardrails">AI Guardrails</Label>
-                  <div className="space-y-3">
-                    <Textarea
-                      id="aiGuardrails"
-                      value={formData.aiGuardrails}
-                      onChange={(e) =>
-                        updateFormData("aiGuardrails", e.target.value)
-                      }
-                      placeholder="List of restrictions or 'do not cross' rules for AI"
-                      rows={4}
-                    />
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        "No medical advice",
-                        "No legal advice",
-                        "No competitor mentions",
-                        "Professional tone only",
-                      ].map((rule) => (
-                        <div key={rule} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id={rule}
-                            className="rounded border-gray-300"
-                          />
-                          <Label htmlFor={rule} className="text-sm">
-                            {rule}
-                          </Label>
-                        </div>
-                      ))}
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        1
+                      </div>
+                      <h3 className="text-xl font-semibold">
+                        AI System Design
+                      </h3>
                     </div>
-                  </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="brandGuardrails">Brand Guardrails</Label>
-                  <div className="space-y-3">
-                    <Textarea
-                      id="brandGuardrails"
-                      value={formData.brandGuardrails}
-                      onChange={(e) =>
-                        updateFormData("brandGuardrails", e.target.value)
-                      }
-                      placeholder="Brand-specific guidelines or limitations"
-                      rows={4}
-                    />
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        "Mention sustainability",
-                        "Use inclusive language",
-                        "Reference quality guarantee",
-                        "Avoid pricing discussions",
-                      ].map((guideline) => (
-                        <div
-                          key={guideline}
-                          className="flex items-center space-x-2"
-                        >
-                          <input
-                            type="checkbox"
-                            id={guideline}
-                            className="rounded border-gray-300"
-                          />
-                          <Label htmlFor={guideline} className="text-sm">
-                            {guideline}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="marketingOptInCopy">
-                    Marketing Opt-In Copy
-                  </Label>
-                  <Textarea
-                    id="marketingOptInCopy"
-                    value={formData.marketingOptInCopy}
-                    onChange={(e) =>
-                      updateFormData("marketingOptInCopy", e.target.value)
-                    }
-                    placeholder="Copy used to request user consent for marketing communications"
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Media & Personalisation */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    3
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    Media & Personalisation
-                  </h3>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="discoveryQuestions">
-                    Discovery Questions
-                  </Label>
-                  <Textarea
-                    id="discoveryQuestions"
-                    value={formData.discoveryQuestions}
-                    onChange={(e) =>
-                      updateFormData("discoveryQuestions", e.target.value)
-                    }
-                    placeholder="Questions AI should ask to understand user preferences"
-                    rows={5}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Content Catalogue */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    4
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    Content Catalogue (Information Feed)
-                  </h3>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">
-                      Add content items for your AI agent to reference
-                    </p>
-                    <Button variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Content Item
-                    </Button>
-                  </div>
-
-                  <div className="border rounded-lg p-4 space-y-4">
                     <div className="space-y-2">
-                      <Label>Title</Label>
-                      <Input placeholder="Name of content item" />
-                    </div>
+                      <Label htmlFor="systemPromptCustomisation">
+                        System Prompt Customisation *
+                      </Label>
+                      <Textarea
+                        id="systemPromptCustomisation"
+                        value={formData.systemPromptCustomisation}
+                        onChange={(e) =>
+                          updateFormData(
+                            "systemPromptCustomisation",
+                            e.target.value
+                          )
+                        }
+                        placeholder="Customize the base AI system prompt to define your agent's personality, behavior, and response style"
+                        rows={5}
+                      />
+                    </div> */}
+              {/* 
                     <div className="space-y-2">
-                      <Label>Media</Label>
-                      <div className="flex space-x-2">
-                        <Input
-                          placeholder="Upload media files or link to external content"
-                          className="flex-1"
+                      <Label htmlFor="toneOfVoice">
+                        Tone of Voice / Communication Style
+                      </Label>
+                      <Select
+                        value={formData.toneOfVoice}
+                        onValueChange={(value) =>
+                          updateFormData("toneOfVoice", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="professional">
+                            Professional
+                          </SelectItem>
+                          <SelectItem value="friendly">Friendly</SelectItem>
+                          <SelectItem value="casual">Casual</SelectItem>
+                          <SelectItem value="humorous">Humorous</SelectItem>
+                          <SelectItem value="empathetic">Empathetic</SelectItem>
+                          <SelectItem value="authoritative">
+                            Authoritative
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div> */}
+
+              {/* <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="defineSocialMedia"
+                        checked={formData.defineSocialMedia}
+                        onChange={(e) =>
+                          updateFormData("defineSocialMedia", e.target.checked)
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <Label htmlFor="defineSocialMedia">
+                        Define using social media handles
+                      </Label>
+                    </div> */}
+
+              {/* <div className="space-y-2">
+                      <Label htmlFor="targetAudience">Target Audience *</Label>
+                      <Textarea
+                        id="targetAudience"
+                        value={formData.targetAudience}
+                        onChange={(e) =>
+                          updateFormData("targetAudience", e.target.value)
+                        }
+                        placeholder="Describe ideal users/customers"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="faqsBestAnswers">
+                        FAQs & Best Answers
+                      </Label>
+                      <div className="space-y-3">
+                        <Textarea
+                          id="faqsBestAnswers"
+                          value={formData.faqsBestAnswers}
+                          onChange={(e) =>
+                            updateFormData("faqsBestAnswers", e.target.value)
+                          }
+                          placeholder="Enter questions and answers manually"
+                          rows={6}
                         />
-                        <Button variant="outline" size="sm">
-                          <Upload className="h-4 w-4" />
+                        <Button
+                          variant="outline"
+                          className="w-full bg-transparent"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload FAQ Document
+                        </Button>
+                      </div>
+                    </div> */}
+
+              {/* <div className="space-y-2">
+                      <Label htmlFor="conversationClosure">
+                        Conversation Closure Checklist
+                      </Label>
+                      <Textarea
+                        id="conversationClosure"
+                        value={formData.conversationClosure}
+                        onChange={(e) =>
+                          updateFormData("conversationClosure", e.target.value)
+                        }
+                        placeholder="sections AI should follow to close a conversation appropriately"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="newTopicsToLearn">
+                        New Topics for AI to Learn
+                      </Label>
+                      <div className="space-y-3">
+                        <Textarea
+                          id="newTopicsToLearn"
+                          value={formData.newTopicsToLearn}
+                          onChange={(e) =>
+                            updateFormData("newTopicsToLearn", e.target.value)
+                          }
+                          placeholder="Input new topics for AI learning"
+                          rows={3}
+                        />
+                        <Button
+                          variant="outline"
+                          className="w-full bg-transparent"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Learning Documents
                         </Button>
                       </div>
                     </div>
+                  </div>
+
+                  <Separator /> */}
+
+              {/* Governance */}
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        2
+                      </div>
+                      <h3 className="text-xl font-semibold">Governance</h3>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label>Description</Label>
+                      <Label htmlFor="aiGuardrails">AI Guardrails</Label>
+                      <div className="space-y-3">
+                        <Textarea
+                          id="aiGuardrails"
+                          value={formData.aiGuardrails}
+                          onChange={(e) =>
+                            updateFormData("aiGuardrails", e.target.value)
+                          }
+                          placeholder="List of restrictions or 'do not cross' rules for AI"
+                          rows={4}
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            "No medical advice",
+                            "No legal advice",
+                            "No competitor mentions",
+                            "Professional tone only",
+                          ].map((rule) => (
+                            <div
+                              key={rule}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                id={rule}
+                                className="rounded border-gray-300"
+                              />
+                              <Label htmlFor={rule} className="text-sm">
+                                {rule}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="brandGuardrails">Brand Guardrails</Label>
+                      <div className="space-y-3">
+                        <Textarea
+                          id="brandGuardrails"
+                          value={formData.brandGuardrails}
+                          onChange={(e) =>
+                            updateFormData("brandGuardrails", e.target.value)
+                          }
+                          placeholder="Brand-specific guidelines or limitations"
+                          rows={4}
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            "Mention sustainability",
+                            "Use inclusive language",
+                            "Reference quality guarantee",
+                            "Avoid pricing discussions",
+                          ].map((guideline) => (
+                            <div
+                              key={guideline}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                id={guideline}
+                                className="rounded border-gray-300"
+                              />
+                              <Label htmlFor={guideline} className="text-sm">
+                                {guideline}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="marketingOptInCopy">
+                        Marketing Opt-In Copy
+                      </Label>
                       <Textarea
-                        placeholder="Short description of the content"
-                        rows={2}
+                        id="marketingOptInCopy"
+                        value={formData.marketingOptInCopy}
+                        onChange={(e) =>
+                          updateFormData("marketingOptInCopy", e.target.value)
+                        }
+                        placeholder="Copy used to request user consent for marketing communications"
+                        rows={3}
                       />
                     </div>
+                  </div>
+
+                  <Separator /> */}
+
+              {/* Media & Personalisation */}
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        3
+                      </div>
+                      <h3 className="text-xl font-semibold">
+                        Media & Personalisation
+                      </h3>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label>CTA</Label>
-                      <Input placeholder="Call-to-action link or text" />
+                      <Label htmlFor="discoveryQuestions">
+                        Discovery Questions
+                      </Label>
+                      <Textarea
+                        id="discoveryQuestions"
+                        value={formData.discoveryQuestions}
+                        onChange={(e) =>
+                          updateFormData("discoveryQuestions", e.target.value)
+                        }
+                        placeholder="Questions AI should ask to understand user preferences"
+                        rows={5}
+                      />
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <Separator />
+                  <Separator /> */}
+
+              {/* Content Catalogue */}
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        4
+                      </div>
+                      <h3 className="text-xl font-semibold">
+                        Content Catalogue (Information Feed)
+                      </h3>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm text-muted-foreground">
+                          Add content items for your AI agent to reference
+                        </p>
+                        <Button variant="outline" size="sm">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Content Item
+                        </Button>
+                      </div>
+
+                      <div className="border rounded-lg p-4 space-y-4">
+                        <div className="space-y-2">
+                          <Label>Title</Label>
+                          <Input placeholder="Name of content item" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Media</Label>
+                          <div className="flex space-x-2">
+                            <Input
+                              placeholder="Upload media files or link to external content"
+                              className="flex-1"
+                            />
+                            <Button variant="outline" size="sm">
+                              <Upload className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Description</Label>
+                          <Textarea
+                            placeholder="Short description of the content"
+                            rows={2}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>CTA</Label>
+                          <Input placeholder="Call-to-action link or text" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator /> */}
 
               {/* Product Catalogue */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    5
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    Product Catalogue (Subscription Plans)
-                  </h3>
-                </div>
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        5
+                      </div>
+                      <h3 className="text-xl font-semibold">
+                        Product Catalogue (Subscription Plans)
+                      </h3>
+                    </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="productPlans">Product / Plan</Label>
-                    <Textarea
-                      id="productPlans"
-                      value={formData.productPlans}
-                      onChange={(e) =>
-                        updateFormData("productPlans", e.target.value)
-                      }
-                      placeholder="List products or subscription plans with details"
-                      rows={6}
-                    />
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="productPlans">Product / Plan</Label>
+                        <Textarea
+                          id="productPlans"
+                          value={formData.productPlans}
+                          onChange={(e) =>
+                            updateFormData("productPlans", e.target.value)
+                          }
+                          placeholder="List products or subscription plans with details"
+                          rows={6}
+                        />
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="w-full bg-transparent"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload CSV Product Catalog
+                      </Button>
+                    </div>
                   </div>
-                  <Button variant="outline" className="w-full bg-transparent">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload CSV Product Catalog
-                  </Button>
-                </div>
-              </div>
 
-              <Separator />
+                  <Separator /> */}
 
               {/* Contextual Signals */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    6
-                  </div>
-                  <h3 className="text-xl font-semibold">
-                    Contextual Signals (APIs / Feeds)
-                  </h3>
-                </div>
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        6
+                      </div>
+                      <h3 className="text-xl font-semibold">
+                        Contextual Signals (APIs / Feeds)
+                      </h3>
+                    </div>
 
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground">
-                      Provide URLs for dynamic data sources
-                    </p>
-                    <Button variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add API Feed
-                    </Button>
-                  </div>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm text-muted-foreground">
+                          Provide URLs for dynamic data sources
+                        </p>
+                        <Button variant="outline" size="sm">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add API Feed
+                        </Button>
+                      </div>
 
-                  <div className="border rounded-lg p-4 space-y-4">
-                    <div className="space-y-2">
-                      <Label>API / Feed URL</Label>
-                      <Input
-                        type="url"
-                        placeholder="https://api.example.com/feed"
-                      />
+                      <div className="border rounded-lg p-4 space-y-4">
+                        <div className="space-y-2">
+                          <Label>API / Feed URL</Label>
+                          <Input
+                            type="url"
+                            placeholder="https://api.example.com/feed"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <Separator />
+                  <Separator /> */}
 
               {/* Generation Settings */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                    7
+              {/* <div className="space-y-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        7
+                      </div>
+                      <h3 className="text-xl font-semibold">
+                        Generation Settings
+                      </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <Label>Tone / Voice</Label>
+                          <div className="px-3">
+                            <Slider
+                              value={formData.toneVoiceSlider}
+                              onValueChange={(value) =>
+                                updateFormData("toneVoiceSlider", value)
+                              }
+                              max={100}
+                              step={1}
+                              className="w-full"
+                            />
+                            <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                              <span>Formal</span>
+                              <span>{formData.toneVoiceSlider[0]}%</span>
+                              <span>Casual</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <Label>Emotionality</Label>
+                          <div className="px-3">
+                            <Slider
+                              value={formData.emotionality}
+                              onValueChange={(value) =>
+                                updateFormData("emotionality", value)
+                              }
+                              max={100}
+                              step={1}
+                              className="w-full"
+                            />
+                            <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                              <span>Neutral</span>
+                              <span>{formData.emotionality[0]}%</span>
+                              <span>Expressive</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <Label>
+                            Temperature (Assertiveness / Creativity)
+                          </Label>
+                          <div className="px-3">
+                            <Slider
+                              value={formData.temperature}
+                              onValueChange={(value) =>
+                                updateFormData("temperature", value)
+                              }
+                              max={100}
+                              step={1}
+                              className="w-full"
+                            />
+                            <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                              <span>Conservative</span>
+                              <span>{formData.temperature[0]}%</span>
+                              <span>Creative</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <Label>Message Length</Label>
+                          <div className="px-3">
+                            <Slider
+                              value={formData.messageLength}
+                              onValueChange={(value) =>
+                                updateFormData("messageLength", value)
+                              }
+                              max={100}
+                              step={1}
+                              className="w-full"
+                            />
+                            <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                              <span>Concise</span>
+                              <span>{formData.messageLength[0]}%</span>
+                              <span>Detailed</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          <Label>Chatty / Clicky</Label>
+                          <div className="px-3">
+                            <Slider
+                              value={formData.chattyClinky}
+                              onValueChange={(value) =>
+                                updateFormData("chattyClinky", value)
+                              }
+                              max={100}
+                              step={1}
+                              className="w-full"
+                            />
+                            <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                              <span>Action-focused</span>
+                              <span>{formData.chattyClinky[0]}%</span>
+                              <span>Conversational</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold">Generation Settings</h3>
                 </div>
+              )} */}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label>Tone / Voice</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={formData.toneVoiceSlider}
-                          onValueChange={(value) =>
-                            updateFormData("toneVoiceSlider", value)
-                          }
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                          <span>Formal</span>
-                          <span>{formData.toneVoiceSlider[0]}%</span>
-                          <span>Casual</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label>Emotionality</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={formData.emotionality}
-                          onValueChange={(value) =>
-                            updateFormData("emotionality", value)
-                          }
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                          <span>Neutral</span>
-                          <span>{formData.emotionality[0]}%</span>
-                          <span>Expressive</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label>Temperature (Assertiveness / Creativity)</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={formData.temperature}
-                          onValueChange={(value) =>
-                            updateFormData("temperature", value)
-                          }
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                          <span>Conservative</span>
-                          <span>{formData.temperature[0]}%</span>
-                          <span>Creative</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <Label>Message Length</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={formData.messageLength}
-                          onValueChange={(value) =>
-                            updateFormData("messageLength", value)
-                          }
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                          <span>Concise</span>
-                          <span>{formData.messageLength[0]}%</span>
-                          <span>Detailed</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <Label>Chatty / Clicky</Label>
-                      <div className="px-3">
-                        <Slider
-                          value={formData.chattyClinky}
-                          onValueChange={(value) =>
-                            updateFormData("chattyClinky", value)
-                          }
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                          <span>Action-focused</span>
-                          <span>{formData.chattyClinky[0]}%</span>
-                          <span>Conversational</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* WhatsApp Native Fields */}
-          {currentStep === 2 && (
-            <div className="space-y-8">
+              {/* WhatsApp Native Fields */}
+              {/* {currentStep === 2 && (
+            <div className="space-y-8"> */}
               {/* Quick Reply Buttons */}
-              <div className="space-y-6">
+              {/* <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     1
@@ -1040,12 +1074,12 @@ export default function AgentBuilderContainer({
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              <Separator />
+              {/* <Separator /> */}
 
               {/* Call-To-Action Buttons */}
-              <div className="space-y-6">
+              {/* <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     2
@@ -1137,10 +1171,10 @@ export default function AgentBuilderContainer({
                 </div>
               </div>
 
-              <Separator />
+              <Separator /> */}
 
               {/* List Messages */}
-              <div className="space-y-6">
+              {/* <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                     3
@@ -1247,11 +1281,11 @@ export default function AgentBuilderContainer({
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            </div> */}
+              {/* )} */}
 
-          {/* Experience */}
-          {currentStep === 3 && (
+              {/* Experience */}
+              {/* {currentStep === 3 && (
             <div className="space-y-8">
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-4">
@@ -1328,9 +1362,9 @@ export default function AgentBuilderContainer({
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
-          {currentStep === 8 && (
+              {/* {currentStep === 8 && (
             <div className="space-y-6">
               <div className="text-center py-8">
                 <TestTube className="h-16 w-16 text-green-600 mx-auto mb-4" />
@@ -1380,34 +1414,34 @@ export default function AgentBuilderContainer({
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
-          {/* Progress Bar for Agent Builder */}
-          {/* <AgentBuilderProgressBar currentStep={currentStep} steps={steps} /> */}
+              {/* Progress Bar for Agent Builder */}
+              {/* <AgentBuilderProgressBar currentStep={currentStep} sections={sections} /> */}
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between pt-6 border-t">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 0}
-            >
-              Previous
-            </Button>
-
-            <div className="flex space-x-3">
-              <Button variant="outline">Save Draft</Button>
-              {currentStep === steps.length - 1 ? (
-                <Button className="bg-secondary hover:bg-secondary/90">
-                  Deploy Agent
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6 border-t">
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 0}
+                >
+                  Previous
                 </Button>
-              ) : (
-                <Button onClick={nextStep}>Next Step</Button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
+                <div className="flex space-x-3">
+                  {/* <Button variant="outline">Save Draft</Button> */}
+                  {currentStep === sections.length - 1 ? (
+                    <Button type="submit">Deploy Agent</Button>
+                  ) : (
+                    <Button onClick={nextStep}>Next</Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </form>
+      </Form>
     </div>
   );
 }
