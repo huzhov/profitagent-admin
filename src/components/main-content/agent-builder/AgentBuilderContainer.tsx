@@ -32,7 +32,7 @@ import {
 } from "./schema";
 import { useState } from "react";
 import type { AgentBuilderStep } from "./types";
-import { Step } from "./types";
+import { BusinessVertical, Step } from "./types";
 
 const steps: AgentBuilderStep[] = [
   { id: Step.Profile, title: "Agent Program", icon: Bot },
@@ -60,13 +60,9 @@ export default function AgentBuilderContainer() {
       "waAuthToken",
       "wabaPhoneNumberId",
       "wabaId",
-      "waLinkUrl",
+      "waDisplayPhoneNumber",
     ],
-    [Step.Config]: [
-      "systemPromptCustomisation",
-      "toneOfVoice",
-      // Add other required step 1 fields you want to gate navigation on
-    ],
+    [Step.Config]: ["systemPromptCustomisation", "toneOfVoice"],
   };
 
   const nextStep = async () => {
@@ -172,25 +168,33 @@ export default function AgentBuilderContainer() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="entertainment">
+                                <SelectItem
+                                  value={BusinessVertical.Entertainment}
+                                >
                                   Entertainment
                                 </SelectItem>
-                                <SelectItem value="ecommerce">
+                                <SelectItem value={BusinessVertical.Ecommerce}>
                                   E-commerce
                                 </SelectItem>
-                                <SelectItem value="saas">SaaS</SelectItem>
-                                <SelectItem value="retail">Retail</SelectItem>
-                                <SelectItem value="healthcare">
+                                <SelectItem value={BusinessVertical.Saas}>
+                                  SaaS
+                                </SelectItem>
+                                <SelectItem value={BusinessVertical.Retail}>
+                                  Retail
+                                </SelectItem>
+                                <SelectItem value={BusinessVertical.Healthcare}>
                                   Healthcare
                                 </SelectItem>
-                                <SelectItem value="finance">Finance</SelectItem>
-                                <SelectItem value="education">
+                                <SelectItem value={BusinessVertical.Finance}>
+                                  Finance
+                                </SelectItem>
+                                <SelectItem value={BusinessVertical.Education}>
                                   Education
                                 </SelectItem>
-                                <SelectItem value="travel">
+                                <SelectItem value={BusinessVertical.Travel}>
                                   Travel & Hospitality
                                 </SelectItem>
-                                <SelectItem value="realestate">
+                                <SelectItem value={BusinessVertical.RealEstate}>
                                   Real Estate
                                 </SelectItem>
                               </SelectContent>
@@ -279,16 +283,16 @@ export default function AgentBuilderContainer() {
                       <div className="space-y-2">
                         <FormField
                           control={form.control}
-                          name="waLinkUrl"
+                          name="waDisplayPhoneNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel htmlFor="waLinkUrl">
-                                WA Link URL *
+                              <FormLabel htmlFor="waDisplayPhoneNumber">
+                                WA Display Phone Number *
                               </FormLabel>
                               <FormControl>
                                 <Input
                                   {...field}
-                                  placeholder="WhatsApp Business Account URL user to be navigated to"
+                                  placeholder="WhatsApp Business Account display phone number"
                                 />
                               </FormControl>
                               <FormMessage />

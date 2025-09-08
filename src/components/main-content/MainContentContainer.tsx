@@ -2,7 +2,7 @@ import AgentBuilderContainer from "./agent-builder/AgentBuilderContainer";
 import UsersManagement from "./UsersManagement";
 import Reporting from "./Reporting";
 import Agents from "./Agents";
-import Messages from "./Messages";
+import Messages from "./messages/Messages";
 
 enum NavbarSection {
   Builder = "builder",
