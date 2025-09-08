@@ -1,4 +1,4 @@
-import type { ProgressStep } from "../../../types";
+import type { AgentBuilderStep } from "./types";
 import { Badge } from "../../ui/badge";
 
 export default function AgentBuilderProgressBar({
@@ -6,7 +6,7 @@ export default function AgentBuilderProgressBar({
   steps,
 }: {
   currentStep: number;
-  steps: ProgressStep[];
+  steps: AgentBuilderStep[];
 }) {
   const currentProgress = ((currentStep + 1) / steps.length) * 100;
 

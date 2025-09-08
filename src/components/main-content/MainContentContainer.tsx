@@ -1,4 +1,3 @@
-import type { ProgressStep } from "../../types";
 import AgentBuilderContainer from "./agent-builder/AgentBuilderContainer";
 import UsersManagement from "./UsersManagement";
 import Reporting from "./Reporting";
@@ -14,28 +13,16 @@ enum NavbarSection {
 }
 
 export default function MainContentContainer({
-  currentStep,
-  setCurrentStep,
-  steps,
   activeSection,
   setActiveSection,
 }: {
-  currentStep: number;
-  setCurrentStep: (step: number) => void;
-  steps: ProgressStep[];
   activeSection: string;
   setActiveSection: (section: string) => void;
 }) {
   return (
     <main className="flex-1 overflow-auto">
       <div className="container mx-auto px-8 py-8">
-        {activeSection === NavbarSection.Builder && (
-          <AgentBuilderContainer
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-            steps={steps}
-          />
-        )}
+        {activeSection === NavbarSection.Builder && <AgentBuilderContainer />}
         {activeSection === NavbarSection.Admin && <UsersManagement />}
         {activeSection === NavbarSection.Reporting && <Reporting />}
         {activeSection === NavbarSection.Agents && (
