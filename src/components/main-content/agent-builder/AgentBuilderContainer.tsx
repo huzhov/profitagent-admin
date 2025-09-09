@@ -1,5 +1,7 @@
 import { Card, CardContent } from "../../ui/card";
-import axios from "axios";
+import { apiJson } from "@/lib/http";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
 import {
@@ -30,9 +32,9 @@ import {
   defaultValues,
   type AgentBuilderFormValues,
 } from "./schema";
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 import type { AgentBuilderStep } from "./types";
-import { BusinessVertical, Step } from "./types";
+import { Step } from "./types";
 
 const steps: AgentBuilderStep[] = [
   { id: Step.Profile, title: "Agent Program", icon: Bot },
@@ -42,6 +44,7 @@ const steps: AgentBuilderStep[] = [
 ];
 
 export default function AgentBuilderContainer() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(steps[0].id);
   const currentStepIndex = steps.findIndex(
     (section) => section.id === currentStep
@@ -55,8 +58,8 @@ export default function AgentBuilderContainer() {
   // Define which fields belong to each step so we can validate only those
   const stepFields: Record<string, (keyof AgentBuilderFormValues)[]> = {
     [Step.Profile]: [
-      "brandName",
-      "category",
+      "agentName",
+      // "category",
       "waAuthToken",
       "wabaPhoneNumberId",
       "wabaId",
@@ -65,7 +68,10 @@ export default function AgentBuilderContainer() {
     [Step.Config]: ["systemPromptCustomisation", "toneOfVoice"],
   };
 
-  const nextStep = async () => {
+  const nextStep = async (e?: MouseEvent<HTMLButtonElement>) => {
+    // Extra guard: ensure clicking this button never submits the form
+    e?.preventDefault();
+    e?.stopPropagation();
     // Trigger validation only for the current step's fields
     const fieldsToValidate = stepFields[currentStep] || [];
     const isValid = await form.trigger(fieldsToValidate as any, {
@@ -78,25 +84,26 @@ export default function AgentBuilderContainer() {
     }
   };
 
-  const prevStep = () => {
+  const prevStep = (e?: MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     if (currentStepIndex && currentStepIndex > 0) {
       setCurrentStep(steps[currentStepIndex - 1].id);
     }
   };
 
   const submitForm = async (values: AgentBuilderFormValues) => {
-    console.log("smth");
     console.log("Submitting form values:", values);
-    return;
-    const payload = {
-      waAuthToken: values.waAuthToken,
-      wabaPhoneNumberId: values.wabaPhoneNumberId,
-      wabaId: values.wabaId,
-      name: values.brandName,
-      vertical: values.category,
-    };
-
-    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/clients`, payload);
+    await apiJson(`${import.meta.env.VITE_BACKEND_URL}/agents`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...values,
+        businessId: localStorage.getItem("businessId"),
+      }),
+    });
+    toast.success("Form submitted successfully");
+    navigate({ to: "/" });
   };
 
   return (
@@ -112,7 +119,7 @@ export default function AgentBuilderContainer() {
 
       {/* Form Content */}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(submitForm)}>
+        <form onSubmit={(e) => e.preventDefault()}>
           <Card>
             <CardContent className="space-y-6">
               {/* Section 1: Agent Program */}
@@ -131,17 +138,14 @@ export default function AgentBuilderContainer() {
                       <div className="space-y-2">
                         <FormField
                           control={form.control}
-                          name="brandName"
+                          name="agentName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel htmlFor="brandName">
-                                Brand Name *
+                              <FormLabel htmlFor="agentName">
+                                Agent Name *
                               </FormLabel>
                               <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="Brand/company name"
-                                />
+                                <Input {...field} placeholder="Agent name" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -150,7 +154,7 @@ export default function AgentBuilderContainer() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <FormField
                         control={form.control}
                         name="category"
@@ -203,7 +207,7 @@ export default function AgentBuilderContainer() {
                           </FormItem>
                         )}
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   <Separator />
@@ -524,7 +528,7 @@ export default function AgentBuilderContainer() {
                       <div className="space-y-4">
                         <div className="bg-green-600 text-white p-3 rounded-lg rounded-br-sm text-left">
                           <p className="text-sm">
-                            Hi! I'm your {formData.brandName || "AI"} assistant.
+                            Hi! I'm your {formData.agentName || "AI"} assistant.
                             How can I help you today?
                           </p>
                         </div>
@@ -568,6 +572,7 @@ export default function AgentBuilderContainer() {
               {/* Navigation Buttons */}
               <div className="flex justify-between pt-6 border-t">
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={prevStep}
                   disabled={currentStepIndex === 0}
@@ -578,7 +583,12 @@ export default function AgentBuilderContainer() {
                 <div className="flex space-x-3">
                   {/* <Button variant="outline">Save Draft</Button> */}
                   {currentStepIndex === steps.length - 1 ? (
-                    <Button type="submit">Deploy Agent</Button>
+                    <Button
+                      type="button"
+                      onClick={() => form.handleSubmit(submitForm)()}
+                    >
+                      Deploy Agent
+                    </Button>
                   ) : (
                     <Button type="button" onClick={nextStep}>
                       Next

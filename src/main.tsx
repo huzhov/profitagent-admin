@@ -2,6 +2,8 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import "./index.css";
+import { setupGlobalErrorHandling } from "@/lib/errorHandler";
+import { Toaster } from "@/components/ui/sonner";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -19,10 +21,15 @@ declare module "@tanstack/react-router" {
 // Render the app
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
+  // install global error handlers once at startup
+  setupGlobalErrorHandling();
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <>
+        <RouterProvider router={router} />
+        <Toaster position="bottom-center" richColors />
+      </>
     </StrictMode>
   );
 }

@@ -3,8 +3,8 @@ import { BusinessVertical } from "./types";
 
 export const agentBuilderSchema = z.object({
   // Profile
-  brandName: z.string().min(2, "Brand name is required"),
-  category: z.enum(BusinessVertical),
+  agentName: z.string().min(2, "Agent name is required"),
+  // category: z.enum(BusinessVertical),
 
   // Integrations
   waAuthToken: z.string().min(1, "WA Auth Token is required"),
@@ -27,7 +27,7 @@ export type AgentBuilderFormValues = z.infer<typeof agentBuilderSchema>;
 export const defaultValues: Omit<AgentBuilderFormValues, "category"> & {
   category: BusinessVertical | undefined;
 } = {
-  brandName: "",
+  agentName: "",
   category: undefined,
   waAuthToken: "",
   wabaPhoneNumberId: "",
