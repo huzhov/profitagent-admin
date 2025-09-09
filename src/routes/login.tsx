@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { login } from "@/lib/auth";
 import {
   Form,
   FormControl,
@@ -31,12 +32,10 @@ function LoginPage() {
   });
 
   async function onSubmit(values: z.infer<typeof schema>) {
-    // Simulate auth request
-    await new Promise((r) => setTimeout(r, 400));
-    // Reference values to satisfy no-unused-vars and illustrate usage
-    if (!values.email || !values.password) return;
-    // Navigate to home after "login"
-    navigate({ to: "/" });
+    const res = await login(values.email, values.password);
+    if (res.token) {
+      navigate({ to: "/" });
+    }
   }
 
   return (

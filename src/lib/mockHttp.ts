@@ -1,4 +1,5 @@
 import type { Message } from "@/types";
+import { apiFetch } from "@/lib/http";
 
 export type ConversationSummary = {
   id: string;
@@ -19,7 +20,7 @@ export async function fetchMessages(
   if (delayMs > 0) {
     await new Promise((r) => setTimeout(r, delayMs));
   }
-  const res = await fetch("/mock/messagesByConversation.json", {
+  const res = await apiFetch("/mock/messagesByConversation.json", {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Failed to fetch messages map: ${res.status}`);
@@ -36,7 +37,7 @@ export async function fetchConversations(
   if (delayMs > 0) {
     await new Promise((r) => setTimeout(r, delayMs));
   }
-  const res = await fetch("/mock/conversations.json", { cache: "no-store" });
+  const res = await apiFetch("/mock/conversations.json", { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch conversations: ${res.status}`);
   let list: ConversationSummary[] = await res.json();
   if (clientId) list = list.filter((c) => c.client_id === clientId);
@@ -53,7 +54,7 @@ export async function fetchMessagesByConversation(
   if (delayMs > 0) {
     await new Promise((r) => setTimeout(r, delayMs));
   }
-  const res = await fetch("/mock/messagesByConversation.json", {
+  const res = await apiFetch("/mock/messagesByConversation.json", {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Failed to fetch messages map: ${res.status}`);
@@ -65,7 +66,7 @@ export async function fetchConversationMessages(
   delayMs = 180
 ): Promise<Message[]> {
   if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
-  const res = await fetch("/mock/messagesByConversation.json", {
+  const res = await apiFetch("/mock/messagesByConversation.json", {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Failed to fetch messages map: ${res.status}`);
