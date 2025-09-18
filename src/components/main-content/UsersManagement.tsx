@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -24,78 +23,61 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 
+const integrations = [
+  {
+    id: 1,
+    name: "WhatsApp Business API - Main Store",
+    status: "Connected",
+    lastSync: "2024-01-15 10:30 AM",
+    accountId: "123456789",
+    phoneNumber: "+1-555-0123",
+  },
+  {
+    id: 2,
+    name: "WhatsApp Business API - Fashion Line",
+    status: "Connected",
+    lastSync: "2024-01-15 09:15 AM",
+    accountId: "987654321",
+    phoneNumber: "+1-555-0124",
+  },
+  {
+    id: 3,
+    name: "WhatsApp Business API - Electronics",
+    status: "Disconnected",
+    lastSync: "Never",
+    accountId: "",
+    phoneNumber: "",
+  },
+];
+
+// const users = [
+//   {
+//     id: 1,
+//     name: "John Doe",
+//     email: "john@company.com",
+//     role: "Admin",
+//     status: "Active",
+//     lastLogin: "2024-01-15",
+//   },
+//   {
+//     id: 2,
+//     name: "Jane Smith",
+//     email: "jane@company.com",
+//     role: "Editor",
+//     status: "Active",
+//     lastLogin: "2024-01-14",
+//   },
+//   {
+//     id: 3,
+//     name: "Mike Johnson",
+//     email: "mike@company.com",
+//     role: "Viewer",
+//     status: "Inactive",
+//     lastLogin: "2024-01-10",
+//   },
+// ];
+
 export default function UsersManagement() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@company.com",
-      role: "Admin",
-      status: "Active",
-      lastLogin: "2024-01-15",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@company.com",
-      role: "Editor",
-      status: "Active",
-      lastLogin: "2024-01-14",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@company.com",
-      role: "Viewer",
-      status: "Inactive",
-      lastLogin: "2024-01-10",
-    },
-  ]);
-
-  const toggleUserStatus = (userId: number) => {
-    setUsers(
-      users.map((user) =>
-        user.id === userId
-          ? {
-              ...user,
-              status: user.status === "Active" ? "Inactive" : "Active",
-            }
-          : user
-      )
-    );
-  };
-
-  const deleteUser = (userId: number) => {
-    setUsers(users.filter((user) => user.id !== userId));
-  };
-
-  const [integrations, setIntegrations] = useState([
-    {
-      id: 1,
-      name: "WhatsApp Business API - Main Store",
-      status: "Connected",
-      lastSync: "2024-01-15 10:30 AM",
-      accountId: "123456789",
-      phoneNumber: "+1-555-0123",
-    },
-    {
-      id: 2,
-      name: "WhatsApp Business API - Fashion Line",
-      status: "Connected",
-      lastSync: "2024-01-15 09:15 AM",
-      accountId: "987654321",
-      phoneNumber: "+1-555-0124",
-    },
-    {
-      id: 3,
-      name: "WhatsApp Business API - Electronics",
-      status: "Disconnected",
-      lastSync: "Never",
-      accountId: "",
-      phoneNumber: "",
-    },
-  ]);
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
