@@ -65,19 +65,24 @@ export default function AgentBuilderContainer() {
       "wabaId",
       "waDisplayPhoneNumber",
     ],
-    [Step.Config]: ["systemPromptCustomisation", "toneOfVoice"],
+    [Step.Config]: [
+      "systemPromptCustomisation",
+      "toneOfVoice",
+      "aiGuardrails",
+      "faqsBestAnswers",
+      "productPlans",
+    ],
   };
 
   const nextStep = async (e?: MouseEvent<HTMLButtonElement>) => {
-    // Extra guard: ensure clicking this button never submits the form
     e?.preventDefault();
     e?.stopPropagation();
     // Trigger validation only for the current step's fields
     const fieldsToValidate = stepFields[currentStep] || [];
-    const isValid = await form.trigger(fieldsToValidate as any, {
+    const isValid = await form.trigger(fieldsToValidate, {
       shouldFocus: true,
     });
-    if (!isValid) return; // Stop if step invalid
+    if (!isValid) return;
 
     if (currentStepIndex < steps.length - 1) {
       setCurrentStep(steps[currentStepIndex + 1].id);
@@ -93,16 +98,22 @@ export default function AgentBuilderContainer() {
   };
 
   const submitForm = async (values: AgentBuilderFormValues) => {
-    console.log("Submitting form values:", values);
+    const filteredValues = Object.fromEntries(
+      Object.entries(values).filter(([_, v]) => !!v)
+    );
+    const mappedValues = {
+      ...filteredValues,
+      aiGuardrails: filteredValues.aiGuardrails?.length
+        ? filteredValues.aiGuardrails
+        : [],
+      businessId: localStorage.getItem("businessId"),
+    };
     await apiJson(`${import.meta.env.VITE_BACKEND_URL}/agents`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...values,
-        businessId: localStorage.getItem("businessId"),
-      }),
+      body: JSON.stringify(mappedValues),
     });
-    toast.success("Form submitted successfully");
+    toast.success("Agent has been created successfully");
     navigate({ to: "/" });
   };
 
@@ -433,10 +444,11 @@ export default function AgentBuilderContainer() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="aiGuardrails">AI Guardrails</Label>
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
-                          {[
+                      <FormField
+                        control={form.control}
+                        name="aiGuardrails"
+                        render={({ field }) => {
+                          const options = [
                             "No medical advice",
                             "No legal advice",
                             "No competitor mentions",
@@ -445,23 +457,47 @@ export default function AgentBuilderContainer() {
                             "Use inclusive language",
                             "Reference quality guarantee",
                             "Avoid pricing discussions",
-                          ].map((rule) => (
-                            <div
-                              key={rule}
-                              className="flex items-center space-x-2"
-                            >
-                              <input
-                                type="checkbox"
-                                id={rule}
-                                className="rounded border-gray-300"
-                              />
-                              <Label htmlFor={rule} className="text-sm">
-                                {rule}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                          ];
+                          const value: string[] = Array.isArray(field.value)
+                            ? field.value
+                            : [];
+                          const toggle = (rule: string) => {
+                            const next = value.includes(rule)
+                              ? value.filter((r) => r !== rule)
+                              : [...value, rule];
+                            field.onChange(next);
+                          };
+                          return (
+                            <FormItem>
+                              <FormLabel htmlFor="aiGuardrails">
+                                AI Guardrails
+                              </FormLabel>
+                              <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                  {options.map((rule) => (
+                                    <div
+                                      key={rule}
+                                      className="flex items-center space-x-2"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        id={rule}
+                                        className="rounded border-gray-300"
+                                        checked={value.includes(rule)}
+                                        onChange={() => toggle(rule)}
+                                      />
+                                      <Label htmlFor={rule} className="text-sm">
+                                        {rule}
+                                      </Label>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          );
+                        }}
+                      />
                     </div>
                   </div>
 
@@ -471,7 +507,7 @@ export default function AgentBuilderContainer() {
                   <div className="space-y-6">
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="h-8 w-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                        5
+                        3
                       </div>
                       <h3 className="text-xl font-semibold">
                         Product Catalogue (Subscription Plans)

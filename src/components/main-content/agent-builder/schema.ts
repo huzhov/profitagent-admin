@@ -17,7 +17,7 @@ export const agentBuilderSchema = z.object({
   // Config
   systemPromptCustomisation: z.string().max(2000),
   toneOfVoice: z.string(),
-  aiGuardrails: z.string(),
+  aiGuardrails: z.array(z.string()),
   faqsBestAnswers: z.string().max(4000),
   productPlans: z.string().max(4000),
 });
@@ -35,7 +35,7 @@ export const defaultValues: Omit<AgentBuilderFormValues, "category"> & {
   waDisplayPhoneNumber: "",
   systemPromptCustomisation: "",
   toneOfVoice: "professional",
-  aiGuardrails: "",
+  aiGuardrails: [],
   faqsBestAnswers: "",
   productPlans: "",
 };
