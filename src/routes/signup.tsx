@@ -46,7 +46,7 @@ function SignupPage() {
   const fbLoginCallback = (response: any) => {
     if (response.authResponse) {
       const code = response.authResponse.code;
-      console.log("response: ", code); // remove after testing
+      console.log("response code: ", code); // remove after testing
       // your code goes here
     } else {
       console.log("response: ", response); // remove after testing

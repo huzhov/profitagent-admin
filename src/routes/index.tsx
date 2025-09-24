@@ -10,9 +10,12 @@ export const Route = createFileRoute("/")({
 function Index() {
   useEffect(() => {
     const handler = (event: MessageEvent) => {
+      console.log("message event: ", event);
       if (event.origin !== "https://www.facebook.com") return;
       try {
         const payload = JSON.parse(event.data);
+        console.log("message event: ", payload);
+
         if (payload.type === "WA_EMBEDDED_SIGNUP") {
           console.log("message event: ", payload);
           // payload.data contains { waba_id, phone_number_id, business_id }
