@@ -5,7 +5,6 @@ import { useEffect } from "react";
 const RootLayout = () => {
   useEffect(() => {
     const handler = (event: MessageEvent) => {
-      console.log("message event: ", event);
       if (!event.origin.endsWith("facebook.com")) return;
       try {
         const payload = JSON.parse(event.data);

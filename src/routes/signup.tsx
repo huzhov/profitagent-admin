@@ -12,10 +12,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { apiJson } from "@/lib/http";
 
 const schema = z
   .object({
-    email: z.string().email("Enter a valid email"),
+    email: z.email("Enter a valid email"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Please confirm your password"),
   })
@@ -42,19 +43,21 @@ function SignupPage() {
     navigate({ to: "/" });
   }
 
-  // Response callback
-  const fbLoginCallback = (response: any) => {
+  const fbLoginCallback = (response: fb.StatusResponse) => {
     if (response.authResponse) {
       const code = response.authResponse.code;
       console.log("response code: ", code); // remove after testing
-      // your code goes here
+      apiJson(`${import.meta.env.VITE_BACKEND_URL}/auth/whatsapp/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
     } else {
       console.log("response: ", response); // remove after testing
       // your code goes here
     }
   };
 
-  // Launch method and callback registration
   const launchWhatsAppSignup = () => {
     if (!window.FB) {
       console.error("Facebook SDK not loaded");
