@@ -68,6 +68,7 @@ function SignupPage() {
       config_id: import.meta.env.VITE_EMBEDDED_SIGNUP_CONFIGURATION_ID,
       response_type: "code",
       override_default_response_type: true,
+      extras: { version: "v3" },
     });
   };
 
