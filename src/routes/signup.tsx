@@ -13,10 +13,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { apiJson } from "@/lib/http";
+import { signup } from "@/lib/auth";
 
 const schema = z
   .object({
     email: z.email("Enter a valid email"),
+    name: z.string().min(2, "Name must be at least 2 characters"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Please confirm your password"),
   })
@@ -33,14 +35,15 @@ function SignupPage() {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    defaultValues: { email: "", name: "", password: "", confirmPassword: "" },
     mode: "onSubmit",
   });
 
   async function onSubmit(values: z.infer<typeof schema>) {
-    await new Promise((r) => setTimeout(r, 500));
-    if (!values.email || !values.password) return;
-    navigate({ to: "/" });
+    const res = await signup(values);
+    if (res.token) {
+      navigate({ to: "/" });
+    }
   }
 
   const fbLoginCallback = (response: fb.StatusResponse) => {
@@ -82,6 +85,20 @@ function SignupPage() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="email"

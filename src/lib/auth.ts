@@ -64,6 +64,53 @@ export async function login(
   return data;
 }
 
+export async function signup({
+  email,
+  name,
+  password,
+}: {
+  email: string;
+  name: string;
+  password: string;
+}): Promise<LoginResponse> {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, name, password }),
+  });
+  console.log("signup response", res);
+  // Let the improved http error parsing logic run here too
+  if (!res.ok) {
+    // Try to parse server-provided error message
+    const ct = res.headers.get("content-type") || "";
+    let msg = "Login failed";
+    if (ct.includes("application/json")) {
+      try {
+        const data = await res.clone().json();
+        msg =
+          data.message ||
+          data.error?.message ||
+          data.error ||
+          data.detail ||
+          data.title ||
+          msg;
+      } catch {}
+    }
+    if (!ct.includes("application/json")) {
+      try {
+        const t = await res.clone().text();
+        if (t && t.trim()) msg = t.trim();
+      } catch {}
+    }
+    throw new Error(`${msg} (${res.status})`);
+  }
+  const data = (await res.json()) as LoginResponse;
+  if (!data?.token) throw new Error("Invalid login response: missing token");
+  setToken(data.token);
+  localStorage.setItem("businessId", data.user.businessId);
+  return data;
+}
+
 export function logout() {
   setToken(null);
 }
