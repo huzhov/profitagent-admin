@@ -60,7 +60,7 @@ export async function login(
   const data = (await res.json()) as LoginResponse;
   if (!data?.token) throw new Error("Invalid login response: missing token");
   setToken(data.token);
-  localStorage.setItem("businessId", data.user.businessId);
+  localStorage.setItem("user", JSON.stringify(data.user));
   return data;
 }
 
@@ -107,7 +107,7 @@ export async function signup({
   const data = (await res.json()) as LoginResponse;
   if (!data?.token) throw new Error("Invalid login response: missing token");
   setToken(data.token);
-  localStorage.setItem("businessId", data.user.businessId);
+  localStorage.setItem("user", JSON.stringify(data.user));
   return data;
 }
 

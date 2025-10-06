@@ -21,6 +21,8 @@ export default defineConfig({
   },
   // uncomment to test embedded signup flow locally
   // server: {
-  //   allowedHosts: ["proceedings-breakfast-bass-earlier.trycloudflare.com"],
+  //   allowedHosts: [
+  //     "training-programmes-replacement-documentation.trycloudflare.com",
+  //   ],
   // },
 });

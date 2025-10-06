@@ -3,6 +3,7 @@ import UsersManagement from "./UsersManagement";
 import Reporting from "./Reporting";
 import Agents from "./Agents";
 import Messages from "./messages/Messages";
+import BusinessSettings from "./BusinessSettings";
 
 enum NavbarSection {
   Builder = "builder",
@@ -10,6 +11,7 @@ enum NavbarSection {
   Reporting = "reporting",
   Agents = "agents",
   Messages = "messages",
+  BusinessSettings = "business-settings",
 }
 
 export default function MainContentContainer({
@@ -29,6 +31,9 @@ export default function MainContentContainer({
           <Agents setActiveSection={setActiveSection} />
         )}
         {activeSection === NavbarSection.Messages && <Messages />}
+        {activeSection === NavbarSection.BusinessSettings && (
+          <BusinessSettings />
+        )}
       </div>
     </main>
   );

@@ -12,10 +12,7 @@ function Messages() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <SidebarContainer
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-      />
+      <SidebarContainer activeSection={activeSection} />
 
       <MainContentContainer
         activeSection={activeSection}

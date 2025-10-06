@@ -106,7 +106,7 @@ export default function AgentBuilderContainer() {
       aiGuardrails: filteredValues.aiGuardrails?.length
         ? filteredValues.aiGuardrails
         : [],
-      businessId: localStorage.getItem("businessId"),
+      businessId: JSON.parse(localStorage.getItem("user") || "{}").businessId,
     };
     await apiJson(`${import.meta.env.VITE_BACKEND_URL}/agents`, {
       method: "POST",
@@ -164,61 +164,6 @@ export default function AgentBuilderContainer() {
                         />
                       </div>
                     </div>
-
-                    {/* <div className="space-y-2">
-                      <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel htmlFor="category">Category *</FormLabel>
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Industry category of the agent" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem
-                                  value={BusinessVertical.Entertainment}
-                                >
-                                  Entertainment
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Ecommerce}>
-                                  E-commerce
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Saas}>
-                                  SaaS
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Retail}>
-                                  Retail
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Healthcare}>
-                                  Healthcare
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Finance}>
-                                  Finance
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Education}>
-                                  Education
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.Travel}>
-                                  Travel & Hospitality
-                                </SelectItem>
-                                <SelectItem value={BusinessVertical.RealEstate}>
-                                  Real Estate
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div> */}
                   </div>
 
                   <Separator />

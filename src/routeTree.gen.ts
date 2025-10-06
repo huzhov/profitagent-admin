@@ -13,6 +13,8 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SignupRoute = SignupRouteImport.update({
@@ -35,6 +37,16 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BusinessSettingsRoute = BusinessSettingsRouteImport.update({
+  id: '/business-settings',
+  path: '/business-settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +55,8 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/business-settings': typeof BusinessSettingsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -50,6 +64,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/business-settings': typeof BusinessSettingsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -58,6 +74,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/business-settings': typeof BusinessSettingsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -65,14 +83,38 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/messages' | '/privacy-policy' | '/signup'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/business-settings'
+    | '/login'
+    | '/messages'
+    | '/privacy-policy'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/messages' | '/privacy-policy' | '/signup'
-  id: '__root__' | '/' | '/login' | '/messages' | '/privacy-policy' | '/signup'
+  to:
+    | '/'
+    | '/admin'
+    | '/business-settings'
+    | '/login'
+    | '/messages'
+    | '/privacy-policy'
+    | '/signup'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/business-settings'
+    | '/login'
+    | '/messages'
+    | '/privacy-policy'
+    | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  BusinessSettingsRoute: typeof BusinessSettingsRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -109,6 +151,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/business-settings': {
+      id: '/business-settings'
+      path: '/business-settings'
+      fullPath: '/business-settings'
+      preLoaderRoute: typeof BusinessSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -121,6 +177,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  BusinessSettingsRoute: BusinessSettingsRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,

@@ -89,18 +89,10 @@ export default function UsersManagement() {
             Manage users, permissions, and system integrations
           </p>
         </div>
-        <Button className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Add User</span>
-        </Button>
       </div>
 
-      <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="users" className="flex items-center space-x-2">
-            <Users className="h-4 w-4" />
-            <span>Users & Permissions</span>
-          </TabsTrigger>
+      <Tabs defaultValue="integrations" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger
             value="integrations"
             className="flex items-center space-x-2"
@@ -108,10 +100,14 @@ export default function UsersManagement() {
             <Key className="h-4 w-4" />
             <span>Account & Integrations</span>
           </TabsTrigger>
-          <TabsTrigger value="debug" className="flex items-center space-x-2">
+          <TabsTrigger value="users" className="flex items-center space-x-2">
+            <Users className="h-4 w-4" />
+            <span>Users & Permissions</span>
+          </TabsTrigger>
+          {/* <TabsTrigger value="debug" className="flex items-center space-x-2">
             <Bug className="h-4 w-4" />
             <span>Debug Dashboard</span>
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="users" className="space-y-6">
@@ -121,6 +117,12 @@ export default function UsersManagement() {
               <CardDescription>
                 Manage user accounts and their permissions
               </CardDescription>
+            </CardHeader>
+            <CardHeader className="w-24">
+              <Button className="flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Add User</span>
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -378,7 +380,7 @@ export default function UsersManagement() {
           </div>
         </TabsContent>
 
-        <TabsContent value="debug" className="space-y-6">
+        {/* <TabsContent value="debug" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Debug Dashboard (Internal)</CardTitle>
@@ -446,7 +448,7 @@ export default function UsersManagement() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

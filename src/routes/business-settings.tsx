@@ -1,14 +1,14 @@
+import MainContentContainer from "@/components/main-content/MainContentContainer";
+import SidebarContainer from "@/components/sidebar/SidebarContainer";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import MainContentContainer from "../components/main-content/MainContentContainer";
-import SidebarContainer from "../components/sidebar/SidebarContainer";
 
-export const Route = createFileRoute("/")({
-  component: Index,
+export const Route = createFileRoute("/business-settings")({
+  component: BusinessSettings,
 });
 
-function Index() {
-  const [activeSection, setActiveSection] = useState("builder");
+function BusinessSettings() {
+  const [activeSection, setActiveSection] = useState("business-settings");
 
   return (
     <div className="min-h-screen bg-background flex">

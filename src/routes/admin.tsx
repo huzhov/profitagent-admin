@@ -3,12 +3,12 @@ import { useState } from "react";
 import MainContentContainer from "../components/main-content/MainContentContainer";
 import SidebarContainer from "../components/sidebar/SidebarContainer";
 
-export const Route = createFileRoute("/")({
-  component: Index,
+export const Route = createFileRoute("/admin")({
+  component: Admin,
 });
 
-function Index() {
-  const [activeSection, setActiveSection] = useState("builder");
+function Admin() {
+  const [activeSection, setActiveSection] = useState("admin");
 
   return (
     <div className="min-h-screen bg-background flex">
