@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export type User = {
   id: string;
   email: string;
@@ -27,41 +29,35 @@ export async function login(
   email: string,
   password: string
 ): Promise<LoginResponse> {
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
-  // Let the improved http error parsing logic run here too
-  if (!res.ok) {
-    // Try to parse server-provided error message
-    const ct = res.headers.get("content-type") || "";
+  try {
+    const { data } = await axios.post<{
+      token: string;
+      user: User;
+    }>(`${import.meta.env.VITE_BACKEND_URL}/login`, {
+      email,
+      password,
+    });
+
+    if (!data?.token) throw new Error("Invalid login response: missing token");
+    setToken(data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data;
+  } catch (error: any) {
     let msg = "Login failed";
-    if (ct.includes("application/json")) {
-      try {
-        const data = await res.clone().json();
-        msg =
-          data.message ||
-          data.error?.message ||
-          data.error ||
-          data.detail ||
-          data.title ||
-          msg;
-      } catch {}
+    if (axios.isAxiosError(error)) {
+      const errData = error.response?.data;
+      msg =
+        errData?.message ||
+        errData?.error?.message ||
+        errData?.error ||
+        errData?.detail ||
+        errData?.title ||
+        error.message ||
+        msg;
+      throw new Error(`${msg} (${error.response?.status || ""})`);
     }
-    if (!ct.includes("application/json")) {
-      try {
-        const t = await res.clone().text();
-        if (t && t.trim()) msg = t.trim();
-      } catch {}
-    }
-    throw new Error(`${msg} (${res.status})`);
+    throw error;
   }
-  const data = (await res.json()) as LoginResponse;
-  if (!data?.token) throw new Error("Invalid login response: missing token");
-  setToken(data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-  return data;
 }
 
 export async function signup({
@@ -73,44 +69,33 @@ export async function signup({
   name: string;
   password: string;
 }): Promise<LoginResponse> {
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, name, password }),
-  });
-  console.log("signup response", res);
-  // Let the improved http error parsing logic run here too
-  if (!res.ok) {
-    // Try to parse server-provided error message
-    const ct = res.headers.get("content-type") || "";
+  try {
+    const { data } = await axios.post<{
+      token: string;
+      user: User;
+    }>(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
+      email,
+      name,
+      password,
+    });
+    if (!data?.token) throw new Error("Invalid login response: missing token");
+    setToken(data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data;
+  } catch (error: any) {
     let msg = "Login failed";
-    if (ct.includes("application/json")) {
-      try {
-        const data = await res.clone().json();
-        msg =
-          data.message ||
-          data.error?.message ||
-          data.error ||
-          data.detail ||
-          data.title ||
-          msg;
-      } catch {}
+    if (axios.isAxiosError(error)) {
+      const errData = error.response?.data;
+      msg =
+        errData?.message ||
+        errData?.error?.message ||
+        errData?.error ||
+        errData?.detail ||
+        errData?.title ||
+        error.message ||
+        msg;
+      throw new Error(`${msg} (${error.response?.status || ""})`);
     }
-    if (!ct.includes("application/json")) {
-      try {
-        const t = await res.clone().text();
-        if (t && t.trim()) msg = t.trim();
-      } catch {}
-    }
-    throw new Error(`${msg} (${res.status})`);
+    throw error;
   }
-  const data = (await res.json()) as LoginResponse;
-  if (!data?.token) throw new Error("Invalid login response: missing token");
-  setToken(data.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-  return data;
-}
-
-export function logout() {
-  setToken(null);
 }

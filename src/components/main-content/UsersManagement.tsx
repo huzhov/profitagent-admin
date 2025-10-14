@@ -1,3 +1,35 @@
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "../ui/form";
+// WhatsApp Account Form Schema
+const waAccountSchema = z.object({
+  userId: z.string().min(1, "User ID is required"),
+  clientSecret: z.string().min(1, "Client Secret is required"),
+  accessToken: z.string().min(1, "Access Token is required"),
+  wabaId: z.string().min(1, "Business Account ID is required"),
+  accountName: z.string().min(1, "Account Name is required"),
+  phoneNumberId: z.string().min(1, "Phone Number ID is required"),
+});
+
+type WaAccountFormValues = z.infer<typeof waAccountSchema>;
+
+const waDefaultValues: WaAccountFormValues = {
+  userId: "",
+  clientSecret: "",
+  accessToken: "",
+  wabaId: "",
+  accountName: "",
+  phoneNumberId: "",
+};
 import {
   Card,
   CardContent,
@@ -9,7 +41,6 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import {
-  Bug,
   Copy,
   Key,
   MessageSquare,
@@ -22,8 +53,29 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Badge } from "../ui/badge";
+import { apiJson } from "@/lib/http";
 
-const integrations = [
+type Integration = {
+  id: number;
+  name: string;
+  status: string;
+  lastSync: string;
+  accountId: string;
+  phoneNumber: string;
+};
+
+type WA_EMBEDDED_SIGNUP_PAYLOAD = {
+  type: "WA_EMBEDDED_SIGNUP";
+  data: {
+    waba_id: string;
+    phone_number_id: string;
+    business_id: string;
+  };
+  event: string;
+  version: string;
+};
+
+const defIntegrations: Integration[] = [
   {
     id: 1,
     name: "WhatsApp Business API - Main Store",
@@ -78,6 +130,107 @@ const integrations = [
 // ];
 
 export default function UsersManagement() {
+  // WhatsApp Account Form
+  const waForm = useForm<WaAccountFormValues>({
+    resolver: zodResolver(waAccountSchema),
+    defaultValues: waDefaultValues,
+  });
+
+  // Handler for WhatsApp Account form submit
+  const handleAddWhatsAppAccount = async (values: WaAccountFormValues) => {
+    // TODO: Implement API call to add WhatsApp account
+    // Example: await apiJson('/api/whatsapp-accounts', { method: 'POST', body: JSON.stringify(values) })
+    // For now, just log
+    console.log("Add WhatsApp Account:", values);
+    waForm.reset();
+  };
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (!event.origin.endsWith("facebook.com")) return;
+      console.log("event", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("event data: ", payload);
+
+        if (payload.type === "WA_EMBEDDED_SIGNUP") {
+          console.log("message event: ", payload);
+          // payload.data contains { waba_id, phone_number_id, business_id }
+          // payload.code is your OAuth code → send it to backend
+          if (
+            payload.event === "FINISH" ||
+            payload.event === "FINISH_ONLY_WABA"
+          ) {
+            console.log("Signup finished", payload);
+            console.log("payload.data", payload.data);
+            // Example axios usage:
+            // await axios.post("/api/wa/install", {
+            //   code: payload.code,
+            //   waba_id: payload.data.waba_id,
+            //   phone_number_id: payload.data.phone_number_id,
+            // });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to parse message event data:", err);
+        // ignore parsing errors
+      }
+    };
+
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const fbLoginCallback = (response: fb.StatusResponse) => {
+    if (response.authResponse) {
+      const code = response.authResponse.code;
+      console.log("response code: ", code); // remove after testing
+      apiJson<string>(
+        `${import.meta.env.VITE_BACKEND_URL}/integrations/whatsapp/token`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        }
+      ).then((result) => {
+        waForm.setValue("accessToken", result);
+      });
+    } else {
+      console.log("response: ", response); // remove after testing
+      // your code goes here
+    }
+  };
+
+  const launchWhatsAppSignup = () => {
+    if (!window.FB) {
+      console.error("Facebook SDK not loaded");
+      return;
+    }
+
+    window.FB.login(fbLoginCallback, {
+      config_id: import.meta.env.VITE_EMBEDDED_SIGNUP_CONFIGURATION_ID,
+      response_type: "code",
+      override_default_response_type: true,
+      extras: { version: "v3" },
+    });
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    apiJson<Integration[]>(
+      `${import.meta.env.VITE_BACKEND_URL}/integrations/whatsapp`
+    )
+      .then(async (res) => {
+        setIntegrations([...res, ...defIntegrations]);
+      })
+      .catch((err) => setError(err.message || "Unknown error"))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -220,56 +373,68 @@ export default function UsersManagement() {
                   <h4 className="font-medium text-card-foreground">
                     Connected Accounts
                   </h4>
-                  {integrations.map((integration) => (
-                    <div
-                      key={integration.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div
-                          className={`w-3 h-3 rounded-full ${
-                            integration.status === "Connected"
-                              ? "bg-green-500"
-                              : "bg-gray-400"
-                          }`}
-                        />
-                        <div>
-                          <p className="font-medium text-card-foreground flex items-center space-x-2">
-                            <span>{integration.name}</span>
-                            {integration.status === "Connected" && (
-                              <Badge
-                                variant="outline"
-                                className="text-green-600 border-green-600"
-                              >
-                                <MessageSquare className="h-3 w-3 mr-1" />
-                                Active
-                              </Badge>
-                            )}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {integration.status === "Connected"
-                              ? `Account ID: ${integration.accountId} • Phone: ${integration.phoneNumber}`
-                              : "Not configured"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Last sync: {integration.lastSync}
-                          </p>
+                  {loading ? (
+                    <div className="text-muted-foreground">
+                      Loading integrations...
+                    </div>
+                  ) : error ? (
+                    <div className="text-red-600">{error}</div>
+                  ) : integrations.length === 0 ? (
+                    <div className="text-muted-foreground">
+                      No WhatsApp integrations found.
+                    </div>
+                  ) : (
+                    integrations.map((integration) => (
+                      <div
+                        key={integration.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div
+                            className={`w-3 h-3 rounded-full ${
+                              integration.status === "Connected"
+                                ? "bg-green-500"
+                                : "bg-gray-400"
+                            }`}
+                          />
+                          <div>
+                            <p className="font-medium text-card-foreground flex items-center space-x-2">
+                              <span>{integration.name}</span>
+                              {integration.status === "Connected" && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-green-600 border-green-600"
+                                >
+                                  <MessageSquare className="h-3 w-3 mr-1" />
+                                  Active
+                                </Badge>
+                              )}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {integration.status === "Connected"
+                                ? `Account ID: ${integration.accountId} • Phone: ${integration.phoneNumber}`
+                                : "Not configured"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Last sync: {integration.lastSync}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Settings className="h-4 w-4 mr-1" />
+                            Configure
+                          </Button>
+                          {integration.status === "Connected" && (
+                            <Button variant="outline" size="sm">
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              Sync
+                            </Button>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Settings className="h-4 w-4 mr-1" />
-                          Configure
-                        </Button>
-                        {integration.status === "Connected" && (
-                          <Button variant="outline" size="sm">
-                            <RefreshCw className="h-4 w-4 mr-1" />
-                            Sync
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 {/* Add New WhatsApp Connection */}
@@ -277,59 +442,119 @@ export default function UsersManagement() {
                   <h4 className="font-medium text-card-foreground mb-4">
                     Add New WhatsApp Business Account
                   </h4>
-                  <div className="grid gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="userId">User ID</Label>
-                        <Input
-                          id="userId"
-                          placeholder="Enter WhatsApp User ID"
+                  <Form {...waForm}>
+                    <form
+                      onSubmit={waForm.handleSubmit(handleAddWhatsAppAccount)}
+                      className="grid gap-4"
+                    >
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={waForm.control}
+                          name="userId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="userId">User ID</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter WhatsApp User ID"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={waForm.control}
+                          name="clientSecret"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="clientSecret">
+                                Client Secret
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="password"
+                                  placeholder="Enter Client Secret"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="clientSecret">Client Secret</Label>
-                        <Input
-                          id="clientSecret"
-                          type="password"
-                          placeholder="Enter Client Secret"
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={waForm.control}
+                          name="accessToken"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="accessToken">
+                                WhatsApp Account Access Token
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="password"
+                                  placeholder="Enter Access Token"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={waForm.control}
+                          name="wabaId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel htmlFor="wabaId">
+                                WhatsApp Business Account ID
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="Enter Business Account ID"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="accessToken">
-                          WhatsApp Account Access Token
-                        </Label>
-                        <Input
-                          id="accessToken"
-                          type="password"
-                          placeholder="Enter Access Token"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="businessAccountId">
-                          WhatsApp Business Account ID
-                        </Label>
-                        <Input
-                          id="businessAccountId"
-                          placeholder="Enter Business Account ID"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="accountName">
-                        Account Name (for identification)
-                      </Label>
-                      <Input
-                        id="accountName"
-                        placeholder="e.g., Main Store, Fashion Line, Electronics"
+                      <FormField
+                        control={waForm.control}
+                        name="accountName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel htmlFor="accountName">
+                              Account Name (for identification)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., Main Store, Fashion Line, Electronics"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <Button className="w-fit">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Connect WhatsApp Account
-                    </Button>
-                  </div>
+                      <Button type="submit" className="w-fit">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Connect WhatsApp Account
+                      </Button>
+
+                      <Button
+                        type="button"
+                        className="w-fit bg-blue-600 hover:bg-blue-700"
+                        onClick={launchWhatsAppSignup}
+                      >
+                        Login with Facebook
+                      </Button>
+                    </form>
+                  </Form>
                 </div>
 
                 {/* Webhook Configuration */}

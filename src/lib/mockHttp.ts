@@ -23,8 +23,9 @@ export async function fetchMessages(
   const res = await apiFetch("/mock/messagesByConversation.json", {
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Failed to fetch messages map: ${res.status}`);
-  const map = (await res.json()) as Record<string, Message[]>;
+  if (res.status !== 200)
+    throw new Error(`Failed to fetch messages map: ${res.status}`);
+  const map = res.data as Record<string, Message[]>;
   if (conversationId) return map[conversationId] ?? [];
   // Flatten when no conversationId provided
   return Object.values(map).flat();
@@ -38,8 +39,9 @@ export async function fetchConversations(
     await new Promise((r) => setTimeout(r, delayMs));
   }
   const res = await apiFetch("/mock/conversations.json", { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to fetch conversations: ${res.status}`);
-  let list: ConversationSummary[] = await res.json();
+  if (res.status !== 200)
+    throw new Error(`Failed to fetch conversations: ${res.status}`);
+  let list: ConversationSummary[] = res.data;
   if (clientId) list = list.filter((c) => c.client_id === clientId);
   // Sort by created_at desc
   return list.sort(
@@ -57,8 +59,9 @@ export async function fetchMessagesByConversation(
   const res = await apiFetch("/mock/messagesByConversation.json", {
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Failed to fetch messages map: ${res.status}`);
-  return (await res.json()) as Record<string, Message[]>;
+  if (res.status !== 200)
+    throw new Error(`Failed to fetch messages map: ${res.status}`);
+  return res.data as Record<string, Message[]>;
 }
 
 export async function fetchConversationMessages(
@@ -69,7 +72,8 @@ export async function fetchConversationMessages(
   const res = await apiFetch("/mock/messagesByConversation.json", {
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Failed to fetch messages map: ${res.status}`);
-  const map = (await res.json()) as Record<string, Message[]>;
+  if (res.status !== 200)
+    throw new Error(`Failed to fetch messages map: ${res.status}`);
+  const map = res.data as Record<string, Message[]>;
   return map[conversationId] ?? [];
 }

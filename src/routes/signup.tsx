@@ -12,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { apiJson } from "@/lib/http";
 import { signup } from "@/lib/auth";
 
 const schema = z
@@ -45,35 +44,6 @@ function SignupPage() {
       navigate({ to: "/" });
     }
   }
-
-  const fbLoginCallback = (response: fb.StatusResponse) => {
-    if (response.authResponse) {
-      const code = response.authResponse.code;
-      console.log("response code: ", code); // remove after testing
-      apiJson(`${import.meta.env.VITE_BACKEND_URL}/auth/whatsapp/token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
-      });
-    } else {
-      console.log("response: ", response); // remove after testing
-      // your code goes here
-    }
-  };
-
-  const launchWhatsAppSignup = () => {
-    if (!window.FB) {
-      console.error("Facebook SDK not loaded");
-      return;
-    }
-
-    window.FB.login(fbLoginCallback, {
-      config_id: import.meta.env.VITE_EMBEDDED_SIGNUP_CONFIGURATION_ID,
-      response_type: "code",
-      override_default_response_type: true,
-      extras: { version: "v3" },
-    });
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -151,14 +121,6 @@ function SignupPage() {
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting ? "Creating account…" : "Sign up"}
-            </Button>
-
-            <Button
-              type="button"
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              onClick={launchWhatsAppSignup}
-            >
-              Login with Facebook
             </Button>
           </form>
         </Form>
