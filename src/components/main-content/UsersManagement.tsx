@@ -12,23 +12,32 @@ import {
 } from "../ui/form";
 // WhatsApp Account Form Schema
 const waAccountSchema = z.object({
-  userId: z.string().min(1, "User ID is required"),
-  clientSecret: z.string().min(1, "Client Secret is required"),
-  accessToken: z.string().min(1, "Access Token is required"),
-  wabaId: z.string().min(1, "Business Account ID is required"),
-  accountName: z.string().min(1, "Account Name is required"),
-  phoneNumberId: z.string().min(1, "Phone Number ID is required"),
+  waBusinessPortfolioId: z
+    .string()
+    .min(15, "Business Portfolio ID should be at least 15 chars long")
+    .max(20, "Business Portfolio ID is too long"),
+  accessToken: z.string().max(350, "Access Token is too long"),
+  wabaId: z
+    .string()
+    .min(15, "Whatsapp Business Account ID should be at least 15 chars long")
+    .max(20, "Whatsapp Business Account ID is too long"),
+  accountName: z
+    .string()
+    .min(3, "Account Name should be at least 3 chars long"),
+  phoneNumberId: z
+    .string()
+    .min(10, "Phone Number ID should be at least 10 chars long")
+    .max(16, "Phone Number ID should be 16 chars long max"),
 });
 
 type WaAccountFormValues = z.infer<typeof waAccountSchema>;
 
 const waDefaultValues: WaAccountFormValues = {
-  userId: "",
-  clientSecret: "",
+  waBusinessPortfolioId: "",
+  phoneNumberId: "",
   accessToken: "",
   wabaId: "",
   accountName: "",
-  phoneNumberId: "",
 };
 import {
   Card,
@@ -37,11 +46,9 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import {
-  Copy,
   Key,
   MessageSquare,
   MoreHorizontal,
@@ -49,7 +56,9 @@ import {
   RefreshCw,
   Settings,
   Users,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Badge } from "../ui/badge";
@@ -134,6 +143,7 @@ export default function UsersManagement() {
   const waForm = useForm<WaAccountFormValues>({
     resolver: zodResolver(waAccountSchema),
     defaultValues: waDefaultValues,
+    mode: "onTouched",
   });
 
   // Handler for WhatsApp Account form submit
@@ -172,6 +182,10 @@ export default function UsersManagement() {
             //   waba_id: payload.data.waba_id,
             //   phone_number_id: payload.data.phone_number_id,
             // });
+            const { waba_id, phone_number_id, business_id } = payload.data;
+            waForm.setValue("phoneNumberId", phone_number_id);
+            waForm.setValue("wabaId", waba_id);
+            waForm.setValue("waBusinessPortfolioId", business_id);
           }
         }
       } catch (err) {
@@ -447,16 +461,65 @@ export default function UsersManagement() {
                       onSubmit={waForm.handleSubmit(handleAddWhatsAppAccount)}
                       className="grid gap-4"
                     >
+                      <FormField
+                        control={waForm.control}
+                        name="accountName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel htmlFor="accountName">
+                              Account Name (for identification) *
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., Main Store, Fashion Line, Electronics"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            type="button"
+                            className="w-fit bg-blue-600 hover:bg-blue-700"
+                            onClick={launchWhatsAppSignup}
+                          >
+                            Login with Facebook
+                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                tabIndex={-1}
+                                aria-label="Info"
+                                className="rounded-full p-2"
+                                type="button"
+                              >
+                                <Info className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent sideOffset={4}>
+                              Follow this flow to autopopulate fields below
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={waForm.control}
-                          name="userId"
+                          name="waBusinessPortfolioId"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel htmlFor="userId">User ID</FormLabel>
+                              <FormLabel htmlFor="waBusinessPortfolioId">
+                                Business Portfolio ID *
+                              </FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Enter WhatsApp User ID"
+                                  placeholder="Enter Business Portfolio ID"
                                   {...field}
                                 />
                               </FormControl>
@@ -466,16 +529,15 @@ export default function UsersManagement() {
                         />
                         <FormField
                           control={waForm.control}
-                          name="clientSecret"
+                          name="phoneNumberId"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel htmlFor="clientSecret">
-                                Client Secret
+                              <FormLabel htmlFor="phoneNumberId">
+                                Phone number ID *
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  type="password"
-                                  placeholder="Enter Client Secret"
+                                  placeholder="Enter Phone Number ID"
                                   {...field}
                                 />
                               </FormControl>
@@ -491,11 +553,10 @@ export default function UsersManagement() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel htmlFor="accessToken">
-                                WhatsApp Account Access Token
+                                WhatsApp Account Access Token *
                               </FormLabel>
                               <FormControl>
                                 <Input
-                                  type="password"
                                   placeholder="Enter Access Token"
                                   {...field}
                                 />
@@ -510,12 +571,12 @@ export default function UsersManagement() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel htmlFor="wabaId">
-                                WhatsApp Business Account ID
+                                WhatsApp Business Account ID *
                               </FormLabel>
                               <FormControl>
                                 <Input
                                   {...field}
-                                  placeholder="Enter Business Account ID"
+                                  placeholder="Enter Whatsapp Business Account ID"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -523,42 +584,20 @@ export default function UsersManagement() {
                           )}
                         />
                       </div>
-                      <FormField
-                        control={waForm.control}
-                        name="accountName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel htmlFor="accountName">
-                              Account Name (for identification)
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g., Main Store, Fashion Line, Electronics"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit" className="w-fit">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Connect WhatsApp Account
-                      </Button>
-
                       <Button
-                        type="button"
-                        className="w-fit bg-blue-600 hover:bg-blue-700"
-                        onClick={launchWhatsAppSignup}
+                        type="submit"
+                        className="w-fit"
+                        disabled={loading || !waForm.formState.isValid}
                       >
-                        Login with Facebook
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add WhatsApp Account
                       </Button>
                     </form>
                   </Form>
                 </div>
 
                 {/* Webhook Configuration */}
-                <div className="border-t pt-6">
+                {/* <div className="border-t pt-6">
                   <h4 className="font-medium text-card-foreground mb-4">
                     Webhook Configuration
                   </h4>
@@ -599,7 +638,7 @@ export default function UsersManagement() {
                       </ol>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           </div>
