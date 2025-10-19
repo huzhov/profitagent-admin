@@ -10,16 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ReportingRouteImport } from './routes/reporting'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
+import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportingRoute = ReportingRouteImport.update({
+  id: '/reporting',
+  path: '/reporting',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -42,6 +49,11 @@ const BusinessSettingsRoute = BusinessSettingsRouteImport.update({
   path: '/business-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -56,29 +68,35 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reporting': typeof ReportingRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reporting': typeof ReportingRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reporting': typeof ReportingRoute
   '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
@@ -86,38 +104,46 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/agents'
     | '/business-settings'
     | '/login'
     | '/messages'
     | '/privacy-policy'
+    | '/reporting'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/agents'
     | '/business-settings'
     | '/login'
     | '/messages'
     | '/privacy-policy'
+    | '/reporting'
     | '/signup'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/agents'
     | '/business-settings'
     | '/login'
     | '/messages'
     | '/privacy-policy'
+    | '/reporting'
     | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AgentsRoute: typeof AgentsRoute
   BusinessSettingsRoute: typeof BusinessSettingsRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ReportingRoute: typeof ReportingRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -128,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reporting': {
+      id: '/reporting'
+      path: '/reporting'
+      fullPath: '/reporting'
+      preLoaderRoute: typeof ReportingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -158,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -178,10 +218,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AgentsRoute: AgentsRoute,
   BusinessSettingsRoute: BusinessSettingsRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ReportingRoute: ReportingRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport

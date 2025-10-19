@@ -1,18 +1,11 @@
 import { z } from "zod";
-import { BusinessVertical } from "./types";
 
 export const agentBuilderSchema = z.object({
   // Profile
   agentName: z.string().min(2, "Agent name is required"),
-  // category: z.enum(BusinessVertical),
 
   // Integrations
-  waAuthToken: z.string().min(1, "WA Auth Token is required"),
-  wabaPhoneNumberId: z.string().min(1, "Phone Number ID is required"),
-  wabaId: z.string().min(1, "WABA ID is required"),
-  waDisplayPhoneNumber: z
-    .string()
-    .min(1, "WA Display Phone Number is required"),
+  integrationId: z.uuid("Integration is required"),
 
   // Config
   systemPromptCustomisation: z.string().max(2000),
@@ -24,15 +17,9 @@ export const agentBuilderSchema = z.object({
 
 export type AgentBuilderFormValues = z.infer<typeof agentBuilderSchema>;
 
-export const defaultValues: Omit<AgentBuilderFormValues, "category"> & {
-  category: BusinessVertical | undefined;
-} = {
+export const defaultValues: AgentBuilderFormValues = {
   agentName: "",
-  category: undefined,
-  waAuthToken: "",
-  wabaPhoneNumberId: "",
-  wabaId: "",
-  waDisplayPhoneNumber: "",
+  integrationId: "",
   systemPromptCustomisation: "",
   toneOfVoice: "professional",
   aiGuardrails: [],

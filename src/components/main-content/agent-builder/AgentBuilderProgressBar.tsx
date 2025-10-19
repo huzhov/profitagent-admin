@@ -9,13 +9,22 @@ export default function AgentBuilderProgressBar({
   steps: AgentBuilderStep[];
 }) {
   const currentProgress = ((currentStep + 1) / steps.length) * 100;
+  const currentStepTitle = steps[currentStep]?.title ?? "Step";
 
   return (
     <>
       <div className="flex items-center justify-between mb-2">
-        <Badge variant="secondary" className="text-xs">
-          Step {currentStep + 1} of {steps.length}
-        </Badge>
+        <div className="flex items-center space-x-2">
+          <Badge variant="secondary" className="text-xs">
+            Step {currentStep + 1} of {steps.length}
+          </Badge>
+          <span className="text-sm font-medium text-card-foreground">
+            {currentStepTitle}
+          </span>
+        </div>
+        <span className="text-sm text-muted-foreground font-medium">
+          {Math.round(currentProgress)}%
+        </span>
       </div>
       <div className="w-full bg-muted rounded-full h-2">
         <div

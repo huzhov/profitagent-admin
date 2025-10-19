@@ -1,5 +1,5 @@
 import AgentBuilderContainer from "./agent-builder/AgentBuilderContainer";
-import UsersManagement from "./UsersManagement";
+import IntegrationsManagement from "./IntegrationsManagement";
 import Reporting from "./Reporting";
 import Agents from "./Agents";
 import Messages from "./messages/Messages";
@@ -25,7 +25,7 @@ export default function MainContentContainer({
     <main className="flex-1 overflow-auto">
       <div className="container mx-auto px-8 py-8">
         {activeSection === NavbarSection.Builder && <AgentBuilderContainer />}
-        {activeSection === NavbarSection.Admin && <UsersManagement />}
+        {activeSection === NavbarSection.Admin && <IntegrationsManagement />}
         {activeSection === NavbarSection.Reporting && <Reporting />}
         {activeSection === NavbarSection.Agents && (
           <Agents setActiveSection={setActiveSection} />

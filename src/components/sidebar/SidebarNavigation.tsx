@@ -3,7 +3,7 @@ import {
   Grid3X3,
   Bot,
   MessageSquare,
-  Users,
+  Blocks,
   Building2,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -22,7 +22,7 @@ export default function SidebarNavigation({
       icon: MessageSquare,
       route: "/messages",
     },
-    { id: "admin", title: "User Admin", icon: Users, route: "/admin" },
+    { id: "admin", title: "Integrations", icon: Blocks, route: "/admin" },
     {
       id: "business-settings",
       title: "Business Settings",

@@ -72,7 +72,7 @@ type BusinessDetails = {
   vertical: string;
 };
 
-export default function UsersManagement() {
+export default function IntegrationsManagement() {
   const navigate = useNavigate();
   // WhatsApp Account Form
   const waForm = useForm<WaAccountFormValues>({
@@ -231,7 +231,7 @@ export default function UsersManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-card-foreground">
-            User Administration
+            Integrations
           </h2>
           <p className="text-muted-foreground">
             Manage users, permissions, and system integrations

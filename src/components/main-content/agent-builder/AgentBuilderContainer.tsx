@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import AgentBuilderHeader from "./AgentBuilderHeader";
-import AgentBuilderNavigationTabs from "./AgentBuilderNavigationTabs";
+import AgentBuilderProgressBar from "./AgentBuilderProgressBar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -32,7 +32,7 @@ import {
   defaultValues,
   type AgentBuilderFormValues,
 } from "./schema";
-import { useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import type { AgentBuilderStep } from "./types";
 import { Step } from "./types";
 
@@ -43,11 +43,47 @@ const steps: AgentBuilderStep[] = [
   // { id: "experience", title: "Experience", icon: Sparkles },
 ];
 
+const stepFields: Record<Step, (keyof AgentBuilderFormValues)[]> = {
+  [Step.Profile]: [
+    "agentName",
+    // "category",
+    "integrationId",
+  ],
+  [Step.Config]: [
+    "systemPromptCustomisation",
+    "toneOfVoice",
+    "aiGuardrails",
+    "faqsBestAnswers",
+    "productPlans",
+  ],
+};
+
+const profileSchema = agentBuilderSchema.pick({
+  agentName: true,
+  integrationId: true,
+});
+
+const configSchema = agentBuilderSchema.pick({
+  systemPromptCustomisation: true,
+  toneOfVoice: true,
+  aiGuardrails: true,
+  faqsBestAnswers: true,
+  productPlans: true,
+});
+
+type Integration = {
+  id: number;
+  name: string;
+  displayPhoneNumber: string;
+  status?: "enabled" | "disabled";
+};
+
 export default function AgentBuilderContainer() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(steps[0].id);
-  const currentStepIndex = steps.findIndex(
-    (section) => section.id === currentStep
+  const currentStepIndex = Math.max(
+    0,
+    steps.findIndex((section) => section.id === currentStep)
   );
 
   const form = useForm<AgentBuilderFormValues>({
@@ -55,24 +91,53 @@ export default function AgentBuilderContainer() {
     defaultValues,
   });
 
-  // Define which fields belong to each step so we can validate only those
-  const stepFields: Record<string, (keyof AgentBuilderFormValues)[]> = {
-    [Step.Profile]: [
-      "agentName",
-      // "category",
-      "waAuthToken",
-      "wabaPhoneNumberId",
-      "wabaId",
-      "waDisplayPhoneNumber",
-    ],
-    [Step.Config]: [
-      "systemPromptCustomisation",
-      "toneOfVoice",
-      "aiGuardrails",
-      "faqsBestAnswers",
-      "productPlans",
-    ],
-  };
+  const { isSubmitting, isValid } = form.formState;
+  const profileWatch = form.watch(stepFields[Step.Profile]);
+  const configWatch = form.watch(stepFields[Step.Config]);
+
+  // Evaluate validity so navigation buttons can reflect the current form state.
+  const isCurrentStepValid = useMemo(() => {
+    const fields = stepFields[currentStep] ?? [];
+    if (!fields.length) {
+      return true;
+    }
+
+    const values = Object.fromEntries(
+      fields.map((field) => [field, form.getValues(field)])
+    );
+
+    if (currentStep === Step.Profile) {
+      return profileSchema.safeParse(values).success;
+    }
+
+    if (currentStep === Step.Config) {
+      return configSchema.safeParse(values).success;
+    }
+
+    return true;
+  }, [configWatch, currentStep, form, profileWatch]);
+
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [integrationsLoading, setIntegrationsLoading] = useState(false);
+  const [integrationsError, setIntegrationsError] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    setIntegrationsLoading(true);
+    setIntegrationsError(null);
+    apiJson<Integration[]>(
+      `${import.meta.env.VITE_BACKEND_URL}/integrations/whatsapp`
+    )
+      .then((res) => setIntegrations(res))
+      .catch((err) => {
+        console.error("Failed to fetch integrations", err);
+        const message =
+          err instanceof Error ? err.message : "Failed to load integrations";
+        setIntegrationsError(message);
+      })
+      .finally(() => setIntegrationsLoading(false));
+  }, []);
 
   const nextStep = async (e?: MouseEvent<HTMLButtonElement>) => {
     e?.preventDefault();
@@ -101,8 +166,14 @@ export default function AgentBuilderContainer() {
     const filteredValues = Object.fromEntries(
       Object.entries(values).filter(([_, v]) => !!v)
     );
+    const integrationId = Number(values.integrationId);
+    if (Number.isNaN(integrationId)) {
+      toast.error("Please select a valid integration.");
+      return;
+    }
     const mappedValues = {
       ...filteredValues,
+      integrationId,
       aiGuardrails: filteredValues.aiGuardrails?.length
         ? filteredValues.aiGuardrails
         : [],
@@ -121,12 +192,9 @@ export default function AgentBuilderContainer() {
     <div className="max-w-4xl mx-auto">
       <AgentBuilderHeader />
 
-      {/* Section Navigation Tabs */}
-      <AgentBuilderNavigationTabs
-        steps={steps}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-      />
+      <div className="mt-6 mb-8">
+        <AgentBuilderProgressBar currentStep={currentStepIndex} steps={steps} />
+      </div>
 
       {/* Form Content */}
       <Form {...form}>
@@ -181,80 +249,61 @@ export default function AgentBuilderContainer() {
                       <div className="space-y-2">
                         <FormField
                           control={form.control}
-                          name="waAuthToken"
+                          name="integrationId"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel htmlFor="waAuthToken">
-                                WA Auth Token *
+                              <FormLabel htmlFor="integrationId">
+                                WhatsApp Integration *
                               </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="WhatsApp authentication token"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <FormField
-                          control={form.control}
-                          name="wabaPhoneNumberId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel htmlFor="wabaPhoneNumberId">
-                                WABA Phone Number ID *
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="WhatsApp Business Account phone number ID"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <FormField
-                          control={form.control}
-                          name="wabaId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel htmlFor="wabaId">WABA ID *</FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="WhatsApp Business Account ID"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <FormField
-                          control={form.control}
-                          name="waDisplayPhoneNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel htmlFor="waDisplayPhoneNumber">
-                                WA Display Phone Number *
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  placeholder="WhatsApp Business Account display phone number"
-                                />
-                              </FormControl>
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                disabled={
+                                  integrationsLoading ||
+                                  integrations.length === 0
+                                }
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue
+                                      placeholder={
+                                        integrationsLoading
+                                          ? "Loading integrations..."
+                                          : integrationsError
+                                            ? "Unable to load integrations"
+                                            : "Select an integration"
+                                      }
+                                    />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {integrations.map((integration) => (
+                                    <SelectItem
+                                      key={integration.id}
+                                      value={integration.id.toString()}
+                                    >
+                                      {integration.name}
+                                      {integration.displayPhoneNumber
+                                        ? ` • +${integration.displayPhoneNumber}`
+                                        : ""}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              {integrationsError ? (
+                                <p className="text-sm text-destructive">
+                                  {integrationsError}
+                                </p>
+                              ) : null}
+                              {!integrationsLoading &&
+                              !integrationsError &&
+                              integrations.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                  No WhatsApp integrations available. Configure
+                                  one first.
+                                </p>
+                              ) : null}
                               <FormMessage />
                             </FormItem>
                           )}
@@ -547,9 +596,6 @@ export default function AgentBuilderContainer() {
                 </div>
               )} */}
 
-              {/* Progress Bar for Agent Builder */}
-              {/* <AgentBuilderProgressBar currentStep={currentStep} steps={steps} /> */}
-
               {/* Navigation Buttons */}
               <div className="flex justify-between pt-6 border-t">
                 <Button
@@ -567,11 +613,16 @@ export default function AgentBuilderContainer() {
                     <Button
                       type="button"
                       onClick={() => form.handleSubmit(submitForm)()}
+                      disabled={!isValid || isSubmitting}
                     >
                       Deploy Agent
                     </Button>
                   ) : (
-                    <Button type="button" onClick={nextStep}>
+                    <Button
+                      type="button"
+                      onClick={nextStep}
+                      disabled={!isCurrentStepValid}
+                    >
                       Next
                     </Button>
                   )}
