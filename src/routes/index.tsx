@@ -1,23 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import MainContentContainer from "../components/main-content/MainContentContainer";
-import SidebarContainer from "../components/sidebar/SidebarContainer";
+import AgentBuilderContainer from "@/components/main-content/agent-builder/AgentBuilderContainer";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const [activeSection, setActiveSection] = useState("builder");
-
-  return (
-    <div className="min-h-screen bg-background flex">
-      <SidebarContainer activeSection={activeSection} />
-
-      <MainContentContainer
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-      />
-    </div>
-  );
+  return <AgentBuilderContainer />;
 }

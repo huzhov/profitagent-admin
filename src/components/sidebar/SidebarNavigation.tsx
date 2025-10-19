@@ -6,14 +6,12 @@ import {
   Blocks,
   Building2,
 } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 
-export default function SidebarNavigation({
-  activeSection,
-}: {
-  activeSection: string;
-}) {
+export default function SidebarNavigation() {
   const navigate = useNavigate();
+  const { location } = useRouterState();
+  const currentPath = location.pathname;
   const mainSections = [
     { id: "builder", title: "Agent Builder", icon: Bot, route: "/" },
     {
@@ -22,7 +20,12 @@ export default function SidebarNavigation({
       icon: MessageSquare,
       route: "/messages",
     },
-    { id: "admin", title: "Integrations", icon: Blocks, route: "/admin" },
+    {
+      id: "integrations",
+      title: "Integrations",
+      icon: Blocks,
+      route: "/integrations",
+    },
     {
       id: "business-settings",
       title: "Business Settings",
@@ -43,12 +46,18 @@ export default function SidebarNavigation({
       <div className="space-y-2">
         {mainSections.map((section) => {
           const Icon = section.icon;
+          const isActive =
+            section.route === "/"
+              ? currentPath === "/"
+              : currentPath === section.route ||
+                currentPath.startsWith(`${section.route}/`);
+
           return (
             <button
               key={section.id}
               onClick={() => navigate({ to: section.route })}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left ${
-                activeSection === section.id
+                isActive
                   ? "bg-green-600 text-white hover:bg-green-700"
                   : "hover:bg-muted text-muted-foreground hover:text-foreground"
               }`}

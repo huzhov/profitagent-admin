@@ -1,39 +1,14 @@
-import AgentBuilderContainer from "./agent-builder/AgentBuilderContainer";
-import IntegrationsManagement from "./IntegrationsManagement";
-import Reporting from "./Reporting";
-import Agents from "./Agents";
-import Messages from "./messages/Messages";
-import BusinessSettings from "./BusinessSettings";
-
-enum NavbarSection {
-  Builder = "builder",
-  Admin = "admin",
-  Reporting = "reporting",
-  Agents = "agents",
-  Messages = "messages",
-  BusinessSettings = "business-settings",
-}
+import { ReactNode } from "react";
 
 export default function MainContentContainer({
-  activeSection,
-  setActiveSection,
+  children,
 }: {
-  activeSection: string;
-  setActiveSection: (section: string) => void;
+  children: ReactNode;
 }) {
   return (
     <main className="flex-1 overflow-auto">
       <div className="container mx-auto px-8 py-8">
-        {activeSection === NavbarSection.Builder && <AgentBuilderContainer />}
-        {activeSection === NavbarSection.Admin && <IntegrationsManagement />}
-        {activeSection === NavbarSection.Reporting && <Reporting />}
-        {activeSection === NavbarSection.Agents && (
-          <Agents setActiveSection={setActiveSection} />
-        )}
-        {activeSection === NavbarSection.Messages && <Messages />}
-        {activeSection === NavbarSection.BusinessSettings && (
-          <BusinessSettings />
-        )}
+        {children}
       </div>
     </main>
   );

@@ -47,13 +47,11 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-export default function Agents({
-  setActiveSection,
-}: {
-  setActiveSection: (section: string) => void;
-}) {
+export default function Agents() {
+  const navigate = useNavigate();
   const [agents, setAgents] = useState([
     {
       id: 1,
@@ -201,7 +199,7 @@ export default function Agents({
         <div className="flex items-center space-x-3">
           <Button
             variant="outline"
-            onClick={() => setActiveSection("builder")}
+            onClick={() => navigate({ to: "/" })}
             className="flex items-center space-x-2"
           >
             <Plus className="h-4 w-4" />

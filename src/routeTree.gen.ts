@@ -14,9 +14,9 @@ import { Route as ReportingRouteImport } from './routes/reporting'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
 import { Route as AgentsRouteImport } from './routes/agents'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const SignupRoute = SignupRouteImport.update({
@@ -44,6 +44,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BusinessSettingsRoute = BusinessSettingsRouteImport.update({
   id: '/business-settings',
   path: '/business-settings',
@@ -54,11 +59,6 @@ const AgentsRoute = AgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,9 +67,9 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -78,9 +78,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -90,9 +90,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -103,9 +103,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/agents'
     | '/business-settings'
+    | '/integrations'
     | '/login'
     | '/messages'
     | '/privacy-policy'
@@ -114,9 +114,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/agents'
     | '/business-settings'
+    | '/integrations'
     | '/login'
     | '/messages'
     | '/privacy-policy'
@@ -125,9 +125,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/agents'
     | '/business-settings'
+    | '/integrations'
     | '/login'
     | '/messages'
     | '/privacy-policy'
@@ -137,9 +137,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
   AgentsRoute: typeof AgentsRoute
   BusinessSettingsRoute: typeof BusinessSettingsRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -184,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/business-settings': {
       id: '/business-settings'
       path: '/business-settings'
@@ -198,13 +205,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -217,9 +217,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
   AgentsRoute: AgentsRoute,
   BusinessSettingsRoute: BusinessSettingsRoute,
+  IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
