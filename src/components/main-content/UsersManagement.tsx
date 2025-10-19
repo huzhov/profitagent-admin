@@ -10,7 +10,6 @@ import {
   FormControl,
   FormMessage,
 } from "../ui/form";
-// WhatsApp Account Form Schema
 const waAccountSchema = z.object({
   waBusinessPortfolioId: z
     .string()
@@ -48,97 +47,33 @@ import {
 } from "../ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import {
-  Key,
-  MessageSquare,
-  MoreHorizontal,
-  Plus,
-  RefreshCw,
-  Settings,
-  Users,
-  Info,
-} from "lucide-react";
+import { Empty, EmptyTitle, EmptyDescription, EmptyContent } from "../ui/empty";
+import { Key, MessageSquare, Plus, Info } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+// avatar used in Users tab which is currently commented out
 import { Badge } from "../ui/badge";
 import { apiJson } from "@/lib/http";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 type Integration = {
   id: number;
   name: string;
-  status: string;
-  lastSync: string;
-  accountId: string;
-  phoneNumber: string;
+  status: "enabled" | "disabled";
+  lastSyncedAt: string;
+  wabaId: string;
+  displayPhoneNumber: string;
 };
 
-type WA_EMBEDDED_SIGNUP_PAYLOAD = {
-  type: "WA_EMBEDDED_SIGNUP";
-  data: {
-    waba_id: string;
-    phone_number_id: string;
-    business_id: string;
-  };
-  event: string;
-  version: string;
+type BusinessDetails = {
+  id: string;
+  name: string;
+  vertical: string;
 };
-
-const defIntegrations: Integration[] = [
-  {
-    id: 1,
-    name: "WhatsApp Business API - Main Store",
-    status: "Connected",
-    lastSync: "2024-01-15 10:30 AM",
-    accountId: "123456789",
-    phoneNumber: "+1-555-0123",
-  },
-  {
-    id: 2,
-    name: "WhatsApp Business API - Fashion Line",
-    status: "Connected",
-    lastSync: "2024-01-15 09:15 AM",
-    accountId: "987654321",
-    phoneNumber: "+1-555-0124",
-  },
-  {
-    id: 3,
-    name: "WhatsApp Business API - Electronics",
-    status: "Disconnected",
-    lastSync: "Never",
-    accountId: "",
-    phoneNumber: "",
-  },
-];
-
-// const users = [
-//   {
-//     id: 1,
-//     name: "John Doe",
-//     email: "john@company.com",
-//     role: "Admin",
-//     status: "Active",
-//     lastLogin: "2024-01-15",
-//   },
-//   {
-//     id: 2,
-//     name: "Jane Smith",
-//     email: "jane@company.com",
-//     role: "Editor",
-//     status: "Active",
-//     lastLogin: "2024-01-14",
-//   },
-//   {
-//     id: 3,
-//     name: "Mike Johnson",
-//     email: "mike@company.com",
-//     role: "Viewer",
-//     status: "Inactive",
-//     lastLogin: "2024-01-10",
-//   },
-// ];
 
 export default function UsersManagement() {
+  const navigate = useNavigate();
   // WhatsApp Account Form
   const waForm = useForm<WaAccountFormValues>({
     resolver: zodResolver(waAccountSchema),
@@ -148,40 +83,57 @@ export default function UsersManagement() {
 
   // Handler for WhatsApp Account form submit
   const handleAddWhatsAppAccount = async (values: WaAccountFormValues) => {
-    // TODO: Implement API call to add WhatsApp account
-    // Example: await apiJson('/api/whatsapp-accounts', { method: 'POST', body: JSON.stringify(values) })
-    // For now, just log
     console.log("Add WhatsApp Account:", values);
+    await apiJson(`${import.meta.env.VITE_BACKEND_URL}/integrations/whatsapp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
     waForm.reset();
+    toast.success("Agent has been created successfully");
+    navigate({ to: "/" });
   };
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [business, setBusiness] = useState<BusinessDetails | null | undefined>(
+    undefined
+  );
+  const [businessLoading, setBusinessLoading] = useState(true);
+
+  // Fetch current user's business on mount
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}") || {};
+    const businessId = user.businessId;
+    if (!businessId) {
+      setBusiness(null);
+      setBusinessLoading(false);
+      return;
+    }
+
+    apiJson<BusinessDetails>(
+      `${import.meta.env.VITE_BACKEND_URL}/businesses/${businessId}`
+    )
+      .then((res) => {
+        if (res && res.id) setBusiness(res);
+        else setBusiness(null);
+      })
+      .catch(() => setBusiness(null))
+      .finally(() => setBusinessLoading(false));
+  }, []);
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
       if (!event.origin.endsWith("facebook.com")) return;
-      console.log("event", event);
       try {
         const payload = JSON.parse(event.data);
         console.log("event data: ", payload);
 
         if (payload.type === "WA_EMBEDDED_SIGNUP") {
-          console.log("message event: ", payload);
-          // payload.data contains { waba_id, phone_number_id, business_id }
-          // payload.code is your OAuth code → send it to backend
           if (
             payload.event === "FINISH" ||
             payload.event === "FINISH_ONLY_WABA"
           ) {
-            console.log("Signup finished", payload);
-            console.log("payload.data", payload.data);
-            // Example axios usage:
-            // await axios.post("/api/wa/install", {
-            //   code: payload.code,
-            //   waba_id: payload.data.waba_id,
-            //   phone_number_id: payload.data.phone_number_id,
-            // });
             const { waba_id, phone_number_id, business_id } = payload.data;
             waForm.setValue("phoneNumberId", phone_number_id);
             waForm.setValue("wabaId", waba_id);
@@ -239,11 +191,40 @@ export default function UsersManagement() {
       `${import.meta.env.VITE_BACKEND_URL}/integrations/whatsapp`
     )
       .then(async (res) => {
-        setIntegrations([...res, ...defIntegrations]);
+        setIntegrations(res);
       })
       .catch((err) => setError(err.message || "Unknown error"))
       .finally(() => setLoading(false));
   }, []);
+
+  // If business is still loading, show a centered loading state
+  if (businessLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <span className="text-muted-foreground">Loading...</span>
+      </div>
+    );
+  }
+
+  // If user has no business, render full-page Empty directing them to Business Settings
+  if (business === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8">
+        <Empty className="w-full max-w-md mx-auto text-center">
+          <EmptyTitle>No business assigned</EmptyTitle>
+          <EmptyDescription>
+            You haven't created a business. You can do it on the Business
+            Settings page
+          </EmptyDescription>
+          <EmptyContent>
+            <Button onClick={() => navigate({ to: "/business-settings" })}>
+              Go to Business Settings
+            </Button>
+          </EmptyContent>
+        </Empty>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -259,110 +240,21 @@ export default function UsersManagement() {
       </div>
 
       <Tabs defaultValue="integrations" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-1">
           <TabsTrigger
             value="integrations"
-            className="flex items-center space-x-2"
+            className="flex items-center justify-center w-full space-x-2"
           >
             <Key className="h-4 w-4" />
-            <span>Account & Integrations</span>
+            <span className="text-center">Account & Integrations</span>
           </TabsTrigger>
+          {/* Users & Permissions tab commented out intentionally
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
             <span>Users & Permissions</span>
           </TabsTrigger>
-          {/* <TabsTrigger value="debug" className="flex items-center space-x-2">
-            <Bug className="h-4 w-4" />
-            <span>Debug Dashboard</span>
-          </TabsTrigger> */}
+          */}
         </TabsList>
-
-        <TabsContent value="users" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-              <CardDescription>
-                Manage user accounts and their permissions
-              </CardDescription>
-            </CardHeader>
-            <CardHeader className="w-24">
-              <Button className="flex items-center space-x-2">
-                <Plus className="h-4 w-4" />
-                <span>Add User</span>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  {
-                    name: "John Smith",
-                    email: "john@hbomax.com",
-                    role: "Admin",
-                    brand: "HBO Max",
-                  },
-                  {
-                    name: "Sarah Johnson",
-                    email: "sarah@disney.com",
-                    role: "Manager",
-                    brand: "Disney",
-                  },
-                  {
-                    name: "Mike Chen",
-                    email: "mike@netflix.com",
-                    role: "Editor",
-                    brand: "Netflix",
-                  },
-                  {
-                    name: "Emma Wilson",
-                    email: "emma@spotify.com",
-                    role: "Viewer",
-                    brand: "Spotify",
-                  },
-                ].map((user, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <Avatar>
-                        <AvatarFallback>
-                          {user.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <Badge
-                        variant="outline"
-                        className="bg-blue-50 text-blue-700 border-blue-200"
-                      >
-                        {user.brand}
-                      </Badge>
-                      <Badge
-                        variant={
-                          user.role === "Admin" ? "default" : "secondary"
-                        }
-                      >
-                        {user.role}
-                      </Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="integrations" className="space-y-6">
           <div className="grid gap-6">
@@ -406,7 +298,7 @@ export default function UsersManagement() {
                         <div className="flex items-center space-x-4">
                           <div
                             className={`w-3 h-3 rounded-full ${
-                              integration.status === "Connected"
+                              integration.status === "enabled"
                                 ? "bg-green-500"
                                 : "bg-gray-400"
                             }`}
@@ -414,7 +306,7 @@ export default function UsersManagement() {
                           <div>
                             <p className="font-medium text-card-foreground flex items-center space-x-2">
                               <span>{integration.name}</span>
-                              {integration.status === "Connected" && (
+                              {integration.status === "enabled" && (
                                 <Badge
                                   variant="outline"
                                   className="text-green-600 border-green-600"
@@ -425,27 +317,27 @@ export default function UsersManagement() {
                               )}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                              {integration.status === "Connected"
-                                ? `Account ID: ${integration.accountId} • Phone: ${integration.phoneNumber}`
+                              {integration.status === "enabled"
+                                ? `Account ID: ${integration.wabaId} • Phone number: +${integration.displayPhoneNumber}`
                                 : "Not configured"}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Last sync: {integration.lastSync}
+                              Last sync: {integration.lastSyncedAt}
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        {/* <div className="flex items-center space-x-2">
                           <Button variant="outline" size="sm">
                             <Settings className="h-4 w-4 mr-1" />
                             Configure
                           </Button>
-                          {integration.status === "Connected" && (
+                          {integration.status === "enabled" && (
                             <Button variant="outline" size="sm">
                               <RefreshCw className="h-4 w-4 mr-1" />
                               Sync
                             </Button>
                           )}
-                        </div>
+                        </div> */}
                       </div>
                     ))
                   )}

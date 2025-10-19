@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
+import { Empty, EmptyTitle, EmptyDescription, EmptyContent } from "../ui/empty";
 import { Input } from "../ui/input";
 import {
   Form,
@@ -85,13 +86,6 @@ export default function BusinessSettings() {
           </h2>
           <p className="text-muted-foreground">Manage business details</p>
         </div>
-        <Button
-          className="flex items-center space-x-2"
-          onClick={() => setModalOpen(true)}
-          disabled={!!business}
-        >
-          <span>Add Business</span>
-        </Button>
       </div>
       <div className="flex-1 flex items-center justify-center h-full">
         {loading ? (
@@ -114,9 +108,15 @@ export default function BusinessSettings() {
             </CardContent>
           </Card>
         ) : (
-          <span className="text-muted-foreground text-lg text-center w-full">
-            You haven't created any business details yet
-          </span>
+          <Empty className="w-full max-w-md mx-auto text-center">
+            <EmptyTitle>No business assigned</EmptyTitle>
+            <EmptyDescription>
+              You haven't created any business yet
+            </EmptyDescription>
+            <EmptyContent>
+              <Button onClick={() => setModalOpen(true)}>Add Business</Button>
+            </EmptyContent>
+          </Empty>
         )}
       </div>
       {/* Modal for Add Business */}
