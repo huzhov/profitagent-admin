@@ -28,31 +28,31 @@ function resolveUrl(input: RequestInfo | URL): URL | null {
   }
 }
 
-async function getErrorMessage(res: Response): Promise<string> {
-  const ct = res.headers.get("content-type") || "";
-  // Prefer JSON message if available
-  if (ct.includes("application/json")) {
-    try {
-      const data = await res.clone().json();
-      const msg =
-        (data &&
-          (data.message ||
-            data.error?.message ||
-            data.error ||
-            data.detail ||
-            data.title ||
-            (Array.isArray(data.errors) && data.errors[0]?.message))) ||
-        "";
-      if (typeof msg === "string" && msg.trim()) return msg;
-    } catch {}
-  }
-  // Fallback to text body
-  try {
-    const text = await res.clone().text();
-    if (text && text.trim()) return text.trim();
-  } catch {}
-  return res.statusText || "Request failed";
-}
+// async function getErrorMessage(res: Response): Promise<string> {
+//   const ct = res.headers.get("content-type") || "";
+//   // Prefer JSON message if available
+//   if (ct.includes("application/json")) {
+//     try {
+//       const data = await res.clone().json();
+//       const msg =
+//         (data &&
+//           (data.message ||
+//             data.error?.message ||
+//             data.error ||
+//             data.detail ||
+//             data.title ||
+//             (Array.isArray(data.errors) && data.errors[0]?.message))) ||
+//         "";
+//       if (typeof msg === "string" && msg.trim()) return msg;
+//     } catch {}
+//   }
+//   // Fallback to text body
+//   try {
+//     const text = await res.clone().text();
+//     if (text && text.trim()) return text.trim();
+//   } catch {}
+//   return res.statusText || "Request failed";
+// }
 
 export async function apiFetch(
   input: string,

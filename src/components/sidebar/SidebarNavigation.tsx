@@ -47,10 +47,8 @@ export default function SidebarNavigation() {
         {mainSections.map((section) => {
           const Icon = section.icon;
           const isActive =
-            section.route === "/"
-              ? currentPath === "/"
-              : currentPath === section.route ||
-                currentPath.startsWith(`${section.route}/`);
+            currentPath === section.route ||
+            currentPath.startsWith(`${section.route}/`);
 
           return (
             <button

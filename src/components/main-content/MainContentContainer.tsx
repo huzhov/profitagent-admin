@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export default function MainContentContainer({
   children,
@@ -7,9 +7,7 @@ export default function MainContentContainer({
 }) {
   return (
     <main className="flex-1 overflow-auto">
-      <div className="container mx-auto px-8 py-8">
-        {children}
-      </div>
+      <div className="container mx-auto px-8 py-8">{children}</div>
     </main>
   );
 }

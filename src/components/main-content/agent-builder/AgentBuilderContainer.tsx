@@ -44,11 +44,7 @@ const steps: AgentBuilderStep[] = [
 ];
 
 const stepFields: Record<Step, (keyof AgentBuilderFormValues)[]> = {
-  [Step.Profile]: [
-    "agentName",
-    // "category",
-    "integrationId",
-  ],
+  [Step.Profile]: ["agentName", "integrationId"],
   [Step.Config]: [
     "systemPromptCustomisation",
     "toneOfVoice",
@@ -166,14 +162,8 @@ export default function AgentBuilderContainer() {
     const filteredValues = Object.fromEntries(
       Object.entries(values).filter(([_, v]) => !!v)
     );
-    const integrationId = Number(values.integrationId);
-    if (Number.isNaN(integrationId)) {
-      toast.error("Please select a valid integration.");
-      return;
-    }
     const mappedValues = {
       ...filteredValues,
-      integrationId,
       aiGuardrails: filteredValues.aiGuardrails?.length
         ? filteredValues.aiGuardrails
         : [],
