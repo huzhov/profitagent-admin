@@ -5,7 +5,7 @@ export default function SidebarHeader() {
     <div className="p-6 border-b border-border">
       <div className="flex items-center space-x-3">
         <img
-          src="/images/profitagent-logo.png"
+          src="/src/assets/logo.jpeg"
           alt="ProfitAgent"
           className="h-10 w-10"
         />
