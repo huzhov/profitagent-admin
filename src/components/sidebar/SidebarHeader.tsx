@@ -4,11 +4,7 @@ export default function SidebarHeader() {
   return (
     <div className="p-6 border-b border-border">
       <div className="flex items-center space-x-3">
-        <img
-          src="/src/assets/logo.jpeg"
-          alt="ProfitAgent"
-          className="h-10 w-10"
-        />
+        <img src="/logo.jpeg" alt="ProfitAgent" className="h-10 w-10" />
         <div>
           <h1 className="text-xl font-bold text-card-foreground">
             ProfitAgent.AI
