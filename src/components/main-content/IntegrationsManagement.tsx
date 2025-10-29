@@ -16,7 +16,7 @@ const waAccountSchema = z.object({
     .string()
     .min(15, "Business Portfolio ID should be at least 15 chars long")
     .max(20, "Business Portfolio ID is too long"),
-  accessToken: z.string().max(350, "Access Token is too long"),
+  accessToken: z.string().max(1024, "Access Token is too long"),
   wabaId: z
     .string()
     .min(15, "Whatsapp Business Account ID should be at least 15 chars long")
