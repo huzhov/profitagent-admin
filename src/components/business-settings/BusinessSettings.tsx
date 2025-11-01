@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { BusinessVertical } from "./agent-builder/types";
+import { BusinessVertical } from "../agent-builder/types";
 import { apiJson } from "@/lib/http";
 
 type BusinessDetails = {

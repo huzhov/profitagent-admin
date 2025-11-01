@@ -1,19 +1,19 @@
-import { Card, CardContent } from "../../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { apiJson } from "@/lib/http";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Label } from "../../ui/label";
-import { Input } from "../../ui/input";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
-import { Textarea } from "../../ui/textarea";
-import { Separator } from "../../ui/separator";
-import { Button } from "../../ui/button";
+} from "../ui/select";
+import { Textarea } from "../ui/textarea";
+import { Separator } from "../ui/separator";
+import { Button } from "../ui/button";
 import { Bot, Settings } from "lucide-react";
 import {
   Form,

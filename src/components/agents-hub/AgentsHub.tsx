@@ -50,7 +50,7 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-export default function Agents() {
+export default function AgentsHub() {
   const navigate = useNavigate();
   const [agents, setAgents] = useState([
     {

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export default function MainContentContainer({
+export default function MainContentLayout({
   children,
 }: {
   children: ReactNode;

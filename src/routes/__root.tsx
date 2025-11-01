@@ -4,7 +4,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import MainContentContainer from "@/components/agents/MainContentContainer";
+import MainContentLayout from "@/layouts/MainContentLayout";
 import SidebarContainer from "@/components/sidebar/SidebarContainer";
 
 const DASHBOARD_ROUTES = [
@@ -32,9 +32,9 @@ const RootLayout = () => {
       {isDashboardRoute ? (
         <div className="min-h-screen bg-background flex">
           <SidebarContainer />
-          <MainContentContainer>
+          <MainContentLayout>
             <Outlet />
-          </MainContentContainer>
+          </MainContentLayout>
         </div>
       ) : (
         <Outlet />

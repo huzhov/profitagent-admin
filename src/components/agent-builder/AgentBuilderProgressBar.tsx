@@ -1,5 +1,5 @@
 import type { AgentBuilderStep } from "./types";
-import { Badge } from "../../ui/badge";
+import { Badge } from "../ui/badge";
 
 export default function AgentBuilderProgressBar({
   currentStep,

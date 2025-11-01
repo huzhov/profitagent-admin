@@ -1,4 +1,4 @@
-import BusinessSettingsContent from "@/components/agents/BusinessSettings";
+import BusinessSettingsContent from "@/components/business-settings/BusinessSettings";
 
 const BusinessSettingsPage = () => {
   return <BusinessSettingsContent />;

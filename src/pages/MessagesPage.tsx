@@ -1,4 +1,4 @@
-import MessagesContent from "@/components/agents/messages/Messages";
+import MessagesContent from "@/components/messages/Messages";
 
 const MessagesPage = () => {
   return <MessagesContent />;
