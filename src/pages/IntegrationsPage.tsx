@@ -1,4 +1,4 @@
-import IntegrationsManagement from "@/components/main-content/IntegrationsManagement";
+import IntegrationsManagement from "@/components/agents/IntegrationsManagement";
 
 const IntegrationsPage = () => {
   return <IntegrationsManagement />;

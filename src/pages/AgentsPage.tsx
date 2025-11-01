@@ -1,4 +1,4 @@
-import AgentsContent from "@/components/main-content/Agents";
+import AgentsContent from "@/components/agents/Agents";
 
 const AgentsPage = () => {
   return <AgentsContent />;

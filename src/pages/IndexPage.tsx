@@ -1,4 +1,4 @@
-import AgentBuilderContainer from "@/components/main-content/agent-builder/AgentBuilderContainer";
+import AgentBuilderContainer from "@/components/agents/agent-builder/AgentBuilderContainer";
 
 const IndexPage = () => {
   return <AgentBuilderContainer />;

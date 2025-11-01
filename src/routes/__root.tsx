@@ -4,7 +4,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import MainContentContainer from "@/components/main-content/MainContentContainer";
+import MainContentContainer from "@/components/agents/MainContentContainer";
 import SidebarContainer from "@/components/sidebar/SidebarContainer";
 
 const DASHBOARD_ROUTES = [

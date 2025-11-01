@@ -1,4 +1,4 @@
-import ReportingContent from "@/components/main-content/Reporting";
+import ReportingContent from "@/components/agents/Reporting";
 
 const ReportingPage = () => {
   return <ReportingContent />;
