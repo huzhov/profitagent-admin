@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import MessagesContent from "@/components/main-content/messages/Messages";
+import MessagesPage from "@/pages/MessagesPage";
 
 export const Route = createFileRoute("/messages")({
-  component: Messages,
+  component: MessagesPage,
 });
-
-function Messages() {
-  return <MessagesContent />;
-}

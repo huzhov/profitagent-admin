@@ -1,10 +1,6 @@
-import BusinessSettingsContent from "@/components/main-content/BusinessSettings";
 import { createFileRoute } from "@tanstack/react-router";
+import BusinessSettingsPage from "@/pages/BusinessSettingsPage";
 
 export const Route = createFileRoute("/business-settings")({
-  component: BusinessSettingsRoute,
+  component: BusinessSettingsPage,
 });
-
-function BusinessSettingsRoute() {
-  return <BusinessSettingsContent />;
-}

@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import IntegrationsManagement from "@/components/main-content/IntegrationsManagement";
+import IntegrationsPage from "@/pages/IntegrationsPage";
 
 export const Route = createFileRoute("/integrations")({
-  component: Integrations,
+  component: IntegrationsPage,
 });
-
-function Integrations() {
-  return <IntegrationsManagement />;
-}

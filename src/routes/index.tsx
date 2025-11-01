@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import AgentBuilderContainer from "@/components/main-content/agent-builder/AgentBuilderContainer";
+import IndexPage from "@/pages/IndexPage";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: IndexPage,
 });
-
-function Index() {
-  return <AgentBuilderContainer />;
-}

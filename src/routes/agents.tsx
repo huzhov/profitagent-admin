@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import AgentsContent from "@/components/main-content/Agents";
+import AgentsPage from "@/pages/AgentsPage";
 
 export const Route = createFileRoute("/agents")({
-  component: AgentsRoute,
+  component: AgentsPage,
 });
-
-function AgentsRoute() {
-  return <AgentsContent />;
-}
