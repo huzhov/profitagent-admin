@@ -19,10 +19,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // uncomment to test embedded signup flow locally
-  // server: {
-  //   allowedHosts: [
-  //     "training-programmes-replacement-documentation.trycloudflare.com",
-  //   ],
-  // },
 });
