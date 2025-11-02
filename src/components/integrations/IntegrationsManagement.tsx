@@ -394,8 +394,9 @@ export default function IntegrationsManagement() {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter Business Portfolio ID"
                               {...field}
+                              placeholder="To be filled in by Login With Facebook"
+                              disabled={true}
                             />
                           </FormControl>
                           <FormMessage />
@@ -412,8 +413,9 @@ export default function IntegrationsManagement() {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter Phone Number ID"
                               {...field}
+                              placeholder="To be filled in by Login With Facebook"
+                              disabled={true}
                             />
                           </FormControl>
                           <FormMessage />
@@ -432,8 +434,9 @@ export default function IntegrationsManagement() {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter Access Token"
                               {...field}
+                              placeholder="To be filled in by Login With Facebook"
+                              disabled={true}
                             />
                           </FormControl>
                           <FormMessage />
@@ -451,7 +454,8 @@ export default function IntegrationsManagement() {
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="Enter Whatsapp Business Account ID"
+                              placeholder="To be filled in by Login With Facebook"
+                              disabled={true}
                             />
                           </FormControl>
                           <FormMessage />
@@ -465,9 +469,28 @@ export default function IntegrationsManagement() {
                       name="pinCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel htmlFor="pinCode">
-                            Phone number's two-step verification PIN *
-                          </FormLabel>
+                          <div className="flex items-center space-x-2">
+                            <FormLabel htmlFor="pinCode">
+                              Phone number's two-step verification PIN *
+                            </FormLabel>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  tabIndex={-1}
+                                  aria-label="Info"
+                                  className="rounded-full p-2"
+                                  type="button"
+                                >
+                                  <Info className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                6-digit two-step verification PIN
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                           <FormControl>
                             <Input
                               {...field}
