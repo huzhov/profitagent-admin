@@ -77,3 +77,7 @@ Remove the proxy (or adjust the environment variable back to an absolute URL) wh
 ## Deployment
 
 Use `npm run build` to generate the static assets under `dist/`. Deploy the contents of that directory to your preferred static hosting provider and configure the backend URL environment variable appropriate to the target environment.
+
+## Swagger UI
+
+Swagger is accessible on https://profitagent.onrender.com/docs
