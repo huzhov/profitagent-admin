@@ -1,5 +1,9 @@
-import type { Message } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import {
+  MessageDirection,
+  type Conversation,
+  type GroupedMessages,
+} from "@/types";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectTrigger,
@@ -7,75 +11,34 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { fetchConversations, fetchConversationMessages } from "@/lib/mockHttp";
-
-// Simple date formatter helpers
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-};
-
-const formatTime = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
-// Data fetched via mock HTTP endpoints
-
-// Group messages by day
-const groupByDate = (messages: Message[]) => {
-  const map: Record<string, Message[]> = {};
-  messages.forEach((m) => {
-    const key = new Date(m.sentAt).toDateString();
-    map[key] = map[key] || [];
-    map[key].push(m);
-  });
-  return Object.entries(map)
-    .sort(
-      (a, b) =>
-        new Date(a[1][0].sentAt).getTime() - new Date(b[1][0].sentAt).getTime()
-    )
-    .map(([dateKey, msgs]) => ({
-      dateKey,
-      label: formatDate(msgs[0].sentAt),
-      messages: msgs.sort(
-        (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
-      ),
-    }));
-};
+import { apiJson } from "@/lib/http";
 
 export default function Messages() {
   const [conversationId, setConversationId] = useState<string>("");
-  const [conversations, setConversations] = useState<
-    { id: string; created_at: string }[]
-  >([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [groupedMessages, setGroupedMessages] = useState<GroupedMessages>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const clientId = "client-1"; // TODO: replace with real client id from context/auth
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
         setLoading(true);
-        const convs = await fetchConversations(150, clientId);
+        const convs = await apiJson<Conversation[]>(
+          `${import.meta.env.VITE_BACKEND_URL}/conversations`
+        );
         if (!alive) return;
         setConversations(convs);
         // default to most recent conversation
         if (convs.length && !conversationId) {
-          const first = convs[0]?.id;
+          const first = convs[0].id;
           setConversationId(first);
-          const msgs = await fetchConversationMessages(first);
+          const msgs = await apiJson<GroupedMessages>(
+            `${import.meta.env.VITE_BACKEND_URL}/messages?conversationId=${first}`
+          );
           if (!alive) return;
-          setMessages(msgs);
+          setGroupedMessages(msgs);
         }
       } catch (e: any) {
         if (!alive) return;
@@ -96,9 +59,11 @@ export default function Messages() {
       if (!conversationId) return;
       try {
         setLoading(true);
-        const msgs = await fetchConversationMessages(conversationId);
+        const msgs = await apiJson<GroupedMessages>(
+          `${import.meta.env.VITE_BACKEND_URL}/messages?conversationId=${conversationId}`
+        );
         if (!alive) return;
-        setMessages(msgs);
+        setGroupedMessages(msgs);
       } catch (e: any) {
         if (!alive) return;
         setError(e?.message ?? "Failed to load messages");
@@ -110,8 +75,6 @@ export default function Messages() {
       alive = false;
     };
   }, [conversationId]);
-
-  const grouped = useMemo(() => groupByDate(messages), [messages]);
 
   return (
     <div className="flex flex-col h-full max-h-[calc(100vh-8rem)]">
@@ -150,16 +113,16 @@ export default function Messages() {
             {error}
           </div>
         )}
-        {grouped.length === 0 && (
+        {Object.keys(groupedMessages).length === 0 && (
           <div className="text-center text-sm text-muted-foreground py-10">
             No messages.
           </div>
         )}
-        {grouped.map((group) => (
+        {Object.values(groupedMessages).map((group) => (
           <div key={group.dateKey} className="space-y-4">
             <div className="flex justify-center">
               <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-medium">
-                {group.label}
+                {group.formattedDate}
               </span>
             </div>
             <div className="space-y-2">
@@ -168,10 +131,9 @@ export default function Messages() {
                 const isFirstOfCluster =
                   !prev ||
                   prev.direction !== m.direction ||
-                  new Date(m.sentAt).getTime() -
-                    new Date(prev.sentAt).getTime() >
+                  new Date(m.time).getTime() - new Date(prev.time).getTime() >
                     1000 * 60 * 10;
-                const isOutgoing = m.direction === "out";
+                const isOutgoing = m.direction === MessageDirection.Out;
                 return (
                   <div
                     key={m.id}
@@ -194,7 +156,7 @@ export default function Messages() {
                             : "text-muted-foreground"
                         }`}
                       >
-                        {formatTime(m.sentAt)}
+                        {m.time}
                       </span>
                     </div>
                   </div>
