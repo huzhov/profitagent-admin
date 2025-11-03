@@ -7,7 +7,7 @@ export default function MainContentLayout({
 }) {
   return (
     <main className="flex-1 overflow-auto">
-      <div className="container mx-auto px-8 py-8">{children}</div>
+      <div className="container mx-auto p-6 space-y-6">{children}</div>
     </main>
   );
 }

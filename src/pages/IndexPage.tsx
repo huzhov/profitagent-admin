@@ -1,7 +1,7 @@
-import AgentBuilderContainer from "@/components/agent-builder/AgentBuilderContainer";
+import Home from "@/components/home/Home";
 
 const IndexPage = () => {
-  return <AgentBuilderContainer />;
+  return <Home />;
 };
 
 export default IndexPage;

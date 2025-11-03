@@ -14,10 +14,13 @@ const DASHBOARD_ROUTES = [
   "/business-settings",
   "/reporting",
   "/agents",
+  "/workflows",
+  "/testing",
 ];
 
 const RootLayout = () => {
   const { location } = useRouterState();
+
   const isDashboardRoute = DASHBOARD_ROUTES.some((route) => {
     if (route === "/") {
       return location.pathname === "/";
@@ -30,7 +33,7 @@ const RootLayout = () => {
   return (
     <>
       {isDashboardRoute ? (
-        <div className="min-h-screen bg-background flex">
+        <div className="flex h-screen bg-background">
           <SidebarContainer />
           <MainContentLayout>
             <Outlet />

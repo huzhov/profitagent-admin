@@ -1,7 +1,7 @@
-import AgentsHub from "@/components/agents-hub/AgentsHub";
+import Agents from "@/components/agents/Agents";
 
-const AgentsHubPage = () => {
-  return <AgentsHub />;
+const AgentsPage = () => {
+  return <Agents />;
 };
 
-export default AgentsHubPage;
+export default AgentsPage;
