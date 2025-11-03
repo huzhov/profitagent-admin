@@ -12,6 +12,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { apiJson } from "@/lib/http";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function Messages() {
   const [conversationId, setConversationId] = useState<string>("");
@@ -77,12 +78,15 @@ export default function Messages() {
   }, [conversationId]);
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-8rem)]">
-      <div className="pb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-card-foreground">Messages</h2>
-          <p className="text-muted-foreground">WhatsApp-like chat preview</p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <PageHeader
+          title="Messages"
+          description="Message management coming soon..."
+          showBorder={false}
+          showButton={false}
+        />
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-muted-foreground pl-1">
             Conversation
@@ -102,7 +106,7 @@ export default function Messages() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto rounded-lg border bg-background p-4 space-y-8 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto rounded-lg border bg-background p-4 space-y-8 scrollbar-thin h-[calc(100vh-16rem)]">
         {loading && (
           <div className="text-center text-sm text-muted-foreground py-10">
             Loading…

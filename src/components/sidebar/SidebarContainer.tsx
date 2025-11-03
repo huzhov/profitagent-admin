@@ -2,13 +2,22 @@ import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
 import { Button } from "../ui/button";
 import { Plus } from "lucide-react";
+import { useState } from "react";
+import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function SidebarContainer() {
+  const navigate = useNavigate();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   return (
     <aside className="w-64 bg-card border-r border-border h-screen flex flex-col">
       <SidebarHeader />
       <div className="p-4">
-        <Button className="w-full mb-4">
+        <Button
+          className="w-full mb-4"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Create Agent
         </Button>
@@ -25,6 +34,15 @@ export default function SidebarContainer() {
           </div>
         </div>
       </div>
+
+      {/* Create Agent Modal */}
+      <CreateAgentModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSelectAgentType={(agentTypeId) => {
+          navigate({ to: `/agents/create/${agentTypeId}` as any });
+        }}
+      />
     </aside>
   );
 }

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   Plus,
   Play,
@@ -110,15 +111,12 @@ export default function ABTesting() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-border bg-card -mx-6 -mt-6">
-        <div className="px-6 py-4">
-          <h1 className="text-2xl font-semibold">A/B Testing</h1>
-          <p className="text-muted-foreground">
-            Test different agent configurations to optimize performance and
-            conversions
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="A/B Testing"
+        description="Test different agent configurations to optimize performance and conversions"
+        showBorder={true}
+        showButton={false}
+      />
 
       {/* Content */}
       <div>

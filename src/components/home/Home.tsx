@@ -17,8 +17,14 @@ import {
   Zap,
   Users,
 } from "lucide-react";
+import { useState } from "react";
+import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -27,7 +33,7 @@ export default function Home() {
         description="Create and manage AI agents that drive sales and engagement"
         buttonLabel="Create Agent"
         buttonIcon={Plus}
-        onButtonClick={() => console.log("Create Agent clicked")}
+        onButtonClick={() => setIsCreateModalOpen(true)}
       />
 
       {/* Stats Grid */}
@@ -177,6 +183,7 @@ export default function Home() {
             <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
+              onClick={() => setIsCreateModalOpen(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
               Create New Agent
@@ -253,6 +260,15 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Create Agent Modal */}
+      <CreateAgentModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSelectAgentType={(agentTypeId) => {
+          navigate({ to: `/agents/create/${agentTypeId}` as any });
+        }}
+      />
     </div>
   );
 }
