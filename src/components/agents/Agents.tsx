@@ -25,9 +25,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { CreateAgentModal } from "./CreateAgentModal";
 
 export default function Agents() {
   const navigate = useNavigate();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [agents, setAgents] = useState([
     {
       id: 1,
@@ -117,7 +119,7 @@ export default function Agents() {
         description="Manage and monitor your AI agents"
         buttonLabel="Create Agent"
         buttonIcon={Plus}
-        onButtonClick={() => navigate({ to: "/" })}
+        onButtonClick={() => setIsCreateModalOpen(true)}
       />
 
       {/* Stats Grid */}
@@ -401,7 +403,7 @@ export default function Agents() {
             </p>
             <Button
               data-slot="button"
-              onClick={() => navigate({ to: "/" })}
+              onClick={() => setIsCreateModalOpen(true)}
               className="cursor-pointer"
             >
               Get Started
@@ -409,6 +411,15 @@ export default function Agents() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Create Agent Modal */}
+      <CreateAgentModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onSelectAgentType={(agentTypeId) => {
+          navigate({ to: `/agents/create/${agentTypeId}` as any });
+        }}
+      />
     </div>
   );
 }
