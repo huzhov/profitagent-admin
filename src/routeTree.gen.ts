@@ -11,15 +11,20 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkflowsRouteImport } from './routes/workflows'
 import { Route as TestingRouteImport } from './routes/testing'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportingRouteImport } from './routes/reporting'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as IntelligenceRouteImport } from './routes/intelligence'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AgentsIndexRouteImport } from './routes/agents.index'
+import { Route as AgentsCreateTypeRouteImport } from './routes/agents.create.$type'
 
 const WorkflowsRoute = WorkflowsRouteImport.update({
   id: '/workflows',
@@ -31,9 +36,19 @@ const TestingRoute = TestingRouteImport.update({
   path: '/testing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportingRoute = ReportingRouteImport.update({
@@ -56,6 +71,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntelligenceRoute = IntelligenceRouteImport.update({
+  id: '/intelligence',
+  path: '/intelligence',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntegrationsRoute = IntegrationsRouteImport.update({
   id: '/integrations',
   path: '/integrations',
@@ -76,46 +96,70 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentsIndexRoute = AgentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AgentsRoute,
+} as any)
+const AgentsCreateTypeRoute = AgentsCreateTypeRouteImport.update({
+  id: '/create/$type',
+  path: '/create/$type',
+  getParentRoute: () => AgentsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/business-settings': typeof BusinessSettingsRoute
   '/integrations': typeof IntegrationsRoute
+  '/intelligence': typeof IntelligenceRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/reporting': typeof ReportingRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/templates': typeof TemplatesRoute
   '/testing': typeof TestingRoute
   '/workflows': typeof WorkflowsRoute
+  '/agents/': typeof AgentsIndexRoute
+  '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/agents': typeof AgentsRoute
   '/business-settings': typeof BusinessSettingsRoute
   '/integrations': typeof IntegrationsRoute
+  '/intelligence': typeof IntelligenceRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/reporting': typeof ReportingRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/templates': typeof TemplatesRoute
   '/testing': typeof TestingRoute
   '/workflows': typeof WorkflowsRoute
+  '/agents': typeof AgentsIndexRoute
+  '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/business-settings': typeof BusinessSettingsRoute
   '/integrations': typeof IntegrationsRoute
+  '/intelligence': typeof IntelligenceRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/reporting': typeof ReportingRoute
+  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
+  '/templates': typeof TemplatesRoute
   '/testing': typeof TestingRoute
   '/workflows': typeof WorkflowsRoute
+  '/agents/': typeof AgentsIndexRoute
+  '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -124,51 +168,68 @@ export interface FileRouteTypes {
     | '/agents'
     | '/business-settings'
     | '/integrations'
+    | '/intelligence'
     | '/login'
     | '/messages'
     | '/privacy-policy'
     | '/reporting'
+    | '/settings'
     | '/signup'
+    | '/templates'
     | '/testing'
     | '/workflows'
+    | '/agents/'
+    | '/agents/create/$type'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/agents'
     | '/business-settings'
     | '/integrations'
+    | '/intelligence'
     | '/login'
     | '/messages'
     | '/privacy-policy'
     | '/reporting'
+    | '/settings'
     | '/signup'
+    | '/templates'
     | '/testing'
     | '/workflows'
+    | '/agents'
+    | '/agents/create/$type'
   id:
     | '__root__'
     | '/'
     | '/agents'
     | '/business-settings'
     | '/integrations'
+    | '/intelligence'
     | '/login'
     | '/messages'
     | '/privacy-policy'
     | '/reporting'
+    | '/settings'
     | '/signup'
+    | '/templates'
     | '/testing'
     | '/workflows'
+    | '/agents/'
+    | '/agents/create/$type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AgentsRoute: typeof AgentsRoute
+  AgentsRoute: typeof AgentsRouteWithChildren
   BusinessSettingsRoute: typeof BusinessSettingsRoute
   IntegrationsRoute: typeof IntegrationsRoute
+  IntelligenceRoute: typeof IntelligenceRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ReportingRoute: typeof ReportingRoute
+  SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
+  TemplatesRoute: typeof TemplatesRoute
   TestingRoute: typeof TestingRoute
   WorkflowsRoute: typeof WorkflowsRoute
 }
@@ -189,11 +250,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reporting': {
@@ -224,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/intelligence': {
+      id: '/intelligence'
+      path: '/intelligence'
+      fullPath: '/intelligence'
+      preLoaderRoute: typeof IntelligenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integrations': {
       id: '/integrations'
       path: '/integrations'
@@ -252,19 +334,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agents/': {
+      id: '/agents/'
+      path: '/'
+      fullPath: '/agents/'
+      preLoaderRoute: typeof AgentsIndexRouteImport
+      parentRoute: typeof AgentsRoute
+    }
+    '/agents/create/$type': {
+      id: '/agents/create/$type'
+      path: '/create/$type'
+      fullPath: '/agents/create/$type'
+      preLoaderRoute: typeof AgentsCreateTypeRouteImport
+      parentRoute: typeof AgentsRoute
+    }
   }
 }
 
+interface AgentsRouteChildren {
+  AgentsIndexRoute: typeof AgentsIndexRoute
+  AgentsCreateTypeRoute: typeof AgentsCreateTypeRoute
+}
+
+const AgentsRouteChildren: AgentsRouteChildren = {
+  AgentsIndexRoute: AgentsIndexRoute,
+  AgentsCreateTypeRoute: AgentsCreateTypeRoute,
+}
+
+const AgentsRouteWithChildren =
+  AgentsRoute._addFileChildren(AgentsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AgentsRoute: AgentsRoute,
+  AgentsRoute: AgentsRouteWithChildren,
   BusinessSettingsRoute: BusinessSettingsRoute,
   IntegrationsRoute: IntegrationsRoute,
+  IntelligenceRoute: IntelligenceRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   ReportingRoute: ReportingRoute,
+  SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
+  TemplatesRoute: TemplatesRoute,
   TestingRoute: TestingRoute,
   WorkflowsRoute: WorkflowsRoute,
 }

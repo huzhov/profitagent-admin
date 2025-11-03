@@ -16,19 +16,27 @@ const DASHBOARD_ROUTES = [
   "/agents",
   "/workflows",
   "/testing",
+  "/templates",
+  "/intelligence",
+  "/settings",
 ];
 
 const RootLayout = () => {
   const { location } = useRouterState();
 
-  const isDashboardRoute = DASHBOARD_ROUTES.some((route) => {
-    if (route === "/") {
-      return location.pathname === "/";
-    }
-    return (
-      location.pathname === route || location.pathname.startsWith(`${route}/`)
-    );
-  });
+  // Exclude agent creation routes from dashboard layout
+  const isAgentCreationRoute = location.pathname.startsWith("/agents/create/");
+
+  const isDashboardRoute =
+    !isAgentCreationRoute &&
+    DASHBOARD_ROUTES.some((route) => {
+      if (route === "/") {
+        return location.pathname === "/";
+      }
+      return (
+        location.pathname === route || location.pathname.startsWith(`${route}/`)
+      );
+    });
 
   return (
     <>
