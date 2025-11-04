@@ -21,22 +21,29 @@ const DASHBOARD_ROUTES = [
   "/settings",
 ];
 
+const AGENT_VIEW_PATTERN = /^\/agents\/[^/]+\/view$/;
+
 const RootLayout = () => {
   const { location } = useRouterState();
 
   // Exclude agent creation routes from dashboard layout
   const isAgentCreationRoute = location.pathname.startsWith("/agents/create/");
 
+  // Check if current path matches agent view pattern
+  const isAgentViewRoute = AGENT_VIEW_PATTERN.test(location.pathname);
+
   const isDashboardRoute =
     !isAgentCreationRoute &&
-    DASHBOARD_ROUTES.some((route) => {
-      if (route === "/") {
-        return location.pathname === "/";
-      }
-      return (
-        location.pathname === route || location.pathname.startsWith(`${route}/`)
-      );
-    });
+    (isAgentViewRoute ||
+      DASHBOARD_ROUTES.some((route) => {
+        if (route === "/") {
+          return location.pathname === "/";
+        }
+        return (
+          location.pathname === route ||
+          location.pathname.startsWith(`${route}/`)
+        );
+      }));
 
   return (
     <>
