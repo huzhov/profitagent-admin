@@ -78,7 +78,7 @@ export default function BusinessSettings() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="container mx-auto p-6 flex flex-col min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-3xl font-bold text-card-foreground">

@@ -112,7 +112,7 @@ export default function Agents() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <PageHeader
         title="My Agents"
@@ -342,6 +342,9 @@ export default function Agents() {
                   data-slot="button"
                   size="sm"
                   className="w-full cursor-pointer"
+                  onClick={() =>
+                    navigate({ to: `/agents/${agent.id}/view` as any })
+                  }
                 >
                   <Eye className="w-3 h-3 mr-1" />
                   View Agent
