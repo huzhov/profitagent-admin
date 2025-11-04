@@ -25,6 +25,7 @@ import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgentsIndexRouteImport } from './routes/agents.index'
 import { Route as AgentsCreateTypeRouteImport } from './routes/agents.create.$type'
+import { Route as AgentsIdViewRouteImport } from './routes/agents.$id.view'
 
 const WorkflowsRoute = WorkflowsRouteImport.update({
   id: '/workflows',
@@ -106,6 +107,11 @@ const AgentsCreateTypeRoute = AgentsCreateTypeRouteImport.update({
   path: '/create/$type',
   getParentRoute: () => AgentsRoute,
 } as any)
+const AgentsIdViewRoute = AgentsIdViewRouteImport.update({
+  id: '/$id/view',
+  path: '/$id/view',
+  getParentRoute: () => AgentsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/testing': typeof TestingRoute
   '/workflows': typeof WorkflowsRoute
   '/agents/': typeof AgentsIndexRoute
+  '/agents/$id/view': typeof AgentsIdViewRoute
   '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRoutesByTo {
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/testing': typeof TestingRoute
   '/workflows': typeof WorkflowsRoute
   '/agents': typeof AgentsIndexRoute
+  '/agents/$id/view': typeof AgentsIdViewRoute
   '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRoutesById {
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/testing': typeof TestingRoute
   '/workflows': typeof WorkflowsRoute
   '/agents/': typeof AgentsIndexRoute
+  '/agents/$id/view': typeof AgentsIdViewRoute
   '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRouteTypes {
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/testing'
     | '/workflows'
     | '/agents/'
+    | '/agents/$id/view'
     | '/agents/create/$type'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/testing'
     | '/workflows'
     | '/agents'
+    | '/agents/$id/view'
     | '/agents/create/$type'
   id:
     | '__root__'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/testing'
     | '/workflows'
     | '/agents/'
+    | '/agents/$id/view'
     | '/agents/create/$type'
   fileRoutesById: FileRoutesById
 }
@@ -348,16 +360,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsCreateTypeRouteImport
       parentRoute: typeof AgentsRoute
     }
+    '/agents/$id/view': {
+      id: '/agents/$id/view'
+      path: '/$id/view'
+      fullPath: '/agents/$id/view'
+      preLoaderRoute: typeof AgentsIdViewRouteImport
+      parentRoute: typeof AgentsRoute
+    }
   }
 }
 
 interface AgentsRouteChildren {
   AgentsIndexRoute: typeof AgentsIndexRoute
+  AgentsIdViewRoute: typeof AgentsIdViewRoute
   AgentsCreateTypeRoute: typeof AgentsCreateTypeRoute
 }
 
 const AgentsRouteChildren: AgentsRouteChildren = {
   AgentsIndexRoute: AgentsIndexRoute,
+  AgentsIdViewRoute: AgentsIdViewRoute,
   AgentsCreateTypeRoute: AgentsCreateTypeRoute,
 }
 
