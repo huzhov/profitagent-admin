@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signup } from "@/lib/auth";
+import { LogoIcon } from "@/components/assets/index";
 
 const schema = z
   .object({
@@ -44,6 +45,15 @@ const SignupPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm border rounded-lg p-6 shadow-sm bg-card">
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <LogoIcon className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold">ProfitAgent</h1>
+            <p className="text-sm text-muted-foreground">AI Sales Platform</p>
+          </div>
+        </div>
         <h1 className="text-xl font-semibold mb-1">Sign up</h1>
         <p className="text-sm text-muted-foreground mb-6">
           Create your account to continue.
