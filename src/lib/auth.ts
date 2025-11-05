@@ -25,6 +25,11 @@ export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
+export function isAuth(): boolean {
+  if (getToken() === null) return false;
+  return true;
+}
+
 export async function login(
   email: string,
   password: string

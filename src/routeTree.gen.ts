@@ -9,62 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkflowsRouteImport } from './routes/workflows'
-import { Route as TestingRouteImport } from './routes/testing'
-import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ReportingRouteImport } from './routes/reporting'
-import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
-import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as IntelligenceRouteImport } from './routes/intelligence'
-import { Route as IntegrationsRouteImport } from './routes/integrations'
-import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
-import { Route as AgentsRouteImport } from './routes/agents'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AgentsIndexRouteImport } from './routes/agents.index'
-import { Route as AgentsCreateTypeRouteImport } from './routes/agents.create.$type'
-import { Route as AgentsIdViewRouteImport } from './routes/agents.$id.view'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedWorkflowsRouteImport } from './routes/_authenticated/workflows'
+import { Route as AuthenticatedTestingRouteImport } from './routes/_authenticated/testing'
+import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedReportingRouteImport } from './routes/_authenticated/reporting'
+import { Route as AuthenticatedPrivacyPolicyRouteImport } from './routes/_authenticated/privacy-policy'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedIntelligenceRouteImport } from './routes/_authenticated/intelligence'
+import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated/integrations'
+import { Route as AuthenticatedBusinessSettingsRouteImport } from './routes/_authenticated/business-settings'
+import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
+import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
+import { Route as AuthenticatedAgentsCreateTypeRouteImport } from './routes/_authenticated/agents.create.$type'
+import { Route as AuthenticatedAgentsIdViewRouteImport } from './routes/_authenticated/agents.$id.view'
 
-const WorkflowsRoute = WorkflowsRouteImport.update({
-  id: '/workflows',
-  path: '/workflows',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TestingRoute = TestingRouteImport.update({
-  id: '/testing',
-  path: '/testing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TemplatesRoute = TemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportingRoute = ReportingRouteImport.update({
-  id: '/reporting',
-  path: '/reporting',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -72,236 +38,224 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IntelligenceRoute = IntelligenceRouteImport.update({
-  id: '/intelligence',
-  path: '/intelligence',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IntegrationsRoute = IntegrationsRouteImport.update({
-  id: '/integrations',
-  path: '/integrations',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const BusinessSettingsRoute = BusinessSettingsRouteImport.update({
-  id: '/business-settings',
-  path: '/business-settings',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedWorkflowsRoute = AuthenticatedWorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AgentsRoute = AgentsRouteImport.update({
+const AuthenticatedTestingRoute = AuthenticatedTestingRouteImport.update({
+  id: '/testing',
+  path: '/testing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedReportingRoute = AuthenticatedReportingRouteImport.update({
+  id: '/reporting',
+  path: '/reporting',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPrivacyPolicyRoute =
+  AuthenticatedPrivacyPolicyRouteImport.update({
+    id: '/privacy-policy',
+    path: '/privacy-policy',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedIntelligenceRoute =
+  AuthenticatedIntelligenceRouteImport.update({
+    id: '/intelligence',
+    path: '/intelligence',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedIntegrationsRoute =
+  AuthenticatedIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBusinessSettingsRoute =
+  AuthenticatedBusinessSettingsRouteImport.update({
+    id: '/business-settings',
+    path: '/business-settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAgentsRoute = AuthenticatedAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AgentsIndexRoute = AgentsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AgentsRoute,
-} as any)
-const AgentsCreateTypeRoute = AgentsCreateTypeRouteImport.update({
-  id: '/create/$type',
-  path: '/create/$type',
-  getParentRoute: () => AgentsRoute,
-} as any)
-const AgentsIdViewRoute = AgentsIdViewRouteImport.update({
-  id: '/$id/view',
-  path: '/$id/view',
-  getParentRoute: () => AgentsRoute,
-} as any)
+const AuthenticatedAgentsIndexRoute =
+  AuthenticatedAgentsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
+const AuthenticatedAgentsCreateTypeRoute =
+  AuthenticatedAgentsCreateTypeRouteImport.update({
+    id: '/create/$type',
+    path: '/create/$type',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
+const AuthenticatedAgentsIdViewRoute =
+  AuthenticatedAgentsIdViewRouteImport.update({
+    id: '/$id/view',
+    path: '/$id/view',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/agents': typeof AgentsRouteWithChildren
-  '/business-settings': typeof BusinessSettingsRoute
-  '/integrations': typeof IntegrationsRoute
-  '/intelligence': typeof IntelligenceRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/reporting': typeof ReportingRoute
-  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
-  '/templates': typeof TemplatesRoute
-  '/testing': typeof TestingRoute
-  '/workflows': typeof WorkflowsRoute
-  '/agents/': typeof AgentsIndexRoute
-  '/agents/$id/view': typeof AgentsIdViewRoute
-  '/agents/create/$type': typeof AgentsCreateTypeRoute
+  '/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/business-settings': typeof AuthenticatedBusinessSettingsRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
+  '/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/messages': typeof AuthenticatedMessagesRoute
+  '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
+  '/reporting': typeof AuthenticatedReportingRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/testing': typeof AuthenticatedTestingRoute
+  '/workflows': typeof AuthenticatedWorkflowsRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
+  '/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/business-settings': typeof BusinessSettingsRoute
-  '/integrations': typeof IntegrationsRoute
-  '/intelligence': typeof IntelligenceRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/reporting': typeof ReportingRoute
-  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
-  '/templates': typeof TemplatesRoute
-  '/testing': typeof TestingRoute
-  '/workflows': typeof WorkflowsRoute
-  '/agents': typeof AgentsIndexRoute
-  '/agents/$id/view': typeof AgentsIdViewRoute
-  '/agents/create/$type': typeof AgentsCreateTypeRoute
+  '/business-settings': typeof AuthenticatedBusinessSettingsRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
+  '/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/messages': typeof AuthenticatedMessagesRoute
+  '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
+  '/reporting': typeof AuthenticatedReportingRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/testing': typeof AuthenticatedTestingRoute
+  '/workflows': typeof AuthenticatedWorkflowsRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/agents': typeof AuthenticatedAgentsIndexRoute
+  '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
+  '/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/agents': typeof AgentsRouteWithChildren
-  '/business-settings': typeof BusinessSettingsRoute
-  '/integrations': typeof IntegrationsRoute
-  '/intelligence': typeof IntelligenceRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/reporting': typeof ReportingRoute
-  '/settings': typeof SettingsRoute
   '/signup': typeof SignupRoute
-  '/templates': typeof TemplatesRoute
-  '/testing': typeof TestingRoute
-  '/workflows': typeof WorkflowsRoute
-  '/agents/': typeof AgentsIndexRoute
-  '/agents/$id/view': typeof AgentsIdViewRoute
-  '/agents/create/$type': typeof AgentsCreateTypeRoute
+  '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/_authenticated/business-settings': typeof AuthenticatedBusinessSettingsRoute
+  '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
+  '/_authenticated/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
+  '/_authenticated/reporting': typeof AuthenticatedReportingRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
+  '/_authenticated/testing': typeof AuthenticatedTestingRoute
+  '/_authenticated/workflows': typeof AuthenticatedWorkflowsRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/_authenticated/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
+  '/_authenticated/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | '/login'
+    | '/signup'
     | '/agents'
     | '/business-settings'
     | '/integrations'
     | '/intelligence'
-    | '/login'
     | '/messages'
     | '/privacy-policy'
     | '/reporting'
     | '/settings'
-    | '/signup'
     | '/templates'
     | '/testing'
     | '/workflows'
+    | '/'
     | '/agents/'
     | '/agents/$id/view'
     | '/agents/create/$type'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/login'
+    | '/signup'
     | '/business-settings'
     | '/integrations'
     | '/intelligence'
-    | '/login'
     | '/messages'
     | '/privacy-policy'
     | '/reporting'
     | '/settings'
-    | '/signup'
     | '/templates'
     | '/testing'
     | '/workflows'
+    | '/'
     | '/agents'
     | '/agents/$id/view'
     | '/agents/create/$type'
   id:
     | '__root__'
-    | '/'
-    | '/agents'
-    | '/business-settings'
-    | '/integrations'
-    | '/intelligence'
+    | '/_authenticated'
     | '/login'
-    | '/messages'
-    | '/privacy-policy'
-    | '/reporting'
-    | '/settings'
     | '/signup'
-    | '/templates'
-    | '/testing'
-    | '/workflows'
-    | '/agents/'
-    | '/agents/$id/view'
-    | '/agents/create/$type'
+    | '/_authenticated/agents'
+    | '/_authenticated/business-settings'
+    | '/_authenticated/integrations'
+    | '/_authenticated/intelligence'
+    | '/_authenticated/messages'
+    | '/_authenticated/privacy-policy'
+    | '/_authenticated/reporting'
+    | '/_authenticated/settings'
+    | '/_authenticated/templates'
+    | '/_authenticated/testing'
+    | '/_authenticated/workflows'
+    | '/_authenticated/'
+    | '/_authenticated/agents/'
+    | '/_authenticated/agents/$id/view'
+    | '/_authenticated/agents/create/$type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AgentsRoute: typeof AgentsRouteWithChildren
-  BusinessSettingsRoute: typeof BusinessSettingsRoute
-  IntegrationsRoute: typeof IntegrationsRoute
-  IntelligenceRoute: typeof IntelligenceRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  MessagesRoute: typeof MessagesRoute
-  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
-  ReportingRoute: typeof ReportingRoute
-  SettingsRoute: typeof SettingsRoute
   SignupRoute: typeof SignupRoute
-  TemplatesRoute: typeof TemplatesRoute
-  TestingRoute: typeof TestingRoute
-  WorkflowsRoute: typeof WorkflowsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workflows': {
-      id: '/workflows'
-      path: '/workflows'
-      fullPath: '/workflows'
-      preLoaderRoute: typeof WorkflowsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/testing': {
-      id: '/testing'
-      path: '/testing'
-      fullPath: '/testing'
-      preLoaderRoute: typeof TestingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/templates': {
-      id: '/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/signup': {
       id: '/signup'
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reporting': {
-      id: '/reporting'
-      path: '/reporting'
-      fullPath: '/reporting'
-      preLoaderRoute: typeof ReportingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -311,95 +265,174 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/intelligence': {
-      id: '/intelligence'
-      path: '/intelligence'
-      fullPath: '/intelligence'
-      preLoaderRoute: typeof IntelligenceRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/integrations': {
-      id: '/integrations'
-      path: '/integrations'
-      fullPath: '/integrations'
-      preLoaderRoute: typeof IntegrationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/business-settings': {
-      id: '/business-settings'
-      path: '/business-settings'
-      fullPath: '/business-settings'
-      preLoaderRoute: typeof BusinessSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agents': {
-      id: '/agents'
-      path: '/agents'
-      fullPath: '/agents'
-      preLoaderRoute: typeof AgentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/agents/': {
-      id: '/agents/'
+    '/_authenticated/workflows': {
+      id: '/_authenticated/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof AuthenticatedWorkflowsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/testing': {
+      id: '/_authenticated/testing'
+      path: '/testing'
+      fullPath: '/testing'
+      preLoaderRoute: typeof AuthenticatedTestingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/templates': {
+      id: '/_authenticated/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reporting': {
+      id: '/_authenticated/reporting'
+      path: '/reporting'
+      fullPath: '/reporting'
+      preLoaderRoute: typeof AuthenticatedReportingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/privacy-policy': {
+      id: '/_authenticated/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof AuthenticatedPrivacyPolicyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/intelligence': {
+      id: '/_authenticated/intelligence'
+      path: '/intelligence'
+      fullPath: '/intelligence'
+      preLoaderRoute: typeof AuthenticatedIntelligenceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/integrations': {
+      id: '/_authenticated/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/business-settings': {
+      id: '/_authenticated/business-settings'
+      path: '/business-settings'
+      fullPath: '/business-settings'
+      preLoaderRoute: typeof AuthenticatedBusinessSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/agents': {
+      id: '/_authenticated/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AuthenticatedAgentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/agents/': {
+      id: '/_authenticated/agents/'
       path: '/'
       fullPath: '/agents/'
-      preLoaderRoute: typeof AgentsIndexRouteImport
-      parentRoute: typeof AgentsRoute
+      preLoaderRoute: typeof AuthenticatedAgentsIndexRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
     }
-    '/agents/create/$type': {
-      id: '/agents/create/$type'
+    '/_authenticated/agents/create/$type': {
+      id: '/_authenticated/agents/create/$type'
       path: '/create/$type'
       fullPath: '/agents/create/$type'
-      preLoaderRoute: typeof AgentsCreateTypeRouteImport
-      parentRoute: typeof AgentsRoute
+      preLoaderRoute: typeof AuthenticatedAgentsCreateTypeRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
     }
-    '/agents/$id/view': {
-      id: '/agents/$id/view'
+    '/_authenticated/agents/$id/view': {
+      id: '/_authenticated/agents/$id/view'
       path: '/$id/view'
       fullPath: '/agents/$id/view'
-      preLoaderRoute: typeof AgentsIdViewRouteImport
-      parentRoute: typeof AgentsRoute
+      preLoaderRoute: typeof AuthenticatedAgentsIdViewRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
     }
   }
 }
 
-interface AgentsRouteChildren {
-  AgentsIndexRoute: typeof AgentsIndexRoute
-  AgentsIdViewRoute: typeof AgentsIdViewRoute
-  AgentsCreateTypeRoute: typeof AgentsCreateTypeRoute
+interface AuthenticatedAgentsRouteChildren {
+  AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
+  AuthenticatedAgentsIdViewRoute: typeof AuthenticatedAgentsIdViewRoute
+  AuthenticatedAgentsCreateTypeRoute: typeof AuthenticatedAgentsCreateTypeRoute
 }
 
-const AgentsRouteChildren: AgentsRouteChildren = {
-  AgentsIndexRoute: AgentsIndexRoute,
-  AgentsIdViewRoute: AgentsIdViewRoute,
-  AgentsCreateTypeRoute: AgentsCreateTypeRoute,
+const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
+  AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
+  AuthenticatedAgentsIdViewRoute: AuthenticatedAgentsIdViewRoute,
+  AuthenticatedAgentsCreateTypeRoute: AuthenticatedAgentsCreateTypeRoute,
 }
 
-const AgentsRouteWithChildren =
-  AgentsRoute._addFileChildren(AgentsRouteChildren)
+const AuthenticatedAgentsRouteWithChildren =
+  AuthenticatedAgentsRoute._addFileChildren(AuthenticatedAgentsRouteChildren)
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
+  AuthenticatedBusinessSettingsRoute: typeof AuthenticatedBusinessSettingsRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
+  AuthenticatedIntelligenceRoute: typeof AuthenticatedIntelligenceRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedPrivacyPolicyRoute: typeof AuthenticatedPrivacyPolicyRoute
+  AuthenticatedReportingRoute: typeof AuthenticatedReportingRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedTestingRoute: typeof AuthenticatedTestingRoute
+  AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
+  AuthenticatedBusinessSettingsRoute: AuthenticatedBusinessSettingsRoute,
+  AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
+  AuthenticatedIntelligenceRoute: AuthenticatedIntelligenceRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedPrivacyPolicyRoute: AuthenticatedPrivacyPolicyRoute,
+  AuthenticatedReportingRoute: AuthenticatedReportingRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedTestingRoute: AuthenticatedTestingRoute,
+  AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AgentsRoute: AgentsRouteWithChildren,
-  BusinessSettingsRoute: BusinessSettingsRoute,
-  IntegrationsRoute: IntegrationsRoute,
-  IntelligenceRoute: IntelligenceRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
-  MessagesRoute: MessagesRoute,
-  PrivacyPolicyRoute: PrivacyPolicyRoute,
-  ReportingRoute: ReportingRoute,
-  SettingsRoute: SettingsRoute,
   SignupRoute: SignupRoute,
-  TemplatesRoute: TemplatesRoute,
-  TestingRoute: TestingRoute,
-  WorkflowsRoute: WorkflowsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
