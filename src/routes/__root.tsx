@@ -59,7 +59,7 @@ const RootLayout = () => {
       ) : (
         <Outlet />
       )}
-      {/* <TanStackRouterDevtools /> */}
+      <TanStackRouterDevtools />
     </>
   );
 };

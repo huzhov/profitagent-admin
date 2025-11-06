@@ -56,7 +56,7 @@ const agentTypeConfig = {
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
-  const { type } = useParams({ from: "/agents/create/$type" });
+  const { type } = useParams({ from: "/_authenticated/agents/create/$type" });
   const agentConfig =
     agentTypeConfig[type as keyof typeof agentTypeConfig] ||
     agentTypeConfig.onboarding;

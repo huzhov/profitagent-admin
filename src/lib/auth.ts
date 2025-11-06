@@ -25,40 +25,71 @@ export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
+export function removeToken() {
+  localStorage.removeItem(TOKEN_KEY);
+}
+
+/* Hardcoded login */
 export async function login(
   email: string,
   password: string
 ): Promise<LoginResponse> {
   try {
-    const { data } = await axios.post<{
-      token: string;
-      user: User;
-    }>(`${import.meta.env.VITE_BACKEND_URL}/login`, {
-      email,
-      password,
-    });
+    if (email === "profitagent@gmail.com" && password === "123456")
+      setToken("email");
+    else throw "Incorrect Email/Password";
 
-    if (!data?.token) throw new Error("Invalid login response: missing token");
-    setToken(data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    return data;
+    return {
+      token: "token",
+      user: {
+        id: "1",
+        email: "profitagent@gmail.com",
+        name: "profitagent",
+        businessId: "1",
+      },
+    };
   } catch (error: any) {
     let msg = "Login failed";
-    if (axios.isAxiosError(error)) {
-      const errData = error.response?.data;
-      msg =
-        errData?.message ||
-        errData?.error?.message ||
-        errData?.error ||
-        errData?.detail ||
-        errData?.title ||
-        error.message ||
-        msg;
-      throw new Error(`${msg} (${error.response?.status || ""})`);
-    }
-    throw error;
+    throw new Error(`${msg} (${error || ""})`);
   }
 }
+
+/* Login with Endpoint */
+// export async function login(
+//   email: string,
+//   password: string
+// ): Promise<LoginResponse> {
+
+//   try {
+//     const { data } = await axios.post<{
+//       token: string;
+//       user: User;
+//     }>(`${import.meta.env.VITE_BACKEND_URL}/login`, {
+//       email,
+//       password,
+//     });
+
+//     if (!data?.token) throw new Error("Invalid login response: missing token");
+//     setToken(data.token);
+//     localStorage.setItem("user", JSON.stringify(data.user));
+//     return data;
+//   } catch (error: any) {
+//     let msg = "Login failed";
+//     if (axios.isAxiosError(error)) {
+//       const errData = error.response?.data;
+//       msg =
+//         errData?.message ||
+//         errData?.error?.message ||
+//         errData?.error ||
+//         errData?.detail ||
+//         errData?.title ||
+//         error.message ||
+//         msg;
+//       throw new Error(`${msg} (${error.response?.status || ""})`);
+//     }
+//     throw error;
+//   }
+// }
 
 export async function signup({
   email,

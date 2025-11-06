@@ -5,10 +5,16 @@ import { Plus, PowerOff } from "lucide-react";
 import { useState } from "react";
 import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
 import { useNavigate } from "@tanstack/react-router";
+import { removeToken } from "@/lib/auth";
 
 export default function SidebarContainer() {
   const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const logout = () => {
+    removeToken();
+    navigate({ to: "/login" });
+  };
 
   return (
     <aside className="w-64 bg-card border-r border-border h-screen flex flex-col">
@@ -38,7 +44,7 @@ export default function SidebarContainer() {
       {/* Log Out */}
       <div className="p-2 border-t border-border text-muted-foreground hover:text-foreground hover:bg-accent/50">
         <button
-          onClick={() => navigate({ to: "/login" })}
+          onClick={logout}
           className={`w-full flex items-center px-3 gap-3 rounded-lg text-left transition-colors `}
         >
           <PowerOff className="w-4 h-4" />
