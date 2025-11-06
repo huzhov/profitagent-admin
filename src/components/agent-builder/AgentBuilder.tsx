@@ -7,6 +7,7 @@ import {
   Send,
   Bot,
   User,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +71,9 @@ export default function AgentBuilder() {
   const [creativity, setCreativity] = useState([0.7]);
   const [systemPrompt, setSystemPrompt] = useState("");
   const [contextInfo, setContextInfo] = useState("");
+  const [productCatalogue, setProductCatalogue] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   // Track collapsible states
   const [openSections, setOpenSections] = useState({
@@ -79,6 +83,7 @@ export default function AgentBuilder() {
     aiConfig: false,
     channels: false,
     knowledge: false,
+    productCatalogue: false,
   });
 
   const [channels, setChannels] = useState({
@@ -106,6 +111,43 @@ export default function AgentBuilder() {
   ]);
 
   const progress = 0; // Calculate based on filled fields
+
+  const handleFileUpload = (file: File) => {
+    if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+      setUploadedFile(file);
+      // Here you would typically process the CSV file
+      console.log("File uploaded:", file.name);
+    } else {
+      alert("Please upload a CSV file");
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
 
   const handleSendMessage = () => {
     if (!chatInput.trim()) return;
@@ -548,6 +590,87 @@ export default function AgentBuilder() {
                           <p className="text-xs text-gray-500 mt-1">
                             Add relevant information the agent should know
                           </p>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Product Catalogue */}
+                <Collapsible
+                  open={openSections.productCatalogue}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, productCatalogue: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Product Catalogue</h3>
+                        <p className="text-gray-600 text-sm">
+                          Subscription Plans
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.productCatalogue ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div>
+                          <Label htmlFor="product-catalogue">
+                            Product / Plan
+                          </Label>
+                          <Textarea
+                            id="product-catalogue"
+                            placeholder="List products or subscription plans with details"
+                            rows={6}
+                            value={productCatalogue}
+                            onChange={(e) =>
+                              setProductCatalogue(e.target.value)
+                            }
+                            className="mt-1.5"
+                          />
+                        </div>
+
+                        {/* Drag and Drop Upload Zone */}
+                        <div
+                          onDrop={handleDrop}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                            isDragging
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() =>
+                            document.getElementById("csv-upload")?.click()
+                          }
+                        >
+                          <input
+                            id="csv-upload"
+                            type="file"
+                            accept=".csv"
+                            onChange={handleFileInputChange}
+                            className="hidden"
+                          />
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload
+                              className={`w-8 h-8 ${isDragging ? "text-blue-500" : "text-gray-400"}`}
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {uploadedFile
+                                  ? uploadedFile.name
+                                  : "Upload CSV Product Catalog"}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {uploadedFile
+                                  ? "Click to upload a different file"
+                                  : "Drag and drop your CSV file here, or click to browse"}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </CollapsibleContent>

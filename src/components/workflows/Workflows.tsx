@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Workflow {
   id: number;
@@ -27,6 +28,7 @@ interface Workflow {
 }
 
 export default function Workflows() {
+  const navigate = useNavigate();
   const [workflows] = useState<Workflow[]>([
     {
       id: 1,
@@ -59,7 +61,7 @@ export default function Workflows() {
         description="Define and visualize structured workflows for your AI agents"
         buttonLabel="New Workflow"
         buttonIcon={Plus}
-        onButtonClick={() => console.log("Create new workflow")}
+        onButtonClick={() => navigate({ to: "/workflows/new" })}
       />
 
       {/* Workflows Table */}

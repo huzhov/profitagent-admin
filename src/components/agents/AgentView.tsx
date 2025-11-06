@@ -94,7 +94,11 @@ export default function AgentView() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate({ to: `/agents/${id}/preview` as any })}
+              >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
               </Button>
