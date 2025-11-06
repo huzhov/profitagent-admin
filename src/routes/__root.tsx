@@ -15,7 +15,7 @@ const DASHBOARD_ROUTES = [
   "/reporting",
   "/agents",
   "/workflows",
-  "/testing",
+  "/ab-testing",
   "/templates",
   "/intelligence",
   "/settings",
@@ -26,14 +26,16 @@ const AGENT_VIEW_PATTERN = /^\/agents\/[^/]+\/view$/;
 const RootLayout = () => {
   const { location } = useRouterState();
 
-  // Exclude agent creation routes from dashboard layout
+  // Exclude agent creation routes and workflow creation from dashboard layout
   const isAgentCreationRoute = location.pathname.startsWith("/agents/create/");
+  const isWorkflowCreationRoute = location.pathname === "/workflows/new";
 
   // Check if current path matches agent view pattern
   const isAgentViewRoute = AGENT_VIEW_PATTERN.test(location.pathname);
 
   const isDashboardRoute =
     !isAgentCreationRoute &&
+    !isWorkflowCreationRoute &&
     (isAgentViewRoute ||
       DASHBOARD_ROUTES.some((route) => {
         if (route === "/") {

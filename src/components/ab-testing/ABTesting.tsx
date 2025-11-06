@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
+import { useNavigate } from "@tanstack/react-router";
 import {
   Plus,
   Play,
@@ -44,6 +45,8 @@ interface ABTest {
 }
 
 export default function ABTesting() {
+  const navigate = useNavigate();
+
   const tests: ABTest[] = [
     {
       id: 1,
@@ -192,7 +195,9 @@ export default function ABTesting() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">A/B Tests</h2>
-                  <Button>
+                  <Button
+                    onClick={() => navigate({ to: "/ab-testing/create" })}
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Create Test
                   </Button>

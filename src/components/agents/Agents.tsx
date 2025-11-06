@@ -355,6 +355,9 @@ export default function Agents() {
                     variant="outline"
                     size="sm"
                     className="flex-1 cursor-pointer"
+                    onClick={() =>
+                      navigate({ to: `/agents/${agent.id}/preview` as any })
+                    }
                   >
                     <Play className="w-3 h-3 mr-1" />
                     Preview

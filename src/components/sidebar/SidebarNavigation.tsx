@@ -29,7 +29,7 @@ export default function SidebarNavigation() {
       id: "testing",
       title: "A/B Testing",
       icon: FlaskConical,
-      route: "/testing",
+      route: "/ab-testing",
     },
     {
       id: "templates",

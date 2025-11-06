@@ -22,10 +22,16 @@ import { Route as IntelligenceRouteImport } from './routes/intelligence'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
 import { Route as AgentsRouteImport } from './routes/agents'
+import { Route as AbTestingRouteImport } from './routes/ab-testing'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkflowsIndexRouteImport } from './routes/workflows.index'
 import { Route as AgentsIndexRouteImport } from './routes/agents.index'
+import { Route as AbTestingIndexRouteImport } from './routes/ab-testing.index'
+import { Route as WorkflowsNewRouteImport } from './routes/workflows.new'
+import { Route as AbTestingCreateRouteImport } from './routes/ab-testing.create'
 import { Route as AgentsCreateTypeRouteImport } from './routes/agents.create.$type'
 import { Route as AgentsIdViewRouteImport } from './routes/agents.$id.view'
+import { Route as AgentsIdPreviewRouteImport } from './routes/agents.$id.preview'
 
 const WorkflowsRoute = WorkflowsRouteImport.update({
   id: '/workflows',
@@ -92,15 +98,40 @@ const AgentsRoute = AgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AbTestingRoute = AbTestingRouteImport.update({
+  id: '/ab-testing',
+  path: '/ab-testing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkflowsIndexRoute = WorkflowsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WorkflowsRoute,
+} as any)
 const AgentsIndexRoute = AgentsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AgentsRoute,
+} as any)
+const AbTestingIndexRoute = AbTestingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AbTestingRoute,
+} as any)
+const WorkflowsNewRoute = WorkflowsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => WorkflowsRoute,
+} as any)
+const AbTestingCreateRoute = AbTestingCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AbTestingRoute,
 } as any)
 const AgentsCreateTypeRoute = AgentsCreateTypeRouteImport.update({
   id: '/create/$type',
@@ -112,9 +143,15 @@ const AgentsIdViewRoute = AgentsIdViewRouteImport.update({
   path: '/$id/view',
   getParentRoute: () => AgentsRoute,
 } as any)
+const AgentsIdPreviewRoute = AgentsIdPreviewRouteImport.update({
+  id: '/$id/preview',
+  path: '/$id/preview',
+  getParentRoute: () => AgentsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ab-testing': typeof AbTestingRouteWithChildren
   '/agents': typeof AgentsRouteWithChildren
   '/business-settings': typeof BusinessSettingsRoute
   '/integrations': typeof IntegrationsRoute
@@ -127,8 +164,13 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/templates': typeof TemplatesRoute
   '/testing': typeof TestingRoute
-  '/workflows': typeof WorkflowsRoute
+  '/workflows': typeof WorkflowsRouteWithChildren
+  '/ab-testing/create': typeof AbTestingCreateRoute
+  '/workflows/new': typeof WorkflowsNewRoute
+  '/ab-testing/': typeof AbTestingIndexRoute
   '/agents/': typeof AgentsIndexRoute
+  '/workflows/': typeof WorkflowsIndexRoute
+  '/agents/$id/preview': typeof AgentsIdPreviewRoute
   '/agents/$id/view': typeof AgentsIdViewRoute
   '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
@@ -145,14 +187,19 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/templates': typeof TemplatesRoute
   '/testing': typeof TestingRoute
-  '/workflows': typeof WorkflowsRoute
+  '/ab-testing/create': typeof AbTestingCreateRoute
+  '/workflows/new': typeof WorkflowsNewRoute
+  '/ab-testing': typeof AbTestingIndexRoute
   '/agents': typeof AgentsIndexRoute
+  '/workflows': typeof WorkflowsIndexRoute
+  '/agents/$id/preview': typeof AgentsIdPreviewRoute
   '/agents/$id/view': typeof AgentsIdViewRoute
   '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ab-testing': typeof AbTestingRouteWithChildren
   '/agents': typeof AgentsRouteWithChildren
   '/business-settings': typeof BusinessSettingsRoute
   '/integrations': typeof IntegrationsRoute
@@ -165,8 +212,13 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/templates': typeof TemplatesRoute
   '/testing': typeof TestingRoute
-  '/workflows': typeof WorkflowsRoute
+  '/workflows': typeof WorkflowsRouteWithChildren
+  '/ab-testing/create': typeof AbTestingCreateRoute
+  '/workflows/new': typeof WorkflowsNewRoute
+  '/ab-testing/': typeof AbTestingIndexRoute
   '/agents/': typeof AgentsIndexRoute
+  '/workflows/': typeof WorkflowsIndexRoute
+  '/agents/$id/preview': typeof AgentsIdPreviewRoute
   '/agents/$id/view': typeof AgentsIdViewRoute
   '/agents/create/$type': typeof AgentsCreateTypeRoute
 }
@@ -174,6 +226,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ab-testing'
     | '/agents'
     | '/business-settings'
     | '/integrations'
@@ -187,7 +240,12 @@ export interface FileRouteTypes {
     | '/templates'
     | '/testing'
     | '/workflows'
+    | '/ab-testing/create'
+    | '/workflows/new'
+    | '/ab-testing/'
     | '/agents/'
+    | '/workflows/'
+    | '/agents/$id/preview'
     | '/agents/$id/view'
     | '/agents/create/$type'
   fileRoutesByTo: FileRoutesByTo
@@ -204,13 +262,18 @@ export interface FileRouteTypes {
     | '/signup'
     | '/templates'
     | '/testing'
-    | '/workflows'
+    | '/ab-testing/create'
+    | '/workflows/new'
+    | '/ab-testing'
     | '/agents'
+    | '/workflows'
+    | '/agents/$id/preview'
     | '/agents/$id/view'
     | '/agents/create/$type'
   id:
     | '__root__'
     | '/'
+    | '/ab-testing'
     | '/agents'
     | '/business-settings'
     | '/integrations'
@@ -224,13 +287,19 @@ export interface FileRouteTypes {
     | '/templates'
     | '/testing'
     | '/workflows'
+    | '/ab-testing/create'
+    | '/workflows/new'
+    | '/ab-testing/'
     | '/agents/'
+    | '/workflows/'
+    | '/agents/$id/preview'
     | '/agents/$id/view'
     | '/agents/create/$type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AbTestingRoute: typeof AbTestingRouteWithChildren
   AgentsRoute: typeof AgentsRouteWithChildren
   BusinessSettingsRoute: typeof BusinessSettingsRoute
   IntegrationsRoute: typeof IntegrationsRoute
@@ -243,7 +312,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   TemplatesRoute: typeof TemplatesRoute
   TestingRoute: typeof TestingRoute
-  WorkflowsRoute: typeof WorkflowsRoute
+  WorkflowsRoute: typeof WorkflowsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -339,6 +408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ab-testing': {
+      id: '/ab-testing'
+      path: '/ab-testing'
+      fullPath: '/ab-testing'
+      preLoaderRoute: typeof AbTestingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -346,12 +422,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workflows/': {
+      id: '/workflows/'
+      path: '/'
+      fullPath: '/workflows/'
+      preLoaderRoute: typeof WorkflowsIndexRouteImport
+      parentRoute: typeof WorkflowsRoute
+    }
     '/agents/': {
       id: '/agents/'
       path: '/'
       fullPath: '/agents/'
       preLoaderRoute: typeof AgentsIndexRouteImport
       parentRoute: typeof AgentsRoute
+    }
+    '/ab-testing/': {
+      id: '/ab-testing/'
+      path: '/'
+      fullPath: '/ab-testing/'
+      preLoaderRoute: typeof AbTestingIndexRouteImport
+      parentRoute: typeof AbTestingRoute
+    }
+    '/workflows/new': {
+      id: '/workflows/new'
+      path: '/new'
+      fullPath: '/workflows/new'
+      preLoaderRoute: typeof WorkflowsNewRouteImport
+      parentRoute: typeof WorkflowsRoute
+    }
+    '/ab-testing/create': {
+      id: '/ab-testing/create'
+      path: '/create'
+      fullPath: '/ab-testing/create'
+      preLoaderRoute: typeof AbTestingCreateRouteImport
+      parentRoute: typeof AbTestingRoute
     }
     '/agents/create/$type': {
       id: '/agents/create/$type'
@@ -367,17 +471,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsIdViewRouteImport
       parentRoute: typeof AgentsRoute
     }
+    '/agents/$id/preview': {
+      id: '/agents/$id/preview'
+      path: '/$id/preview'
+      fullPath: '/agents/$id/preview'
+      preLoaderRoute: typeof AgentsIdPreviewRouteImport
+      parentRoute: typeof AgentsRoute
+    }
   }
 }
 
+interface AbTestingRouteChildren {
+  AbTestingCreateRoute: typeof AbTestingCreateRoute
+  AbTestingIndexRoute: typeof AbTestingIndexRoute
+}
+
+const AbTestingRouteChildren: AbTestingRouteChildren = {
+  AbTestingCreateRoute: AbTestingCreateRoute,
+  AbTestingIndexRoute: AbTestingIndexRoute,
+}
+
+const AbTestingRouteWithChildren = AbTestingRoute._addFileChildren(
+  AbTestingRouteChildren,
+)
+
 interface AgentsRouteChildren {
   AgentsIndexRoute: typeof AgentsIndexRoute
+  AgentsIdPreviewRoute: typeof AgentsIdPreviewRoute
   AgentsIdViewRoute: typeof AgentsIdViewRoute
   AgentsCreateTypeRoute: typeof AgentsCreateTypeRoute
 }
 
 const AgentsRouteChildren: AgentsRouteChildren = {
   AgentsIndexRoute: AgentsIndexRoute,
+  AgentsIdPreviewRoute: AgentsIdPreviewRoute,
   AgentsIdViewRoute: AgentsIdViewRoute,
   AgentsCreateTypeRoute: AgentsCreateTypeRoute,
 }
@@ -385,8 +512,23 @@ const AgentsRouteChildren: AgentsRouteChildren = {
 const AgentsRouteWithChildren =
   AgentsRoute._addFileChildren(AgentsRouteChildren)
 
+interface WorkflowsRouteChildren {
+  WorkflowsNewRoute: typeof WorkflowsNewRoute
+  WorkflowsIndexRoute: typeof WorkflowsIndexRoute
+}
+
+const WorkflowsRouteChildren: WorkflowsRouteChildren = {
+  WorkflowsNewRoute: WorkflowsNewRoute,
+  WorkflowsIndexRoute: WorkflowsIndexRoute,
+}
+
+const WorkflowsRouteWithChildren = WorkflowsRoute._addFileChildren(
+  WorkflowsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AbTestingRoute: AbTestingRouteWithChildren,
   AgentsRoute: AgentsRouteWithChildren,
   BusinessSettingsRoute: BusinessSettingsRoute,
   IntegrationsRoute: IntegrationsRoute,
@@ -399,7 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   TemplatesRoute: TemplatesRoute,
   TestingRoute: TestingRoute,
-  WorkflowsRoute: WorkflowsRoute,
+  WorkflowsRoute: WorkflowsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
