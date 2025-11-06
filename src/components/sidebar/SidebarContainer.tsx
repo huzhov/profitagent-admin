@@ -11,7 +11,7 @@ export default function SidebarContainer() {
   const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  const logout = () => {
+  const handleLogout = () => {
     removeToken();
     navigate({ to: "/login" });
   };
@@ -44,7 +44,7 @@ export default function SidebarContainer() {
       {/* Log Out */}
       <div className="p-2 border-t border-border text-muted-foreground hover:text-foreground hover:bg-accent/50">
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className={`w-full flex items-center px-3 gap-3 rounded-lg text-left transition-colors `}
         >
           <PowerOff className="w-4 h-4" />
