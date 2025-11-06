@@ -1,7 +1,7 @@
 import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Plus, PowerOff } from "lucide-react";
 import { useState } from "react";
 import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
 import { useNavigate } from "@tanstack/react-router";
@@ -33,6 +33,17 @@ export default function SidebarContainer() {
             <p className="text-xs text-muted-foreground">Premium Plan</p>
           </div>
         </div>
+      </div>
+
+      {/* Log Out */}
+      <div className="p-2 border-t border-border text-muted-foreground hover:text-foreground hover:bg-accent/50">
+        <button
+          onClick={() => navigate({ to: "/login" })}
+          className={`w-full flex items-center px-3 gap-3 rounded-lg text-left transition-colors `}
+        >
+          <PowerOff className="w-4 h-4" />
+          <span>Log Out</span>
+        </button>
       </div>
 
       {/* Create Agent Modal */}
