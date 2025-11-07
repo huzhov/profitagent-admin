@@ -17,6 +17,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   MarkerType,
+  applyNodeChanges,
+  applyEdgeChanges,
 } from "reactflow";
 import type { Node, Edge, Connection } from "reactflow";
 import "reactflow/dist/style.css";
@@ -432,6 +434,26 @@ export default function CreateWorkflow() {
     [setOrchEdges]
   );
 
+  const addOrchNode = useCallback(
+    (type: WorkflowNodeData["type"]) => {
+      const newId = `orch-${Date.now()}`;
+      const newNode: Node<WorkflowNodeData> = {
+        id: newId,
+        type: "workflowNode",
+        position: {
+          x: Math.random() * 400 + 100,
+          y: Math.random() * 300 + 100,
+        },
+        data: {
+          label: `New ${type.charAt(0).toUpperCase() + type.slice(1)} Step`,
+          type: type,
+        },
+      };
+      setOrchNodes((nds) => [...nds, newNode]);
+    },
+    [setOrchNodes]
+  );
+
   const toggleAgent = (agentId: string) => {
     setAgents((prev) =>
       prev.map((agent) =>
@@ -439,6 +461,41 @@ export default function CreateWorkflow() {
       )
     );
   };
+
+  const addAgentNode = useCallback(
+    (agentId: string, type: WorkflowNodeData["type"]) => {
+      const agent = agents.find((a) => a.id === agentId);
+      if (!agent) return;
+
+      const newId = `${agentId}-${Date.now()}`;
+      const newNode: Node<WorkflowNodeData> = {
+        id: newId,
+        type: "workflowNode",
+        position: {
+          x: Math.random() * 400 + 100,
+          y: Math.random() * 300 + 100,
+        },
+        data: {
+          label: `New ${type.charAt(0).toUpperCase() + type.slice(1)} Step`,
+          type: type,
+          agent: agent.name,
+        },
+      };
+
+      setAgents((prev) =>
+        prev.map((a) =>
+          a.id === agentId
+            ? {
+                ...a,
+                nodes: [...a.nodes, newNode],
+                steps: a.steps + 1,
+              }
+            : a
+        )
+      );
+    },
+    [agents]
+  );
 
   const updateAgentFlow = (
     agentId: string,
@@ -538,7 +595,14 @@ export default function CreateWorkflow() {
       <div className="flex-1 flex overflow-hidden bg-gray-50">
         {/* Canvas */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
+          <div
+            className="flex-1 overflow-y-auto"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, rgb(229, 231, 235) 1px, transparent 1px), linear-gradient(rgb(229, 231, 235) 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
+            }}
+          >
             <div className="p-8 space-y-8 min-h-full">
               {/* Master Orchestrator */}
               <div>
@@ -566,27 +630,27 @@ export default function CreateWorkflow() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => addOrchNode("prompt")}>
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Prompt
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => addOrchNode("action")}>
                         <Settings className="w-4 h-4 mr-2" />
                         Action
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => addOrchNode("tool")}>
                         <Wrench className="w-4 h-4 mr-2" />
                         Tool Call
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => addOrchNode("decision")}>
                         <GitBranch className="w-4 h-4 mr-2" />
                         Decision
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => addOrchNode("system")}>
                         <Monitor className="w-4 h-4 mr-2" />
                         System
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => addOrchNode("end")}>
                         <StopCircle className="w-4 h-4 mr-2" />
                         End
                       </DropdownMenuItem>
@@ -662,27 +726,57 @@ export default function CreateWorkflow() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addAgentNode(agent.id, "prompt");
+                                  }}
+                                >
                                   <MessageCircle className="w-4 h-4 mr-2" />
                                   Prompt
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addAgentNode(agent.id, "action");
+                                  }}
+                                >
                                   <Settings className="w-4 h-4 mr-2" />
                                   Action
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addAgentNode(agent.id, "tool");
+                                  }}
+                                >
                                   <Wrench className="w-4 h-4 mr-2" />
                                   Tool Call
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addAgentNode(agent.id, "decision");
+                                  }}
+                                >
                                   <GitBranch className="w-4 h-4 mr-2" />
                                   Decision
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addAgentNode(agent.id, "system");
+                                  }}
+                                >
                                   <Monitor className="w-4 h-4 mr-2" />
                                   System
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    addAgentNode(agent.id, "end");
+                                  }}
+                                >
                                   <StopCircle className="w-4 h-4 mr-2" />
                                   End
                                 </DropdownMenuItem>
@@ -701,20 +795,8 @@ export default function CreateWorkflow() {
                             nodes={agent.nodes}
                             edges={agent.edges}
                             onNodesChange={(changes) => {
-                              const updatedNodes = changes.reduce(
-                                (acc, change) => {
-                                  if (
-                                    change.type === "position" &&
-                                    change.dragging === false
-                                  ) {
-                                    return acc.map((n) =>
-                                      n.id === change.id
-                                        ? { ...n, position: change.position! }
-                                        : n
-                                    );
-                                  }
-                                  return acc;
-                                },
+                              const updatedNodes = applyNodeChanges(
+                                changes,
                                 agent.nodes
                               );
                               updateAgentFlow(
@@ -724,15 +806,8 @@ export default function CreateWorkflow() {
                               );
                             }}
                             onEdgesChange={(changes) => {
-                              const updatedEdges = changes.reduce(
-                                (acc, change) => {
-                                  if (change.type === "remove") {
-                                    return acc.filter(
-                                      (e) => e.id !== change.id
-                                    );
-                                  }
-                                  return acc;
-                                },
+                              const updatedEdges = applyEdgeChanges(
+                                changes,
                                 agent.edges
                               );
                               updateAgentFlow(

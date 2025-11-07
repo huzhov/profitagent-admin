@@ -31,14 +31,12 @@ const RootLayout = () => {
   const isAgentEditRoute =
     location.pathname.startsWith("/agents") &&
     location.pathname.endsWith("/edit");
-  const isWorkflowCreationRoute = location.pathname === "/workflows/new";
 
   // Check if current path matches agent view pattern
   const isAgentViewRoute = AGENT_VIEW_PATTERN.test(location.pathname);
 
   const isDashboardRoute =
     !isAgentCreationRoute &&
-    !isWorkflowCreationRoute &&
     !isAgentEditRoute &&
     (isAgentViewRoute ||
       DASHBOARD_ROUTES.some((route) => {

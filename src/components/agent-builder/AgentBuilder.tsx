@@ -77,6 +77,25 @@ export default function AgentBuilder() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
+  // Document Library state - Lee's categories
+  const [productInfoDocs, setProductInfoDocs] = useState<File[]>([]);
+  const [isProductInfoDragging, setIsProductInfoDragging] = useState(false);
+  const [processWorkflowDocs, setProcessWorkflowDocs] = useState<File[]>([]);
+  const [isProcessWorkflowDragging, setIsProcessWorkflowDragging] =
+    useState(false);
+  const [complianceDocs, setComplianceDocs] = useState<File[]>([]);
+  const [isComplianceDragging, setIsComplianceDragging] = useState(false);
+  const [customerEducationDocs, setCustomerEducationDocs] = useState<File[]>(
+    []
+  );
+  const [isCustomerEducationDragging, setIsCustomerEducationDragging] =
+    useState(false);
+  const [salesMarketingDocs, setSalesMarketingDocs] = useState<File[]>([]);
+  const [isSalesMarketingDragging, setIsSalesMarketingDragging] =
+    useState(false);
+  const [dataToolsDocs, setDataToolsDocs] = useState<File[]>([]);
+  const [isDataToolsDragging, setIsDataToolsDragging] = useState(false);
+
   // Guardrails state
   const [restrictedTopics, setRestrictedTopics] = useState("");
   const [profanityFilter, setProfanityFilter] = useState(true);
@@ -143,6 +162,12 @@ export default function AgentBuilder() {
     knowledge: false,
     productCatalogue: false,
     audience: false,
+    productInfo: false,
+    processWorkflow: false,
+    compliance: false,
+    customerEducation: false,
+    salesMarketing: false,
+    dataTools: false,
     guardrails: false,
     messagingControls: false,
     hitlHandover: false,
@@ -797,6 +822,839 @@ export default function AgentBuilder() {
                             </SelectContent>
                           </Select>
                         </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Product Information Documents */}
+                <Collapsible
+                  open={openSections.productInfo}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, productInfo: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">
+                          Product Information Documents
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Brochures, plan details, terms & conditions
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.productInfo ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsProductInfoDragging(false);
+                            const files = Array.from(e.dataTransfer.files);
+                            const validFiles = files.filter(
+                              (f) =>
+                                f.type === "application/pdf" ||
+                                f.type === "text/plain" ||
+                                f.name.endsWith(".pdf") ||
+                                f.name.endsWith(".txt")
+                            );
+                            if (validFiles.length > 0) {
+                              setProductInfoDocs([
+                                ...productInfoDocs,
+                                ...validFiles,
+                              ]);
+                            } else {
+                              alert("Please upload PDF or text documents");
+                            }
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsProductInfoDragging(true);
+                          }}
+                          onDragLeave={(e) => {
+                            e.preventDefault();
+                            setIsProductInfoDragging(false);
+                          }}
+                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                            isProductInfoDragging
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() =>
+                            document
+                              .getElementById("product-info-upload")
+                              ?.click()
+                          }
+                        >
+                          <input
+                            id="product-info-upload"
+                            type="file"
+                            accept=".pdf,.txt"
+                            multiple
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length > 0) {
+                                setProductInfoDocs([
+                                  ...productInfoDocs,
+                                  ...files,
+                                ]);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload
+                              className={`w-8 h-8 ${isProductInfoDragging ? "text-blue-500" : "text-gray-400"}`}
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                Upload Product Documents
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                PDF or text files - Drag and drop or click to
+                                browse
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {productInfoDocs.length > 0 && (
+                          <div className="space-y-2">
+                            <Label>
+                              Uploaded Documents ({productInfoDocs.length})
+                            </Label>
+                            {productInfoDocs.map((file, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              >
+                                <span className="text-sm">{file.name}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    setProductInfoDocs(
+                                      productInfoDocs.filter(
+                                        (_, i) => i !== index
+                                      )
+                                    )
+                                  }
+                                >
+                                  Remove
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Processes & Workflows Documents */}
+                <Collapsible
+                  open={openSections.processWorkflow}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, processWorkflow: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">
+                          Processes & Workflows Documents
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Onboarding, claims, service guides
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.processWorkflow ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsProcessWorkflowDragging(false);
+                            const files = Array.from(e.dataTransfer.files);
+                            const validFiles = files.filter(
+                              (f) =>
+                                f.type === "application/pdf" ||
+                                f.type === "text/plain" ||
+                                f.name.endsWith(".pdf") ||
+                                f.name.endsWith(".txt")
+                            );
+                            if (validFiles.length > 0) {
+                              setProcessWorkflowDocs([
+                                ...processWorkflowDocs,
+                                ...validFiles,
+                              ]);
+                            } else {
+                              alert("Please upload PDF or text documents");
+                            }
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsProcessWorkflowDragging(true);
+                          }}
+                          onDragLeave={(e) => {
+                            e.preventDefault();
+                            setIsProcessWorkflowDragging(false);
+                          }}
+                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                            isProcessWorkflowDragging
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() =>
+                            document
+                              .getElementById("process-workflow-upload")
+                              ?.click()
+                          }
+                        >
+                          <input
+                            id="process-workflow-upload"
+                            type="file"
+                            accept=".pdf,.txt"
+                            multiple
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length > 0) {
+                                setProcessWorkflowDocs([
+                                  ...processWorkflowDocs,
+                                  ...files,
+                                ]);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload
+                              className={`w-8 h-8 ${isProcessWorkflowDragging ? "text-blue-500" : "text-gray-400"}`}
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                Upload Process Documents
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                PDF or text files - Drag and drop or click to
+                                browse
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {processWorkflowDocs.length > 0 && (
+                          <div className="space-y-2">
+                            <Label>
+                              Uploaded Documents ({processWorkflowDocs.length})
+                            </Label>
+                            {processWorkflowDocs.map((file, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              >
+                                <span className="text-sm">{file.name}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    setProcessWorkflowDocs(
+                                      processWorkflowDocs.filter(
+                                        (_, i) => i !== index
+                                      )
+                                    )
+                                  }
+                                >
+                                  Remove
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Compliance & Regulatory Documents */}
+                <Collapsible
+                  open={openSections.compliance}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, compliance: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">
+                          Compliance & Regulatory Documents
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Disclosures, approved language, legal docs
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.compliance ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsComplianceDragging(false);
+                            const files = Array.from(e.dataTransfer.files);
+                            const validFiles = files.filter(
+                              (f) =>
+                                f.type === "application/pdf" ||
+                                f.type === "text/plain" ||
+                                f.name.endsWith(".pdf") ||
+                                f.name.endsWith(".txt")
+                            );
+                            if (validFiles.length > 0) {
+                              setComplianceDocs([
+                                ...complianceDocs,
+                                ...validFiles,
+                              ]);
+                            } else {
+                              alert("Please upload PDF or text documents");
+                            }
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsComplianceDragging(true);
+                          }}
+                          onDragLeave={(e) => {
+                            e.preventDefault();
+                            setIsComplianceDragging(false);
+                          }}
+                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                            isComplianceDragging
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() =>
+                            document
+                              .getElementById("compliance-upload")
+                              ?.click()
+                          }
+                        >
+                          <input
+                            id="compliance-upload"
+                            type="file"
+                            accept=".pdf,.txt"
+                            multiple
+                            onChange={(e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length > 0) {
+                                setComplianceDocs([
+                                  ...complianceDocs,
+                                  ...files,
+                                ]);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload
+                              className={`w-8 h-8 ${isComplianceDragging ? "text-blue-500" : "text-gray-400"}`}
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                Upload Compliance Documents
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                PDF or text files - Drag and drop or click to
+                                browse
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {complianceDocs.length > 0 && (
+                          <div className="space-y-2">
+                            <Label>
+                              Uploaded Documents ({complianceDocs.length})
+                            </Label>
+                            {complianceDocs.map((file, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                              >
+                                <span className="text-sm">{file.name}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    setComplianceDocs(
+                                      complianceDocs.filter(
+                                        (_, i) => i !== index
+                                      )
+                                    )
+                                  }
+                                >
+                                  {/* Customer Education & FAQs Documents */}
+                                  <Collapsible
+                                    open={openSections.customerEducation}
+                                    onOpenChange={(open) =>
+                                      setOpenSections({
+                                        ...openSections,
+                                        customerEducation: open,
+                                      })
+                                    }
+                                  >
+                                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                                      <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                                        <div className="text-left">
+                                          <h3 className="text-gray-900">
+                                            Customer Education & FAQs
+                                          </h3>
+                                          <p className="text-gray-600 text-sm">
+                                            Explainers, how-tos, training docs
+                                          </p>
+                                        </div>
+                                        <ChevronDown
+                                          className={`w-5 h-5 text-gray-400 transition-transform ${openSections.customerEducation ? "" : "-rotate-90"}`}
+                                        />
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent>
+                                        <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                                          <div
+                                            onDrop={(e) => {
+                                              e.preventDefault();
+                                              setIsCustomerEducationDragging(
+                                                false
+                                              );
+                                              const files = Array.from(
+                                                e.dataTransfer.files
+                                              );
+                                              const validFiles = files.filter(
+                                                (f) =>
+                                                  f.type ===
+                                                    "application/pdf" ||
+                                                  f.type === "text/plain" ||
+                                                  f.name.endsWith(".pdf") ||
+                                                  f.name.endsWith(".txt")
+                                              );
+                                              if (validFiles.length > 0) {
+                                                setCustomerEducationDocs([
+                                                  ...customerEducationDocs,
+                                                  ...validFiles,
+                                                ]);
+                                              } else {
+                                                alert(
+                                                  "Please upload PDF or text documents"
+                                                );
+                                              }
+                                            }}
+                                            onDragOver={(e) => {
+                                              e.preventDefault();
+                                              setIsCustomerEducationDragging(
+                                                true
+                                              );
+                                            }}
+                                            onDragLeave={(e) => {
+                                              e.preventDefault();
+                                              setIsCustomerEducationDragging(
+                                                false
+                                              );
+                                            }}
+                                            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                                              isCustomerEducationDragging
+                                                ? "border-blue-500 bg-blue-50"
+                                                : "border-gray-300"
+                                            }`}
+                                            onClick={() =>
+                                              document
+                                                .getElementById(
+                                                  "customer-education-upload"
+                                                )
+                                                ?.click()
+                                            }
+                                          >
+                                            <input
+                                              id="customer-education-upload"
+                                              type="file"
+                                              accept=".pdf,.txt"
+                                              multiple
+                                              onChange={(e) => {
+                                                const files = Array.from(
+                                                  e.target.files || []
+                                                );
+                                                if (files.length > 0) {
+                                                  setCustomerEducationDocs([
+                                                    ...customerEducationDocs,
+                                                    ...files,
+                                                  ]);
+                                                }
+                                              }}
+                                              className="hidden"
+                                            />
+                                            <div className="flex flex-col items-center gap-2">
+                                              <Upload
+                                                className={`w-8 h-8 ${isCustomerEducationDragging ? "text-blue-500" : "text-gray-400"}`}
+                                              />
+                                              <div>
+                                                <p className="text-sm font-medium text-gray-900">
+                                                  Upload Customer Education
+                                                  Documents
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                  PDF or text files - Drag and
+                                                  drop or click to browse
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {customerEducationDocs.length > 0 && (
+                                            <div className="space-y-2">
+                                              <Label>
+                                                Uploaded Documents (
+                                                {customerEducationDocs.length})
+                                              </Label>
+                                              {customerEducationDocs.map(
+                                                (file, index) => (
+                                                  <div
+                                                    key={index}
+                                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                  >
+                                                    <span className="text-sm">
+                                                      {file.name}
+                                                    </span>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={() =>
+                                                        setCustomerEducationDocs(
+                                                          customerEducationDocs.filter(
+                                                            (_, i) =>
+                                                              i !== index
+                                                          )
+                                                        )
+                                                      }
+                                                    >
+                                                      Remove
+                                                    </Button>
+                                                  </div>
+                                                )
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </CollapsibleContent>
+                                    </div>
+                                  </Collapsible>
+                                  {/* Sales & Marketing Documents */}
+                                  <Collapsible
+                                    open={openSections.salesMarketing}
+                                    onOpenChange={(open) =>
+                                      setOpenSections({
+                                        ...openSections,
+                                        salesMarketing: open,
+                                      })
+                                    }
+                                  >
+                                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                                      <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                                        <div className="text-left">
+                                          <h3 className="text-gray-900">
+                                            Sales & Marketing Documents
+                                          </h3>
+                                          <p className="text-gray-600 text-sm">
+                                            Scripts, tone guides, campaign
+                                            materials
+                                          </p>
+                                        </div>
+                                        <ChevronDown
+                                          className={`w-5 h-5 text-gray-400 transition-transform ${openSections.salesMarketing ? "" : "-rotate-90"}`}
+                                        />
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent>
+                                        <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                                          <div
+                                            onDrop={(e) => {
+                                              e.preventDefault();
+                                              setIsSalesMarketingDragging(
+                                                false
+                                              );
+                                              const files = Array.from(
+                                                e.dataTransfer.files
+                                              );
+                                              const validFiles = files.filter(
+                                                (f) =>
+                                                  f.type ===
+                                                    "application/pdf" ||
+                                                  f.type === "text/plain" ||
+                                                  f.name.endsWith(".pdf") ||
+                                                  f.name.endsWith(".txt")
+                                              );
+                                              if (validFiles.length > 0) {
+                                                setSalesMarketingDocs([
+                                                  ...salesMarketingDocs,
+                                                  ...validFiles,
+                                                ]);
+                                              } else {
+                                                alert(
+                                                  "Please upload PDF or text documents"
+                                                );
+                                              }
+                                            }}
+                                            onDragOver={(e) => {
+                                              e.preventDefault();
+                                              setIsSalesMarketingDragging(true);
+                                            }}
+                                            onDragLeave={(e) => {
+                                              e.preventDefault();
+                                              setIsSalesMarketingDragging(
+                                                false
+                                              );
+                                            }}
+                                            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                                              isSalesMarketingDragging
+                                                ? "border-blue-500 bg-blue-50"
+                                                : "border-gray-300"
+                                            }`}
+                                            onClick={() =>
+                                              document
+                                                .getElementById(
+                                                  "sales-marketing-upload"
+                                                )
+                                                ?.click()
+                                            }
+                                          >
+                                            <input
+                                              id="sales-marketing-upload"
+                                              type="file"
+                                              accept=".pdf,.txt"
+                                              multiple
+                                              onChange={(e) => {
+                                                const files = Array.from(
+                                                  e.target.files || []
+                                                );
+                                                if (files.length > 0) {
+                                                  setSalesMarketingDocs([
+                                                    ...salesMarketingDocs,
+                                                    ...files,
+                                                  ]);
+                                                }
+                                              }}
+                                              className="hidden"
+                                            />
+                                            <div className="flex flex-col items-center gap-2">
+                                              <Upload
+                                                className={`w-8 h-8 ${isSalesMarketingDragging ? "text-blue-500" : "text-gray-400"}`}
+                                              />
+                                              <div>
+                                                <p className="text-sm font-medium text-gray-900">
+                                                  Upload Sales & Marketing
+                                                  Documents
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                  PDF or text files - Drag and
+                                                  drop or click to browse
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {salesMarketingDocs.length > 0 && (
+                                            <div className="space-y-2">
+                                              <Label>
+                                                Uploaded Documents (
+                                                {salesMarketingDocs.length})
+                                              </Label>
+                                              {salesMarketingDocs.map(
+                                                (file, index) => (
+                                                  <div
+                                                    key={index}
+                                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                  >
+                                                    <span className="text-sm">
+                                                      {file.name}
+                                                    </span>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={() =>
+                                                        setSalesMarketingDocs(
+                                                          salesMarketingDocs.filter(
+                                                            (_, i) =>
+                                                              i !== index
+                                                          )
+                                                        )
+                                                      }
+                                                    >
+                                                      Remove
+                                                    </Button>
+                                                  </div>
+                                                )
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </CollapsibleContent>
+                                    </div>
+                                  </Collapsible>
+                                  {/* Data & Tools Documents */}
+                                  <Collapsible
+                                    open={openSections.dataTools}
+                                    onOpenChange={(open) =>
+                                      setOpenSections({
+                                        ...openSections,
+                                        dataTools: open,
+                                      })
+                                    }
+                                  >
+                                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                                      <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                                        <div className="text-left">
+                                          <h3 className="text-gray-900">
+                                            Data & Tools Documents
+                                          </h3>
+                                          <p className="text-gray-600 text-sm">
+                                            Pricing tables, calculators,
+                                            API/logic files
+                                          </p>
+                                        </div>
+                                        <ChevronDown
+                                          className={`w-5 h-5 text-gray-400 transition-transform ${openSections.dataTools ? "" : "-rotate-90"}`}
+                                        />
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent>
+                                        <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                                          <div
+                                            onDrop={(e) => {
+                                              e.preventDefault();
+                                              setIsDataToolsDragging(false);
+                                              const files = Array.from(
+                                                e.dataTransfer.files
+                                              );
+                                              const validFiles = files.filter(
+                                                (f) =>
+                                                  f.type ===
+                                                    "application/pdf" ||
+                                                  f.type === "text/plain" ||
+                                                  f.name.endsWith(".pdf") ||
+                                                  f.name.endsWith(".txt")
+                                              );
+                                              if (validFiles.length > 0) {
+                                                setDataToolsDocs([
+                                                  ...dataToolsDocs,
+                                                  ...validFiles,
+                                                ]);
+                                              } else {
+                                                alert(
+                                                  "Please upload PDF or text documents"
+                                                );
+                                              }
+                                            }}
+                                            onDragOver={(e) => {
+                                              e.preventDefault();
+                                              setIsDataToolsDragging(true);
+                                            }}
+                                            onDragLeave={(e) => {
+                                              e.preventDefault();
+                                              setIsDataToolsDragging(false);
+                                            }}
+                                            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                                              isDataToolsDragging
+                                                ? "border-blue-500 bg-blue-50"
+                                                : "border-gray-300"
+                                            }`}
+                                            onClick={() =>
+                                              document
+                                                .getElementById(
+                                                  "data-tools-upload"
+                                                )
+                                                ?.click()
+                                            }
+                                          >
+                                            <input
+                                              id="data-tools-upload"
+                                              type="file"
+                                              accept=".pdf,.txt"
+                                              multiple
+                                              onChange={(e) => {
+                                                const files = Array.from(
+                                                  e.target.files || []
+                                                );
+                                                if (files.length > 0) {
+                                                  setDataToolsDocs([
+                                                    ...dataToolsDocs,
+                                                    ...files,
+                                                  ]);
+                                                }
+                                              }}
+                                              className="hidden"
+                                            />
+                                            <div className="flex flex-col items-center gap-2">
+                                              <Upload
+                                                className={`w-8 h-8 ${isDataToolsDragging ? "text-blue-500" : "text-gray-400"}`}
+                                              />
+                                              <div>
+                                                <p className="text-sm font-medium text-gray-900">
+                                                  Upload Data & Tools Documents
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                  PDF or text files - Drag and
+                                                  drop or click to browse
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {dataToolsDocs.length > 0 && (
+                                            <div className="space-y-2">
+                                              <Label>
+                                                Uploaded Documents (
+                                                {dataToolsDocs.length})
+                                              </Label>
+                                              {dataToolsDocs.map(
+                                                (file, index) => (
+                                                  <div
+                                                    key={index}
+                                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                  >
+                                                    <span className="text-sm">
+                                                      {file.name}
+                                                    </span>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={() =>
+                                                        setDataToolsDocs(
+                                                          dataToolsDocs.filter(
+                                                            (_, i) =>
+                                                              i !== index
+                                                          )
+                                                        )
+                                                      }
+                                                    >
+                                                      Remove
+                                                    </Button>
+                                                  </div>
+                                                )
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </CollapsibleContent>
+                                    </div>
+                                  </Collapsible>
+                                  Remove
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </div>
