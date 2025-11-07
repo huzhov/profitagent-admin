@@ -26,73 +26,19 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { CreateAgentModal } from "./CreateAgentModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useApp } from "@/context/AppContext";
 
 export default function Agents() {
   const navigate = useNavigate();
+  const { agents, handleCloneAgent, handleDeleteAgent, toggleAgentStatus } =
+    useApp();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [agents, setAgents] = useState([
-    {
-      id: 1,
-      name: "SalesBot Pro",
-      description: "Advanced sales agent for lead qualification and conversion",
-      status: "Active",
-      workflows: 3,
-      tests: 0,
-      conversations: 0,
-      conversionRate: "0%",
-      revenueGenerated: "$0",
-      customerSatisfaction: "0%",
-      channels: ["WhatsApp", "Web"],
-      created: "Oct 15, 2024",
-      lastActive: "2 minutes ago",
-      iconColor: "blue",
-    },
-    {
-      id: 2,
-      name: "Support Assistant",
-      description: "Customer support automation with intelligent routing",
-      status: "Active",
-      workflows: 2,
-      tests: 0,
-      conversations: 0,
-      conversionRate: "0%",
-      revenueGenerated: "$0",
-      customerSatisfaction: "0%",
-      channels: ["Slack", "Web"],
-      created: "Sep 28, 2024",
-      lastActive: "5 minutes ago",
-      iconColor: "green",
-    },
-    {
-      id: 3,
-      name: "Lead Qualifier",
-      description: "Pre-qualifies leads and schedules appointments",
-      status: "Paused",
-      workflows: 1,
-      tests: 0,
-      conversations: 0,
-      conversionRate: "0%",
-      revenueGenerated: "$0",
-      customerSatisfaction: "0%",
-      channels: ["Web"],
-      created: "Sep 10, 2024",
-      lastActive: "1 hour ago",
-      iconColor: "purple",
-    },
-  ]);
-
-  const toggleAgentStatus = (agentId: number) => {
-    setAgents(
-      agents.map((agent) =>
-        agent.id === agentId
-          ? {
-              ...agent,
-              status: agent.status === "Active" ? "Paused" : "Active",
-            }
-          : agent
-      )
-    );
-  };
 
   const totalConversations = agents.reduce(
     (sum, agent) => sum + agent.conversations,
@@ -254,14 +200,33 @@ export default function Agents() {
                     </Badge>
                   </div>
                 </div>
-                <Button
-                  data-slot="button"
-                  variant="ghost"
-                  size="sm"
-                  className="cursor-pointer"
-                >
-                  <EllipsisVertical className="w-4 h-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <EllipsisVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate({ to: `/agents/${agent.id}/edit` })
+                      }
+                    >
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleCloneAgent(agent.id)}
+                    >
+                      Clone
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDeleteAgent(agent.id)}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <CardDescription
                 data-slot="card-description"

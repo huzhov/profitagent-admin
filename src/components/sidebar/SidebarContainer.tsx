@@ -1,7 +1,7 @@
 import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
 import { Button } from "../ui/button";
-import { Plus, PowerOff } from "lucide-react";
+import { Plus, Power } from "lucide-react";
 import { useState } from "react";
 import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
 import { useNavigate } from "@tanstack/react-router";
@@ -47,7 +47,7 @@ export default function SidebarContainer() {
           onClick={handleLogout}
           className={`w-full flex items-center px-3 gap-3 rounded-lg text-left transition-colors `}
         >
-          <PowerOff className="w-4 h-4" />
+          <Power className="w-4 h-4" />
           <span>Log Out</span>
         </button>
       </div>
