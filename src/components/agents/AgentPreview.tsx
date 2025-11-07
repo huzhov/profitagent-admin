@@ -24,7 +24,7 @@ interface Message {
 }
 
 export function AgentPreview() {
-  const { id } = useParams({ from: "/agents/$id/preview" });
+  const { id } = useParams({ from: "/_authenticated/agents/$id/preview" });
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

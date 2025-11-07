@@ -56,7 +56,7 @@ const agentTypeConfig = {
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
-  const { type } = useParams({ from: "/agents/create/$type" });
+  const { type } = useParams({ from: "/_authenticated/agents/create/$type" });
   const agentConfig =
     agentTypeConfig[type as keyof typeof agentTypeConfig] ||
     agentTypeConfig.onboarding;
@@ -72,6 +72,8 @@ export default function AgentBuilder() {
   const [systemPrompt, setSystemPrompt] = useState("");
   const [contextInfo, setContextInfo] = useState("");
   const [productCatalogue, setProductCatalogue] = useState("");
+  const [highTouch, setHighTouch] = useState("");
+  const [audience, setAudience] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -84,6 +86,7 @@ export default function AgentBuilder() {
     channels: false,
     knowledge: false,
     productCatalogue: false,
+    audience: false,
   });
 
   const [channels, setChannels] = useState({
@@ -671,6 +674,64 @@ export default function AgentBuilder() {
                               </p>
                             </div>
                           </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Audience*/}
+                <Collapsible
+                  open={openSections.audience}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, audience: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Audience</h3>
+                        <p className="text-gray-600 text-sm">
+                          Choose how you want to add your audience.
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.audience ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div>
+                          <Label htmlFor="context-info">
+                            Audience description
+                          </Label>
+                          <Textarea
+                            id="context-info"
+                            placeholder="Enter audience description."
+                            rows={4}
+                            value={audience}
+                            onChange={(e) => setAudience(e.target.value)}
+                            className="mt-1.5"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="industry">Hightouch segment</Label>
+                          <Select
+                            value={highTouch}
+                            onValueChange={setHighTouch}
+                          >
+                            <SelectTrigger
+                              id="industry"
+                              className="mt-1.5 w-full"
+                            >
+                              <SelectValue placeholder="Select Hightouch" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="technology">
+                                Stay at home mums
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </CollapsibleContent>

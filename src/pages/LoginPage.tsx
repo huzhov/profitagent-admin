@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { login } from "@/lib/auth";
+import { Eye, EyeOff } from "lucide-react";
+import { LogoIcon } from "@/components/assets/index";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
@@ -20,6 +23,7 @@ const schema = z.object({
 });
 
 const LoginPage = () => {
+  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -34,10 +38,21 @@ const LoginPage = () => {
     }
   }
 
+  const toggleVisibility = () => setIsVisible((prevState) => !prevState);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm border rounded-lg p-6 shadow-sm bg-card">
-        <h1 className="text-xl font-semibold mb-1">Log in</h1>
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <LogoIcon className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold">ProfitAgent</h1>
+            <p className="text-sm text-muted-foreground">AI Sales Platform</p>
+          </div>
+        </div>
+        <h1 className="text-xl font-semibold my-1">Log in</h1>
         <p className="text-sm text-muted-foreground mb-6">
           Use your email and password to continue.
         </p>
@@ -61,21 +76,37 @@ const LoginPage = () => {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type={isVisible ? "password" : "text"}
+                        placeholder="••••••••"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-10 end-0 flex items-center z-20 px-2.5 cursor-pointer text-gray-400 rounded-e-md"
+                onClick={toggleVisibility}
+              >
+                {isVisible ? <EyeOff /> : <Eye />}
+              </button>
+            </div>
+            <div className="mt-4 text-xs text-muted-foreground">
+              <Link to="/signup" className="underline">
+                Forgot Password
+              </Link>
+            </div>
             <Button
               type="submit"
               className="w-full"

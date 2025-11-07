@@ -19,7 +19,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 
 export default function AgentView() {
   const navigate = useNavigate();
-  const { id } = useParams({ from: "/agents/$id/view" });
+  const { id } = useParams({ from: "/_authenticated/agents/$id/view" });
 
   // Mock data - replace with actual data fetching
   const agent = {
