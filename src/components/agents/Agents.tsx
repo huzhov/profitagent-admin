@@ -26,6 +26,12 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { CreateAgentModal } from "./CreateAgentModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -92,6 +98,29 @@ export default function Agents() {
           : agent
       )
     );
+  };
+
+  const handleCloneAgent = (agentId: number) => {
+    const agent = agents.find((agent) => agent.id === agentId);
+    if (!agent) return;
+
+    const counter = agents.filter((agent) =>
+      agent.name.includes("Copy")
+    ).length;
+
+    const cloneAgent = {
+      ...agent,
+      id: agents[agents.length - 1].id + 1,
+      name: agent.name.includes("Copy")
+        ? agent.name.replace(/\(Copy.*\)$/, `(Copy - ${counter})`)
+        : `${agent?.name} (Copy)`,
+    };
+
+    setAgents(agents.concat(cloneAgent));
+  };
+
+  const handleDeleteAgent = (agentId: number) => {
+    setAgents(agents.filter((agent) => agent.id !== agentId));
   };
 
   const totalConversations = agents.reduce(
@@ -254,14 +283,27 @@ export default function Agents() {
                     </Badge>
                   </div>
                 </div>
-                <Button
-                  data-slot="button"
-                  variant="ghost"
-                  size="sm"
-                  className="cursor-pointer"
-                >
-                  <EllipsisVertical className="w-4 h-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <EllipsisVertical className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleCloneAgent(agent.id)}
+                    >
+                      Clone
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDeleteAgent(agent.id)}
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               <CardDescription
                 data-slot="card-description"
