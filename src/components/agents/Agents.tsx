@@ -207,7 +207,13 @@ export default function Agents() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate({ to: `/agents/${agent.id}/edit` })
+                      }
+                    >
+                      Edit
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleCloneAgent(agent.id)}
                     >

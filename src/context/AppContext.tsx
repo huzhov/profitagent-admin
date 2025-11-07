@@ -7,6 +7,7 @@ interface AppContextType {
   toggleAgentStatus: (agentId: number) => void;
   handleCloneAgent: (agentId: number) => void;
   handleDeleteAgent: (agentId: number) => void;
+  handleSaveAgent: (agentId: number, name: string, description: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -99,6 +100,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setAgents(agents.filter((agent) => agent.id !== agentId));
   };
 
+  const handleSaveAgent = (
+    agentId: number,
+    name: string,
+    description: string
+  ) => {
+    setAgents(
+      agents.map((agent) =>
+        agent.id === agentId
+          ? {
+              ...agent,
+              name,
+              description,
+            }
+          : agent
+      )
+    );
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -106,6 +125,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleAgentStatus,
         handleCloneAgent,
         handleDeleteAgent,
+        handleSaveAgent,
       }}
     >
       {children}
