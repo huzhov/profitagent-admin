@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import type { FormEvent } from "react";
+import { useApp } from "@/context/AppContext";
 
 interface Message {
   id: string;
@@ -29,28 +30,30 @@ export function AgentPreview() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Mock agent data - in a real app, this would come from an API or context
-  const agents = [
-    {
-      id: "1",
-      name: "SalesBot Pro",
-      description: "Advanced sales agent for lead qualification and conversion",
-      channels: ["WhatsApp", "Web"],
-    },
-    {
-      id: "2",
-      name: "Support Assistant",
-      description: "Customer support automation with intelligent routing",
-      channels: ["Slack", "Web"],
-    },
-    {
-      id: "3",
-      name: "Lead Qualifier",
-      description: "Pre-qualifies leads and schedules appointments",
-      channels: ["Web"],
-    },
-  ];
+  // const agents = [
+  //   {
+  //     id: "1",
+  //     name: "SalesBot Pro",
+  //     description: "Advanced sales agent for lead qualification and conversion",
+  //     channels: ["WhatsApp", "Web"],
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Support Assistant",
+  //     description: "Customer support automation with intelligent routing",
+  //     channels: ["Slack", "Web"],
+  //   },
+  //   {
+  //     id: "3",
+  //     name: "Lead Qualifier",
+  //     description: "Pre-qualifies leads and schedules appointments",
+  //     channels: ["Web"],
+  //   },
+  // ];
 
-  const agent = agents.find((a) => a.id === id);
+  const { agents } = useApp();
+
+  const agent = agents.find((a) => a.id === Number(id));
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -188,7 +191,10 @@ export function AgentPreview() {
       <div className="border-b border-border bg-card">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 gap-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
-            <Button variant="ghost" onClick={() => navigate({ to: "/agents" })}>
+            <Button
+              variant="ghost"
+              onClick={() => navigate({ to: `/agents/${id}/edit` })}
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Configuration
             </Button>
