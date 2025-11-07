@@ -82,7 +82,7 @@ export function CreateAgentModal({
               <button
                 key={agentType.id}
                 onClick={() => handleSelectAgent(agentType.id)}
-                className={`bg-white rounded-lg border-2 border-gray-200 p-4 text-left transition-all ${agentType.hoverBgColor} hover:border-gray-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                className={`bg-white rounded-lg border-2 border-gray-200 p-4 text-left transition-all cursor-pointer ${agentType.hoverBgColor} hover:border-gray-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
               >
                 <div className="flex items-start gap-4">
                   <div

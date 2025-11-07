@@ -2,7 +2,12 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "@tanstack/react-router";
 import ReactFlow, {
   Controls,
@@ -28,6 +33,12 @@ import {
   ChevronDown,
   ChevronRight,
   Cpu,
+  MessageCircle,
+  Settings,
+  Wrench,
+  GitBranch,
+  Monitor,
+  StopCircle,
 } from "lucide-react";
 import { WorkflowNode } from "./WorkflowNode";
 import type { WorkflowNodeData } from "./WorkflowNode";
@@ -365,6 +376,7 @@ export default function CreateWorkflow() {
     "Multi-Agent Customer Journey"
   );
   const [chatMessage, setChatMessage] = useState("");
+  const [isChatTestVisible, setIsChatTestVisible] = useState(false);
 
   // Master orchestrator flow
   const [orchNodes, setOrchNodes, onOrchNodesChange] =
@@ -474,9 +486,9 @@ export default function CreateWorkflow() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4 flex-1">
           <Button
             variant="ghost"
@@ -511,7 +523,11 @@ export default function CreateWorkflow() {
             <Play className="w-4 h-4 mr-2" />
             Test Run
           </Button>
-          <Button size="sm">
+          <Button
+            size="sm"
+            onClick={() => setIsChatTestVisible(!isChatTestVisible)}
+            variant={isChatTestVisible ? "default" : "outline"}
+          >
             <MessageSquare className="w-4 h-4 mr-2" />
             Chat Test
           </Button>
@@ -519,42 +535,11 @@ export default function CreateWorkflow() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden mt-16">
-        {/* Step Library */}
-        <div className="w-56 bg-white border-r border-gray-200 p-4 flex-shrink-0">
-          <h3 className="text-gray-900 mb-3 font-semibold">Step Library</h3>
-          <div className="space-y-2">
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left">
-              <span className="text-xl">💬</span>
-              <span className="text-gray-700 text-sm">Prompt</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left">
-              <span className="text-xl">⚙️</span>
-              <span className="text-gray-700 text-sm">Action</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left">
-              <span className="text-xl">🧰</span>
-              <span className="text-gray-700 text-sm">Tool Call</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left">
-              <span className="text-xl">🔀</span>
-              <span className="text-gray-700 text-sm">Decision</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left">
-              <span className="text-xl">🖥️</span>
-              <span className="text-gray-700 text-sm">System</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors text-left">
-              <span className="text-xl">⛔️</span>
-              <span className="text-gray-700 text-sm">End</span>
-            </button>
-          </div>
-        </div>
-
+      <div className="flex-1 flex overflow-hidden bg-gray-50">
         {/* Canvas */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <ScrollArea className="flex-1">
-            <div className="p-8 space-y-8">
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-8 space-y-8 min-h-full">
               {/* Master Orchestrator */}
               <div>
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-t-lg shadow-md flex items-center justify-between">
@@ -569,14 +554,44 @@ export default function CreateWorkflow() {
                       </p>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Step
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-white hover:bg-white/20"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Step
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Prompt
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Action
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Wrench className="w-4 h-4 mr-2" />
+                        Tool Call
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <GitBranch className="w-4 h-4 mr-2" />
+                        Decision
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Monitor className="w-4 h-4 mr-2" />
+                        System
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <StopCircle className="w-4 h-4 mr-2" />
+                        End
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <div
                   className="bg-white border-2 border-indigo-200 rounded-b-lg shadow-md"
@@ -634,15 +649,45 @@ export default function CreateWorkflow() {
                         </div>
                         <div className="flex items-center gap-2">
                           {agent.expanded && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-gray-700 hover:bg-white/50"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Plus className="w-4 h-4 mr-2" />
-                              Add Step
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-gray-700 hover:bg-white/50"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Plus className="w-4 h-4 mr-2" />
+                                  Add Step
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <MessageCircle className="w-4 h-4 mr-2" />
+                                  Prompt
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Settings className="w-4 h-4 mr-2" />
+                                  Action
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Wrench className="w-4 h-4 mr-2" />
+                                  Tool Call
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <GitBranch className="w-4 h-4 mr-2" />
+                                  Decision
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Monitor className="w-4 h-4 mr-2" />
+                                  System
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <StopCircle className="w-4 h-4 mr-2" />
+                                  End
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                         </div>
                       </div>
@@ -726,69 +771,75 @@ export default function CreateWorkflow() {
                 })}
               </div>
             </div>
-          </ScrollArea>
+          </div>
         </div>
 
         {/* Chat Test Panel */}
-        <div className="w-96 bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
-          <div className="h-full flex flex-col bg-white">
-            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-gray-900 flex items-center gap-2 font-semibold">
-                    <Zap className="w-4 h-4 text-blue-600" />
-                    Workflow Chat Test
-                  </h3>
-                  <p className="text-gray-600 text-xs mt-0.5">{workflowName}</p>
+        {isChatTestVisible && (
+          <div className="w-96 bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
+            <div className="h-full flex flex-col bg-white">
+              <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-gray-900 flex items-center gap-2 font-semibold">
+                      <Zap className="w-4 h-4 text-blue-600" />
+                      Workflow Chat Test
+                    </h3>
+                    <p className="text-gray-600 text-xs mt-0.5">
+                      {workflowName}
+                    </p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-gray-600">
+                    <RotateCcw className="w-4 h-4 mr-1" />
+                    Reset
+                  </Button>
                 </div>
-                <Button variant="ghost" size="sm" className="text-gray-600">
-                  <RotateCcw className="w-4 h-4 mr-1" />
-                  Reset
-                </Button>
               </div>
-            </div>
 
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                <div className="flex justify-start">
-                  <div className="flex gap-3 max-w-[85%] flex-row">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-600">
-                      <Zap className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <div className="rounded-lg px-4 py-2 bg-yellow-50 text-yellow-900 border border-yellow-200">
-                        <p className="text-sm whitespace-pre-wrap">
-                          Chat test session started. Type a message to simulate
-                          a customer interaction.
-                        </p>
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
+                  <div className="flex justify-start">
+                    <div className="flex gap-3 max-w-[85%] flex-row">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-600">
+                        <Zap className="w-4 h-4 text-white" />
                       </div>
-                      <div className="flex items-center gap-2 px-1 justify-start">
-                        <span className="text-xs text-gray-500">12:58 AM</span>
+                      <div className="flex flex-col gap-1">
+                        <div className="rounded-lg px-4 py-2 bg-yellow-50 text-yellow-900 border border-yellow-200">
+                          <p className="text-sm whitespace-pre-wrap">
+                            Chat test session started. Type a message to
+                            simulate a customer interaction.
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 px-1 justify-start">
+                          <span className="text-xs text-gray-500">
+                            12:58 AM
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </ScrollArea>
 
-            <div className="p-4 border-t border-gray-200 bg-white">
-              <div className="flex gap-2">
-                <Input
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="Type a message to test the workflow..."
-                  className="flex-1"
-                />
-                <Button size="sm" disabled={!chatMessage}>
-                  <Send className="w-4 h-4" />
-                </Button>
+              <div className="p-4 border-t border-gray-200 bg-white">
+                <div className="flex gap-2">
+                  <Input
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    placeholder="Type a message to test the workflow..."
+                    className="flex-1"
+                  />
+                  <Button size="sm" disabled={!chatMessage}>
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Test how your workflow responds to different messages
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Test how your workflow responds to different messages
-              </p>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

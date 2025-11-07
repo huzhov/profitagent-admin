@@ -63,7 +63,7 @@ export default function SidebarNavigation() {
             <li key={section.id}>
               <button
                 onClick={() => navigate({ to: section.route })}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer ${
                   isActive
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent/50"

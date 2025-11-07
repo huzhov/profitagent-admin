@@ -26,9 +26,17 @@ import { Route as AuthenticatedBusinessSettingsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedAbTestingRouteImport } from './routes/_authenticated/ab-testing'
 import { Route as AuthenticatedWorkflowsIndexRouteImport } from './routes/_authenticated/workflows.index'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
+import { Route as AuthenticatedReportingIndexRouteImport } from './routes/_authenticated/reporting.index'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
 import { Route as AuthenticatedAbTestingIndexRouteImport } from './routes/_authenticated/ab-testing.index'
 import { Route as AuthenticatedWorkflowsNewRouteImport } from './routes/_authenticated/workflows.new'
+import { Route as AuthenticatedSettingsReportingRouteImport } from './routes/_authenticated/settings.reporting'
+import { Route as AuthenticatedSettingsGeneralRouteImport } from './routes/_authenticated/settings.general'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings.account'
+import { Route as AuthenticatedReportingVolumeMetricsRouteImport } from './routes/_authenticated/reporting.volume-metrics'
+import { Route as AuthenticatedReportingEngagementRouteImport } from './routes/_authenticated/reporting.engagement'
+import { Route as AuthenticatedReportingBusinessOutcomesRouteImport } from './routes/_authenticated/reporting.business-outcomes'
 import { Route as AuthenticatedAbTestingCreateRouteImport } from './routes/_authenticated/ab-testing.create'
 import { Route as AuthenticatedAgentsCreateTypeRouteImport } from './routes/_authenticated/agents.create.$type'
 import { Route as AuthenticatedAgentsIdViewRouteImport } from './routes/_authenticated/agents.$id.view'
@@ -123,6 +131,18 @@ const AuthenticatedWorkflowsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedWorkflowsRoute,
   } as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedReportingIndexRoute =
+  AuthenticatedReportingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
 const AuthenticatedAgentsIndexRoute =
   AuthenticatedAgentsIndexRouteImport.update({
     id: '/',
@@ -140,6 +160,42 @@ const AuthenticatedWorkflowsNewRoute =
     id: '/new',
     path: '/new',
     getParentRoute: () => AuthenticatedWorkflowsRoute,
+  } as any)
+const AuthenticatedSettingsReportingRoute =
+  AuthenticatedSettingsReportingRouteImport.update({
+    id: '/reporting',
+    path: '/reporting',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsGeneralRoute =
+  AuthenticatedSettingsGeneralRouteImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedReportingVolumeMetricsRoute =
+  AuthenticatedReportingVolumeMetricsRouteImport.update({
+    id: '/volume-metrics',
+    path: '/volume-metrics',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
+const AuthenticatedReportingEngagementRoute =
+  AuthenticatedReportingEngagementRouteImport.update({
+    id: '/engagement',
+    path: '/engagement',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
+const AuthenticatedReportingBusinessOutcomesRoute =
+  AuthenticatedReportingBusinessOutcomesRouteImport.update({
+    id: '/business-outcomes',
+    path: '/business-outcomes',
+    getParentRoute: () => AuthenticatedReportingRoute,
   } as any)
 const AuthenticatedAbTestingCreateRoute =
   AuthenticatedAbTestingCreateRouteImport.update({
@@ -176,16 +232,24 @@ export interface FileRoutesByFullPath {
   '/intelligence': typeof AuthenticatedIntelligenceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
-  '/reporting': typeof AuthenticatedReportingRoute
-  '/settings': typeof AuthenticatedSettingsRoute
+  '/reporting': typeof AuthenticatedReportingRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/templates': typeof AuthenticatedTemplatesRoute
   '/testing': typeof AuthenticatedTestingRoute
   '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/': typeof AuthenticatedIndexRoute
   '/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
+  '/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
+  '/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/general': typeof AuthenticatedSettingsGeneralRoute
+  '/settings/reporting': typeof AuthenticatedSettingsReportingRoute
   '/workflows/new': typeof AuthenticatedWorkflowsNewRoute
   '/ab-testing/': typeof AuthenticatedAbTestingIndexRoute
   '/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/reporting/': typeof AuthenticatedReportingIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/workflows/': typeof AuthenticatedWorkflowsIndexRoute
   '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
@@ -199,15 +263,21 @@ export interface FileRoutesByTo {
   '/intelligence': typeof AuthenticatedIntelligenceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
-  '/reporting': typeof AuthenticatedReportingRoute
-  '/settings': typeof AuthenticatedSettingsRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/testing': typeof AuthenticatedTestingRoute
   '/': typeof AuthenticatedIndexRoute
   '/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
+  '/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
+  '/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/general': typeof AuthenticatedSettingsGeneralRoute
+  '/settings/reporting': typeof AuthenticatedSettingsReportingRoute
   '/workflows/new': typeof AuthenticatedWorkflowsNewRoute
   '/ab-testing': typeof AuthenticatedAbTestingIndexRoute
   '/agents': typeof AuthenticatedAgentsIndexRoute
+  '/reporting': typeof AuthenticatedReportingIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
   '/workflows': typeof AuthenticatedWorkflowsIndexRoute
   '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
@@ -225,16 +295,24 @@ export interface FileRoutesById {
   '/_authenticated/intelligence': typeof AuthenticatedIntelligenceRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
-  '/_authenticated/reporting': typeof AuthenticatedReportingRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/reporting': typeof AuthenticatedReportingRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
   '/_authenticated/testing': typeof AuthenticatedTestingRoute
   '/_authenticated/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/_authenticated/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
+  '/_authenticated/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
+  '/_authenticated/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/general': typeof AuthenticatedSettingsGeneralRoute
+  '/_authenticated/settings/reporting': typeof AuthenticatedSettingsReportingRoute
   '/_authenticated/workflows/new': typeof AuthenticatedWorkflowsNewRoute
   '/_authenticated/ab-testing/': typeof AuthenticatedAbTestingIndexRoute
   '/_authenticated/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/_authenticated/reporting/': typeof AuthenticatedReportingIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/workflows/': typeof AuthenticatedWorkflowsIndexRoute
   '/_authenticated/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/_authenticated/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
@@ -259,9 +337,17 @@ export interface FileRouteTypes {
     | '/workflows'
     | '/'
     | '/ab-testing/create'
+    | '/reporting/business-outcomes'
+    | '/reporting/engagement'
+    | '/reporting/volume-metrics'
+    | '/settings/account'
+    | '/settings/general'
+    | '/settings/reporting'
     | '/workflows/new'
     | '/ab-testing/'
     | '/agents/'
+    | '/reporting/'
+    | '/settings/'
     | '/workflows/'
     | '/agents/$id/preview'
     | '/agents/$id/view'
@@ -275,15 +361,21 @@ export interface FileRouteTypes {
     | '/intelligence'
     | '/messages'
     | '/privacy-policy'
-    | '/reporting'
-    | '/settings'
     | '/templates'
     | '/testing'
     | '/'
     | '/ab-testing/create'
+    | '/reporting/business-outcomes'
+    | '/reporting/engagement'
+    | '/reporting/volume-metrics'
+    | '/settings/account'
+    | '/settings/general'
+    | '/settings/reporting'
     | '/workflows/new'
     | '/ab-testing'
     | '/agents'
+    | '/reporting'
+    | '/settings'
     | '/workflows'
     | '/agents/$id/preview'
     | '/agents/$id/view'
@@ -307,9 +399,17 @@ export interface FileRouteTypes {
     | '/_authenticated/workflows'
     | '/_authenticated/'
     | '/_authenticated/ab-testing/create'
+    | '/_authenticated/reporting/business-outcomes'
+    | '/_authenticated/reporting/engagement'
+    | '/_authenticated/reporting/volume-metrics'
+    | '/_authenticated/settings/account'
+    | '/_authenticated/settings/general'
+    | '/_authenticated/settings/reporting'
     | '/_authenticated/workflows/new'
     | '/_authenticated/ab-testing/'
     | '/_authenticated/agents/'
+    | '/_authenticated/reporting/'
+    | '/_authenticated/settings/'
     | '/_authenticated/workflows/'
     | '/_authenticated/agents/$id/preview'
     | '/_authenticated/agents/$id/view'
@@ -443,6 +543,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkflowsIndexRouteImport
       parentRoute: typeof AuthenticatedWorkflowsRoute
     }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/reporting/': {
+      id: '/_authenticated/reporting/'
+      path: '/'
+      fullPath: '/reporting/'
+      preLoaderRoute: typeof AuthenticatedReportingIndexRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
     '/_authenticated/agents/': {
       id: '/_authenticated/agents/'
       path: '/'
@@ -463,6 +577,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/workflows/new'
       preLoaderRoute: typeof AuthenticatedWorkflowsNewRouteImport
       parentRoute: typeof AuthenticatedWorkflowsRoute
+    }
+    '/_authenticated/settings/reporting': {
+      id: '/_authenticated/settings/reporting'
+      path: '/reporting'
+      fullPath: '/settings/reporting'
+      preLoaderRoute: typeof AuthenticatedSettingsReportingRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/general': {
+      id: '/_authenticated/settings/general'
+      path: '/general'
+      fullPath: '/settings/general'
+      preLoaderRoute: typeof AuthenticatedSettingsGeneralRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/reporting/volume-metrics': {
+      id: '/_authenticated/reporting/volume-metrics'
+      path: '/volume-metrics'
+      fullPath: '/reporting/volume-metrics'
+      preLoaderRoute: typeof AuthenticatedReportingVolumeMetricsRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
+    '/_authenticated/reporting/engagement': {
+      id: '/_authenticated/reporting/engagement'
+      path: '/engagement'
+      fullPath: '/reporting/engagement'
+      preLoaderRoute: typeof AuthenticatedReportingEngagementRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
+    '/_authenticated/reporting/business-outcomes': {
+      id: '/_authenticated/reporting/business-outcomes'
+      path: '/business-outcomes'
+      fullPath: '/reporting/business-outcomes'
+      preLoaderRoute: typeof AuthenticatedReportingBusinessOutcomesRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
     }
     '/_authenticated/ab-testing/create': {
       id: '/_authenticated/ab-testing/create'
@@ -528,6 +684,48 @@ const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
 const AuthenticatedAgentsRouteWithChildren =
   AuthenticatedAgentsRoute._addFileChildren(AuthenticatedAgentsRouteChildren)
 
+interface AuthenticatedReportingRouteChildren {
+  AuthenticatedReportingBusinessOutcomesRoute: typeof AuthenticatedReportingBusinessOutcomesRoute
+  AuthenticatedReportingEngagementRoute: typeof AuthenticatedReportingEngagementRoute
+  AuthenticatedReportingVolumeMetricsRoute: typeof AuthenticatedReportingVolumeMetricsRoute
+  AuthenticatedReportingIndexRoute: typeof AuthenticatedReportingIndexRoute
+}
+
+const AuthenticatedReportingRouteChildren: AuthenticatedReportingRouteChildren =
+  {
+    AuthenticatedReportingBusinessOutcomesRoute:
+      AuthenticatedReportingBusinessOutcomesRoute,
+    AuthenticatedReportingEngagementRoute:
+      AuthenticatedReportingEngagementRoute,
+    AuthenticatedReportingVolumeMetricsRoute:
+      AuthenticatedReportingVolumeMetricsRoute,
+    AuthenticatedReportingIndexRoute: AuthenticatedReportingIndexRoute,
+  }
+
+const AuthenticatedReportingRouteWithChildren =
+  AuthenticatedReportingRoute._addFileChildren(
+    AuthenticatedReportingRouteChildren,
+  )
+
+interface AuthenticatedSettingsRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedSettingsGeneralRoute: typeof AuthenticatedSettingsGeneralRoute
+  AuthenticatedSettingsReportingRoute: typeof AuthenticatedSettingsReportingRoute
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+}
+
+const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
+  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+  AuthenticatedSettingsGeneralRoute: AuthenticatedSettingsGeneralRoute,
+  AuthenticatedSettingsReportingRoute: AuthenticatedSettingsReportingRoute,
+  AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+}
+
+const AuthenticatedSettingsRouteWithChildren =
+  AuthenticatedSettingsRoute._addFileChildren(
+    AuthenticatedSettingsRouteChildren,
+  )
+
 interface AuthenticatedWorkflowsRouteChildren {
   AuthenticatedWorkflowsNewRoute: typeof AuthenticatedWorkflowsNewRoute
   AuthenticatedWorkflowsIndexRoute: typeof AuthenticatedWorkflowsIndexRoute
@@ -552,8 +750,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIntelligenceRoute: typeof AuthenticatedIntelligenceRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedPrivacyPolicyRoute: typeof AuthenticatedPrivacyPolicyRoute
-  AuthenticatedReportingRoute: typeof AuthenticatedReportingRoute
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedReportingRoute: typeof AuthenticatedReportingRouteWithChildren
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
   AuthenticatedTestingRoute: typeof AuthenticatedTestingRoute
   AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRouteWithChildren
@@ -568,8 +766,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIntelligenceRoute: AuthenticatedIntelligenceRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedPrivacyPolicyRoute: AuthenticatedPrivacyPolicyRoute,
-  AuthenticatedReportingRoute: AuthenticatedReportingRoute,
-  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedReportingRoute: AuthenticatedReportingRouteWithChildren,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
   AuthenticatedTestingRoute: AuthenticatedTestingRoute,
   AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRouteWithChildren,

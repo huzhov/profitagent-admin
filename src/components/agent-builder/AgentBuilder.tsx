@@ -77,6 +77,62 @@ export default function AgentBuilder() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
+  // Guardrails state
+  const [restrictedTopics, setRestrictedTopics] = useState("");
+  const [profanityFilter, setProfanityFilter] = useState(true);
+  const [customProfanityWords, setCustomProfanityWords] = useState("");
+  const [piiHandling, setPiiHandling] = useState(true);
+  const [escalationKeywords, setEscalationKeywords] = useState("");
+  const [brandVoiceRules, setBrandVoiceRules] = useState("");
+
+  // Messaging Controls state
+  const [followUpDelay, setFollowUpDelay] = useState([24]);
+  const [maxFollowUps, setMaxFollowUps] = useState([3]);
+  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  const [quietHoursStart, setQuietHoursStart] = useState("22:00");
+  const [quietHoursEnd, setQuietHoursEnd] = useState("08:00");
+  const [dailyMessageLimit, setDailyMessageLimit] = useState([10]);
+  const [monthlyMessageLimit, setMonthlyMessageLimit] = useState([100]);
+
+  // HITL Handover state
+  const [hitlEnabled, setHitlEnabled] = useState(false);
+  const [sentimentThreshold, setSentimentThreshold] = useState([30]);
+  const [repeatedQuestionsCount, setRepeatedQuestionsCount] = useState([3]);
+  const [hitlKeywords, setHitlKeywords] = useState("");
+  const [handoverMessage, setHandoverMessage] = useState(
+    "Let me connect you with a team member who can help you better."
+  );
+
+  // WhatsApp Components state
+  const [quickRepliesEnabled, setQuickRepliesEnabled] = useState(true);
+  const [ctaButtonsEnabled, setCtaButtonsEnabled] = useState(true);
+  const [listMessagesEnabled, setListMessagesEnabled] = useState(true);
+
+  // Scheduling state
+  const [schedulingEnabled, setSchedulingEnabled] = useState(false);
+  const [schedulingProvider, setSchedulingProvider] = useState("calendly");
+  const [calendlyUrl, setCalendlyUrl] = useState("");
+
+  // Question Sets state
+  const [questionSets, setQuestionSets] = useState<File[]>([]);
+  const [isQuestionSetDragging, setIsQuestionSetDragging] = useState(false);
+  const [questionSetJson, setQuestionSetJson] = useState("");
+  const [questionSetInputMode, setQuestionSetInputMode] = useState<
+    "upload" | "paste"
+  >("upload");
+
+  // Product Recommendations state
+  const [recommendationsEnabled, setRecommendationsEnabled] = useState(false);
+  const [maxRecommendations, setMaxRecommendations] = useState([3]);
+  const [recommendationStrategy, setRecommendationStrategy] =
+    useState("popularity");
+  const [includeImages, setIncludeImages] = useState(true);
+
+  // Natural Conversation state
+  const [oneQuestionAtATime, setOneQuestionAtATime] = useState(true);
+  const [responsePacing, setResponsePacing] = useState([1500]);
+  const [simulateTyping, setSimulateTyping] = useState(true);
+
   // Track collapsible states
   const [openSections, setOpenSections] = useState({
     basicInfo: true,
@@ -87,6 +143,14 @@ export default function AgentBuilder() {
     knowledge: false,
     productCatalogue: false,
     audience: false,
+    guardrails: false,
+    messagingControls: false,
+    hitlHandover: false,
+    whatsappComponents: false,
+    scheduling: false,
+    questionSets: false,
+    recommendations: false,
+    conversationFlow: false,
   });
 
   const [channels, setChannels] = useState({
@@ -262,7 +326,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
                           Basic Information
@@ -325,7 +389,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
                           Brand & Business
@@ -388,7 +452,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Agent Behavior</h3>
                         <p className="text-gray-600 text-sm">
@@ -465,7 +529,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
                           AI Configuration
@@ -507,7 +571,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
                           Channels
@@ -565,7 +629,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Knowledge & Context</h3>
                         <p className="text-gray-600 text-sm">
@@ -607,7 +671,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Product Catalogue</h3>
                         <p className="text-gray-600 text-sm">
@@ -688,7 +752,7 @@ export default function AgentBuilder() {
                   }
                 >
                   <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Audience</h3>
                         <p className="text-gray-600 text-sm">
@@ -732,6 +796,981 @@ export default function AgentBuilder() {
                               </SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Guardrails & Safety */}
+                <Collapsible
+                  open={openSections.guardrails}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, guardrails: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Guardrails & Safety</h3>
+                        <p className="text-gray-600 text-sm">
+                          Define boundaries and safety mechanisms
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.guardrails ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div>
+                          <Label htmlFor="restricted-topics">
+                            Restricted Topics
+                          </Label>
+                          <Textarea
+                            id="restricted-topics"
+                            placeholder="Enter topics the agent should avoid (one per line)&#10;e.g., Politics, Religion, Controversial subjects"
+                            rows={3}
+                            value={restrictedTopics}
+                            onChange={(e) =>
+                              setRestrictedTopics(e.target.value)
+                            }
+                            className="mt-1.5"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Agent will politely decline to discuss these topics
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Profanity Filter
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Automatically filter inappropriate language
+                            </p>
+                          </div>
+                          <Switch
+                            checked={profanityFilter}
+                            onCheckedChange={setProfanityFilter}
+                          />
+                        </div>
+
+                        {profanityFilter && (
+                          <div>
+                            <Label htmlFor="custom-profanity">
+                              Custom Restricted Words
+                            </Label>
+                            <Textarea
+                              id="custom-profanity"
+                              placeholder="Add custom words to filter (comma-separated)"
+                              rows={2}
+                              value={customProfanityWords}
+                              onChange={(e) =>
+                                setCustomProfanityWords(e.target.value)
+                              }
+                              className="mt-1.5"
+                            />
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              PII Protection
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Mask personal information in logs
+                            </p>
+                          </div>
+                          <Switch
+                            checked={piiHandling}
+                            onCheckedChange={setPiiHandling}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="escalation-keywords">
+                            Escalation Keywords
+                          </Label>
+                          <Textarea
+                            id="escalation-keywords"
+                            placeholder="Keywords that trigger human handover&#10;e.g., speak to manager, urgent help, complaint"
+                            rows={3}
+                            value={escalationKeywords}
+                            onChange={(e) =>
+                              setEscalationKeywords(e.target.value)
+                            }
+                            className="mt-1.5"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Agent will offer human assistance when these are
+                            detected
+                          </p>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="brand-voice-rules">
+                            Brand Voice Guidelines
+                          </Label>
+                          <Textarea
+                            id="brand-voice-rules"
+                            placeholder="Define brand voice rules&#10;e.g., Always use 'we' not 'I', Avoid technical jargon, Use emojis sparingly"
+                            rows={4}
+                            value={brandVoiceRules}
+                            onChange={(e) => setBrandVoiceRules(e.target.value)}
+                            className="mt-1.5"
+                          />
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Messaging Controls */}
+                <Collapsible
+                  open={openSections.messagingControls}
+                  onOpenChange={(open) =>
+                    setOpenSections({
+                      ...openSections,
+                      messagingControls: open,
+                    })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Messaging Controls</h3>
+                        <p className="text-gray-600 text-sm">
+                          Follow-up frequency and outbound limits
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.messagingControls ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div>
+                          <Label htmlFor="follow-up-delay">
+                            Follow-up Delay: {followUpDelay[0]} hours
+                          </Label>
+                          <Slider
+                            id="follow-up-delay"
+                            min={1}
+                            max={168}
+                            step={1}
+                            value={followUpDelay}
+                            onValueChange={setFollowUpDelay}
+                            className="mt-2"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>1 hour</span>
+                            <span>1 week</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Time to wait before sending a follow-up message
+                          </p>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="max-followups">
+                            Maximum Follow-ups: {maxFollowUps[0]}
+                          </Label>
+                          <Slider
+                            id="max-followups"
+                            min={0}
+                            max={10}
+                            step={1}
+                            value={maxFollowUps}
+                            onValueChange={setMaxFollowUps}
+                            className="mt-2"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>None</span>
+                            <span>10 attempts</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Maximum follow-up attempts before stopping
+                          </p>
+                        </div>
+
+                        <div className="border-t pt-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <Label className="text-sm font-medium">
+                                Quiet Hours
+                              </Label>
+                              <p className="text-xs text-gray-500">
+                                Prevent messages during specific hours
+                              </p>
+                            </div>
+                            <Switch
+                              checked={quietHoursEnabled}
+                              onCheckedChange={setQuietHoursEnabled}
+                            />
+                          </div>
+
+                          {quietHoursEnabled && (
+                            <div className="grid grid-cols-2 gap-4 mt-3">
+                              <div>
+                                <Label
+                                  htmlFor="quiet-start"
+                                  className="text-sm"
+                                >
+                                  Start Time
+                                </Label>
+                                <Input
+                                  id="quiet-start"
+                                  type="time"
+                                  value={quietHoursStart}
+                                  onChange={(e) =>
+                                    setQuietHoursStart(e.target.value)
+                                  }
+                                  className="mt-1.5"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="quiet-end" className="text-sm">
+                                  End Time
+                                </Label>
+                                <Input
+                                  id="quiet-end"
+                                  type="time"
+                                  value={quietHoursEnd}
+                                  onChange={(e) =>
+                                    setQuietHoursEnd(e.target.value)
+                                  }
+                                  className="mt-1.5"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="border-t pt-4">
+                          <Label className="text-sm font-medium mb-3 block">
+                            Rate Limits
+                          </Label>
+
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="daily-limit" className="text-sm">
+                                Daily Messages per User: {dailyMessageLimit[0]}
+                              </Label>
+                              <Slider
+                                id="daily-limit"
+                                min={1}
+                                max={50}
+                                step={1}
+                                value={dailyMessageLimit}
+                                onValueChange={setDailyMessageLimit}
+                                className="mt-2"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Maximum messages sent to a single user per day
+                              </p>
+                            </div>
+
+                            <div>
+                              <Label
+                                htmlFor="monthly-limit"
+                                className="text-sm"
+                              >
+                                Monthly Messages per User:{" "}
+                                {monthlyMessageLimit[0]}
+                              </Label>
+                              <Slider
+                                id="monthly-limit"
+                                min={10}
+                                max={500}
+                                step={10}
+                                value={monthlyMessageLimit}
+                                onValueChange={setMonthlyMessageLimit}
+                                className="mt-2"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Maximum messages sent to a single user per month
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+                {/* Human-In-The-Loop Handover */}
+                <Collapsible
+                  open={openSections.hitlHandover}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, hitlHandover: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Human Handover</h3>
+                        <p className="text-gray-600 text-sm">
+                          Configure when to escalate to human operators
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.hitlHandover ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Enable Human Handover
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Allow escalation to human operators
+                            </p>
+                          </div>
+                          <Switch
+                            checked={hitlEnabled}
+                            onCheckedChange={setHitlEnabled}
+                          />
+                        </div>
+
+                        {hitlEnabled && (
+                          <>
+                            <div>
+                              <Label htmlFor="sentiment-threshold">
+                                Negative Sentiment Threshold:{" "}
+                                {sentimentThreshold[0]}%
+                              </Label>
+                              <Slider
+                                id="sentiment-threshold"
+                                min={0}
+                                max={100}
+                                step={5}
+                                value={sentimentThreshold}
+                                onValueChange={setSentimentThreshold}
+                                className="mt-2"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Trigger handover when customer sentiment drops
+                                below this level
+                              </p>
+                            </div>
+
+                            <div>
+                              <Label htmlFor="repeated-questions">
+                                Repeated Questions Count:{" "}
+                                {repeatedQuestionsCount[0]}
+                              </Label>
+                              <Slider
+                                id="repeated-questions"
+                                min={1}
+                                max={10}
+                                step={1}
+                                value={repeatedQuestionsCount}
+                                onValueChange={setRepeatedQuestionsCount}
+                                className="mt-2"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Escalate if customer asks same question this
+                                many times
+                              </p>
+                            </div>
+
+                            <div>
+                              <Label htmlFor="hitl-keywords">
+                                Handover Trigger Keywords
+                              </Label>
+                              <Textarea
+                                id="hitl-keywords"
+                                placeholder="Enter keywords (one per line)&#10;e.g., speak to manager, human help, talk to person"
+                                rows={3}
+                                value={hitlKeywords}
+                                onChange={(e) =>
+                                  setHitlKeywords(e.target.value)
+                                }
+                                className="mt-1.5"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor="handover-message">
+                                Handover Message
+                              </Label>
+                              <Textarea
+                                id="handover-message"
+                                placeholder="Message shown when transferring to human"
+                                rows={2}
+                                value={handoverMessage}
+                                onChange={(e) =>
+                                  setHandoverMessage(e.target.value)
+                                }
+                                className="mt-1.5"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* WhatsApp Native Components */}
+                <Collapsible
+                  open={openSections.whatsappComponents}
+                  onOpenChange={(open) =>
+                    setOpenSections({
+                      ...openSections,
+                      whatsappComponents: open,
+                    })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">WhatsApp Components</h3>
+                        <p className="text-gray-600 text-sm">
+                          Configure interactive message formats
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.whatsappComponents ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-3 border-t border-gray-100 pt-4">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Quick Reply Buttons
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Use for 2-3 simple choices (Yes/No, options)
+                            </p>
+                          </div>
+                          <Switch
+                            checked={quickRepliesEnabled}
+                            onCheckedChange={setQuickRepliesEnabled}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Call-to-Action Buttons
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Use for links and phone calls (Visit Website, Call
+                              Us)
+                            </p>
+                          </div>
+                          <Switch
+                            checked={ctaButtonsEnabled}
+                            onCheckedChange={setCtaButtonsEnabled}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              List Messages
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Use for 4-10 options (Product menu, Services)
+                            </p>
+                          </div>
+                          <Switch
+                            checked={listMessagesEnabled}
+                            onCheckedChange={setListMessagesEnabled}
+                          />
+                        </div>
+
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-sm text-blue-900">
+                            <strong>Auto-Selection Rules:</strong> Agent will
+                            automatically choose the best component type based
+                            on context and number of options.
+                          </p>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Appointment Scheduling */}
+                <Collapsible
+                  open={openSections.scheduling}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, scheduling: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">
+                          Appointment Scheduling
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Enable calendar booking capabilities
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.scheduling ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Enable Scheduling
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Allow customers to book appointments
+                            </p>
+                          </div>
+                          <Switch
+                            checked={schedulingEnabled}
+                            onCheckedChange={setSchedulingEnabled}
+                          />
+                        </div>
+
+                        {schedulingEnabled && (
+                          <>
+                            <div>
+                              <Label htmlFor="scheduling-provider">
+                                Calendar Provider
+                              </Label>
+                              <Select
+                                value={schedulingProvider}
+                                onValueChange={setSchedulingProvider}
+                              >
+                                <SelectTrigger
+                                  id="scheduling-provider"
+                                  className="mt-1.5 w-full"
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="calendly">
+                                    Calendly
+                                  </SelectItem>
+                                  <SelectItem value="google">
+                                    Google Calendar
+                                  </SelectItem>
+                                  <SelectItem value="outlook">
+                                    Outlook Calendar
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            {schedulingProvider === "calendly" && (
+                              <div>
+                                <Label htmlFor="calendly-url">
+                                  Calendly Event URL
+                                </Label>
+                                <Input
+                                  id="calendly-url"
+                                  placeholder="https://calendly.com/your-link/30min"
+                                  value={calendlyUrl}
+                                  onChange={(e) =>
+                                    setCalendlyUrl(e.target.value)
+                                  }
+                                  className="mt-1.5"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Get this URL from your Calendly event settings
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                              <p className="text-sm text-green-900">
+                                <strong>How it works:</strong> Agent will offer
+                                booking options and send customers a link to
+                                schedule appointments directly.
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Question Sets */}
+                <Collapsible
+                  open={openSections.questionSets}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, questionSets: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Question Sets</h3>
+                        <p className="text-gray-600 text-sm">
+                          Upload structured question flows (JSON)
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.questionSets ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        {/* Toggle between Upload and Paste */}
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              {questionSetInputMode === "upload"
+                                ? "Upload JSON File"
+                                : "Paste JSON Code"}
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              {questionSetInputMode === "upload"
+                                ? "Upload a JSON file from your computer"
+                                : "Paste JSON code directly into the editor"}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-sm ${questionSetInputMode === "upload" ? "text-gray-900 font-medium" : "text-gray-500"}`}
+                            >
+                              Upload
+                            </span>
+                            <Switch
+                              checked={questionSetInputMode === "paste"}
+                              onCheckedChange={(checked) =>
+                                setQuestionSetInputMode(
+                                  checked ? "paste" : "upload"
+                                )
+                              }
+                            />
+                            <span
+                              className={`text-sm ${questionSetInputMode === "paste" ? "text-gray-900 font-medium" : "text-gray-500"}`}
+                            >
+                              Paste
+                            </span>
+                          </div>
+                        </div>
+
+                        {questionSetInputMode === "upload" ? (
+                          <>
+                            <div
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                setIsQuestionSetDragging(false);
+                                const file = e.dataTransfer.files[0];
+                                if (file && file.type === "application/json") {
+                                  setQuestionSets([...questionSets, file]);
+                                } else {
+                                  alert("Please upload a JSON file");
+                                }
+                              }}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                setIsQuestionSetDragging(true);
+                              }}
+                              onDragLeave={(e) => {
+                                e.preventDefault();
+                                setIsQuestionSetDragging(false);
+                              }}
+                              className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
+                                isQuestionSetDragging
+                                  ? "border-blue-500 bg-blue-50"
+                                  : "border-gray-300"
+                              }`}
+                              onClick={() =>
+                                document.getElementById("json-upload")?.click()
+                              }
+                            >
+                              <input
+                                id="json-upload"
+                                type="file"
+                                accept=".json"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    setQuestionSets([...questionSets, file]);
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                              <div className="flex flex-col items-center gap-2">
+                                <Upload
+                                  className={`w-8 h-8 ${isQuestionSetDragging ? "text-blue-500" : "text-gray-400"}`}
+                                />
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    Upload Question Set JSON
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Drag and drop or click to browse
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {questionSets.length > 0 && (
+                              <div className="space-y-2">
+                                <Label>Uploaded Question Sets</Label>
+                                {questionSets.map((file, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                  >
+                                    <span className="text-sm">{file.name}</span>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        setQuestionSets(
+                                          questionSets.filter(
+                                            (_, i) => i !== index
+                                          )
+                                        )
+                                      }
+                                    >
+                                      Remove
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div>
+                            <Textarea
+                              id="question-set-json"
+                              placeholder='Paste your JSON question set here, e.g.:
+{
+  "questions": [
+    {
+      "id": "q1",
+      "text": "What is your name?",
+      "type": "text"
+    }
+  ]
+}'
+                              rows={12}
+                              value={questionSetJson}
+                              onChange={(e) =>
+                                setQuestionSetJson(e.target.value)
+                              }
+                              className="mt-1.5 font-mono text-sm"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Paste your JSON question set configuration
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                          <p className="text-sm text-yellow-900">
+                            <strong>JSON Format:</strong>{" "}
+                            {questionSetInputMode === "upload"
+                              ? "Upload"
+                              : "Paste"}{" "}
+                            structured question flows with conditional logic for
+                            data collection.
+                          </p>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Product Recommendations */}
+                <Collapsible
+                  open={openSections.recommendations}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, recommendations: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">
+                          Product Recommendations
+                        </h3>
+                        <p className="text-gray-600 text-sm">
+                          Configure intelligent product suggestions
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.recommendations ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Enable Recommendations
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Suggest products based on customer needs
+                            </p>
+                          </div>
+                          <Switch
+                            checked={recommendationsEnabled}
+                            onCheckedChange={setRecommendationsEnabled}
+                          />
+                        </div>
+
+                        {recommendationsEnabled && (
+                          <>
+                            <div>
+                              <Label htmlFor="max-recommendations">
+                                Max Recommendations: {maxRecommendations[0]}
+                              </Label>
+                              <Slider
+                                id="max-recommendations"
+                                min={1}
+                                max={10}
+                                step={1}
+                                value={maxRecommendations}
+                                onValueChange={setMaxRecommendations}
+                                className="mt-2"
+                              />
+                              <p className="text-xs text-gray-500 mt-1">
+                                Maximum products to suggest per message
+                              </p>
+                            </div>
+
+                            <div>
+                              <Label htmlFor="recommendation-strategy">
+                                Recommendation Strategy
+                              </Label>
+                              <Select
+                                value={recommendationStrategy}
+                                onValueChange={setRecommendationStrategy}
+                              >
+                                <SelectTrigger
+                                  id="recommendation-strategy"
+                                  className="mt-1.5 w-full"
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="popularity">
+                                    Popularity-Based
+                                  </SelectItem>
+                                  <SelectItem value="collaborative">
+                                    Collaborative Filtering
+                                  </SelectItem>
+                                  <SelectItem value="content_based">
+                                    Content-Based
+                                  </SelectItem>
+                                  <SelectItem value="rule_based">
+                                    Rule-Based
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  Include Product Images
+                                </Label>
+                                <p className="text-xs text-gray-500">
+                                  Show images with recommendations
+                                </p>
+                              </div>
+                              <Switch
+                                checked={includeImages}
+                                onCheckedChange={setIncludeImages}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Natural Conversation Flow */}
+                <Collapsible
+                  open={openSections.conversationFlow}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, conversationFlow: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Conversation Flow</h3>
+                        <p className="text-gray-600 text-sm">
+                          Natural, humanistic conversation pacing
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.conversationFlow ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              One Question at a Time
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Present questions individually for natural flow
+                            </p>
+                          </div>
+                          <Switch
+                            checked={oneQuestionAtATime}
+                            onCheckedChange={setOneQuestionAtATime}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="response-pacing">
+                            Response Delay: {responsePacing[0]}ms
+                          </Label>
+                          <Slider
+                            id="response-pacing"
+                            min={0}
+                            max={5000}
+                            step={100}
+                            value={responsePacing}
+                            onValueChange={setResponsePacing}
+                            className="mt-2"
+                          />
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>Instant</span>
+                            <span>5 seconds</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Delay before sending response (simulates thinking)
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                          <div>
+                            <Label className="text-sm font-medium">
+                              Typing Indicator
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              Show typing animation before responding
+                            </p>
+                          </div>
+                          <Switch
+                            checked={simulateTyping}
+                            onCheckedChange={setSimulateTyping}
+                          />
+                        </div>
+
+                        <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                          <p className="text-sm text-purple-900">
+                            <strong>Natural Feel:</strong> These settings create
+                            a more human-like conversation experience.
+                          </p>
                         </div>
                       </div>
                     </CollapsibleContent>
