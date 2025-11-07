@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { AppProvider } from "./context/AppContext";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -27,8 +28,10 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <>
-        <RouterProvider router={router} />
-        <Toaster position="bottom-center" richColors />
+        <AppProvider>
+          <RouterProvider router={router} />
+          <Toaster position="bottom-center" richColors />
+        </AppProvider>
       </>
     </StrictMode>
   );

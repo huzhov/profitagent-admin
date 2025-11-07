@@ -41,6 +41,7 @@ import { Route as AuthenticatedAbTestingCreateRouteImport } from './routes/_auth
 import { Route as AuthenticatedAgentsCreateTypeRouteImport } from './routes/_authenticated/agents.create.$type'
 import { Route as AuthenticatedAgentsIdViewRouteImport } from './routes/_authenticated/agents.$id.view'
 import { Route as AuthenticatedAgentsIdPreviewRouteImport } from './routes/_authenticated/agents.$id.preview'
+import { Route as AuthenticatedAgentsIdEditRouteImport } from './routes/_authenticated/agents.$id.edit'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -221,6 +222,12 @@ const AuthenticatedAgentsIdPreviewRoute =
     path: '/$id/preview',
     getParentRoute: () => AuthenticatedAgentsRoute,
   } as any)
+const AuthenticatedAgentsIdEditRoute =
+  AuthenticatedAgentsIdEditRouteImport.update({
+    id: '/$id/edit',
+    path: '/$id/edit',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/reporting/': typeof AuthenticatedReportingIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/workflows/': typeof AuthenticatedWorkflowsIndexRoute
+  '/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
   '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
   '/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
@@ -279,6 +287,7 @@ export interface FileRoutesByTo {
   '/reporting': typeof AuthenticatedReportingIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/workflows': typeof AuthenticatedWorkflowsIndexRoute
+  '/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
   '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
   '/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
@@ -314,6 +323,7 @@ export interface FileRoutesById {
   '/_authenticated/reporting/': typeof AuthenticatedReportingIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/workflows/': typeof AuthenticatedWorkflowsIndexRoute
+  '/_authenticated/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
   '/_authenticated/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/_authenticated/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
   '/_authenticated/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/reporting/'
     | '/settings/'
     | '/workflows/'
+    | '/agents/$id/edit'
     | '/agents/$id/preview'
     | '/agents/$id/view'
     | '/agents/create/$type'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/reporting'
     | '/settings'
     | '/workflows'
+    | '/agents/$id/edit'
     | '/agents/$id/preview'
     | '/agents/$id/view'
     | '/agents/create/$type'
@@ -411,6 +423,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reporting/'
     | '/_authenticated/settings/'
     | '/_authenticated/workflows/'
+    | '/_authenticated/agents/$id/edit'
     | '/_authenticated/agents/$id/preview'
     | '/_authenticated/agents/$id/view'
     | '/_authenticated/agents/create/$type'
@@ -648,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgentsIdPreviewRouteImport
       parentRoute: typeof AuthenticatedAgentsRoute
     }
+    '/_authenticated/agents/$id/edit': {
+      id: '/_authenticated/agents/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/agents/$id/edit'
+      preLoaderRoute: typeof AuthenticatedAgentsIdEditRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
   }
 }
 
@@ -669,6 +689,7 @@ const AuthenticatedAbTestingRouteWithChildren =
 
 interface AuthenticatedAgentsRouteChildren {
   AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
+  AuthenticatedAgentsIdEditRoute: typeof AuthenticatedAgentsIdEditRoute
   AuthenticatedAgentsIdPreviewRoute: typeof AuthenticatedAgentsIdPreviewRoute
   AuthenticatedAgentsIdViewRoute: typeof AuthenticatedAgentsIdViewRoute
   AuthenticatedAgentsCreateTypeRoute: typeof AuthenticatedAgentsCreateTypeRoute
@@ -676,6 +697,7 @@ interface AuthenticatedAgentsRouteChildren {
 
 const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
   AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
+  AuthenticatedAgentsIdEditRoute: AuthenticatedAgentsIdEditRoute,
   AuthenticatedAgentsIdPreviewRoute: AuthenticatedAgentsIdPreviewRoute,
   AuthenticatedAgentsIdViewRoute: AuthenticatedAgentsIdViewRoute,
   AuthenticatedAgentsCreateTypeRoute: AuthenticatedAgentsCreateTypeRoute,

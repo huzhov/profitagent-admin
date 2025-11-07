@@ -10,15 +10,23 @@ import {
 } from "lucide-react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
+import { useApp } from "@/context/AppContext";
 
 export default function SidebarNavigation() {
   const navigate = useNavigate();
+  const { agents } = useApp();
   const { location } = useRouterState();
   const currentPath = location.pathname;
 
   const mainSections = [
     { id: "home", title: "Home", icon: House, route: "/" },
-    { id: "agents", title: "Agents", icon: Bot, route: "/agents", badge: "3" },
+    {
+      id: "agents",
+      title: "Agents",
+      icon: Bot,
+      route: "/agents",
+      badge: agents?.length.toString(),
+    },
     {
       id: "workflows",
       title: "Workflows",
