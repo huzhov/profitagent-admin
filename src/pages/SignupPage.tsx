@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,6 @@ import {
 import { signup } from "@/services/auth";
 import { LogoIcon } from "@/components/assets/index";
 import useUserStore from "@/store/user-store";
-import { useMutation } from "@tanstack/react-query";
 import { setToken } from "@/lib/auth";
 
 const schema = z
@@ -45,7 +45,6 @@ const SignupPage = () => {
       const data = await signup(values);
       setToken(data.token);
       setUser(data.user);
-      localStorage.setItem("user", JSON.stringify(data.user));
       navigate({ to: "/" });
     },
   });

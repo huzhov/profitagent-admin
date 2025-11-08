@@ -1,11 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
-
-export type User = {
-  id: string;
-  email: string;
-  name: string;
-  businessId: string;
-};
+import type { User } from "@/types/user";
 
 export type LoginResponse = {
   token: string;

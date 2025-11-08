@@ -1,18 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export interface User {
-  businessId: string | null;
-  email: string | null;
-  id: string | null;
-  name: string | null;
-}
-
-interface UserStore {
-  user: User;
-  setUser: (user: User) => void;
-  clearUser: () => void;
-}
+import type { User, UserStore } from "@/types/user";
 
 const user: User = {
   businessId: "",
@@ -28,7 +16,7 @@ const useUserStore = create<UserStore>()(
       setUser: (user: User) => set({ user }),
       clearUser: () => set({ user: user }),
     }),
-    { name: "userInfo" }
+    { name: "user" }
   )
 );
 

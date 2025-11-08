@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,7 +17,6 @@ import {
 import { login } from "@/services/auth";
 import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
-import { useMutation } from "@tanstack/react-query";
 import { setToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
 
@@ -41,7 +41,6 @@ const LoginPage = () => {
       const data = await login(values.email, values.password);
       setToken(data.token);
       setUser(data.user);
-      localStorage.setItem("user", JSON.stringify(data.user));
       navigate({ to: "/" });
     },
   });

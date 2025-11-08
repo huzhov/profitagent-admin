@@ -24,7 +24,10 @@ axiosInstance.interceptors.request.use(
         errData?.detail ||
         errData?.title ||
         error.message;
-      throw new Error(`${msg} (${error.response?.status || ""})`);
+      throw {
+        message: `${msg} (${error.response?.status || ""})`,
+        status: error.status,
+      };
     }
     throw error;
   }
@@ -47,7 +50,11 @@ axiosInstance.interceptors.response.use(
         errData?.detail ||
         errData?.title ||
         error.message;
-      throw new Error(`${msg} (${error.response?.status || ""})`);
+
+      throw {
+        message: `${msg} (${error.response?.status || ""})`,
+        status: error.status,
+      };
     }
     throw error;
   }
