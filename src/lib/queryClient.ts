@@ -4,9 +4,6 @@ import { toast } from "sonner";
 const publicRoutes = ["/login", "/signup"];
 
 const isPublicRoute = publicRoutes.some((route) => {
-  if (route === "/") {
-    return location.pathname === "/";
-  }
   return (
     location.pathname === route || location.pathname.startsWith(`${route}/`)
   );
@@ -14,9 +11,9 @@ const isPublicRoute = publicRoutes.some((route) => {
 
 const handleOnError = (error: any) => {
   // Redirect to login
-  if (error.status === 401 && !isPublicRoute) {
+  if (error.status === 401 && isPublicRoute) {
     localStorage.clear();
-    location.href = "/login";
+    location.replace("/login");
   }
 
   toast.error(error.message);
