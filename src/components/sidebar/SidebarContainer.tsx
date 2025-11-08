@@ -11,9 +11,9 @@ import { getInitials } from "@/helper/getInitials";
 
 export default function SidebarContainer() {
   const navigate = useNavigate();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
   const { user, clearUser } = useUserStore();
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleLogout = () => {
     removeToken();

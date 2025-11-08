@@ -26,15 +26,15 @@ const schema = z.object({
 });
 
 const LoginPage = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
     mode: "onSubmit",
   });
+  const { setUser } = useUserStore();
 
-  const setUser = useUserStore((state) => state.setUser);
+  const [isVisible, setIsVisible] = useState(false);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof schema>) => {

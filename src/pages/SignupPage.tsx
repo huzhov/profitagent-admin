@@ -37,8 +37,7 @@ const SignupPage = () => {
     defaultValues: { email: "", name: "", password: "", confirmPassword: "" },
     mode: "onSubmit",
   });
-
-  const setUser = useUserStore((state) => state.setUser);
+  const { setUser } = useUserStore();
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof schema>) => {
