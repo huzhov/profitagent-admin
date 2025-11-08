@@ -11,7 +11,7 @@ const isPublicRoute = publicRoutes.some((route) => {
 
 const handleOnError = (error: any) => {
   // Redirect to login
-  if (error.status === 401 && isPublicRoute) {
+  if (error.status === 401 && !isPublicRoute) {
     localStorage.clear();
     location.replace("/login");
   }
