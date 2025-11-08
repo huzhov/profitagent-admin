@@ -12,8 +12,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signup } from "@/lib/auth";
+import { signup } from "@/services/auth";
 import { LogoIcon } from "@/components/assets/index";
+import useUserStore from "@/store/user-store";
+import { useMutation } from "@tanstack/react-query";
+import { setToken } from "@/lib/auth";
 
 const schema = z
   .object({
@@ -35,12 +38,17 @@ const SignupPage = () => {
     mode: "onSubmit",
   });
 
-  async function onSubmit(values: z.infer<typeof schema>) {
-    const res = await signup(values);
-    if (res.token) {
+  const setUser = useUserStore((state) => state.setUser);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof schema>) => {
+      const data = await signup(values);
+      setToken(data.token);
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
       navigate({ to: "/" });
-    }
-  }
+    },
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -60,7 +68,10 @@ const SignupPage = () => {
         </p>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit((values) => mutate(values))}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -121,12 +132,8 @@ const SignupPage = () => {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "Creating account…" : "Sign up"}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Creating account…" : "Sign up"}
             </Button>
           </form>
         </Form>

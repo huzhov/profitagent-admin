@@ -6,13 +6,18 @@ import { useState } from "react";
 import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
 import { useNavigate } from "@tanstack/react-router";
 import { removeToken } from "@/lib/auth";
+import useUserStore from "@/store/user-store";
+import { getInitials } from "@/helper/getInitials";
 
 export default function SidebarContainer() {
   const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+  const { user, clearUser } = useUserStore();
+
   const handleLogout = () => {
     removeToken();
+    clearUser();
     navigate({ to: "/login" });
   };
 
@@ -32,10 +37,10 @@ export default function SidebarContainer() {
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-            <span className="text-sm">JD</span>
+            <span className="text-sm">{getInitials(user?.name)}</span>
           </div>
           <div className="flex-1">
-            <p className="text-sm">John Doe</p>
+            <p className="text-sm">{user.name}</p>
             <p className="text-xs text-muted-foreground">Premium Plan</p>
           </div>
         </div>
