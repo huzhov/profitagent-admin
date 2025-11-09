@@ -1,6 +1,9 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import type { Agent } from "@/types/agent";
+import type { User } from "@/types/user";
+import userStore from "@/store/user-store";
+import businessStore from "@/store/business-store";
 
 interface AppContextType {
   agents: Agent[];
@@ -8,6 +11,8 @@ interface AppContextType {
   handleCloneAgent: (agentId: number) => void;
   handleDeleteAgent: (agentId: number) => void;
   handleSaveAgent: (agentId: number, name: string, description: string) => void;
+  user: User;
+  setUser: (user: User) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -126,6 +131,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         handleCloneAgent,
         handleDeleteAgent,
         handleSaveAgent,
+        user: userStore.getState().user,
+        setUser: userStore.getState().setUser,
       }}
     >
       {children}
@@ -135,8 +142,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 export function useApp() {
   const context = useContext(AppContext);
+  const user = userStore((state) => state.user);
+  const setUser = userStore((state) => state.setUser);
+
   if (!context) {
     throw new Error("useApp must be used within AppProvider");
   }
-  return context;
+
+  return {
+    ...context,
+    user,
+    setUser,
+  };
+}
+
+// Re-export Zustand stores for direct access if needed
+export { default as useUserStore } from "@/store/user-store";
+export { default as useBusinessStore } from "@/store/business-store";
+
+// Convenience hook that provides business state
+export function useBusiness() {
+  const business = businessStore((state) => state.business);
+  const setBusiness = businessStore((state) => state.setBusiness);
+  const loading = businessStore((state) => state.loading);
+  const error = businessStore((state) => state.error);
+  const fetchBusiness = businessStore((state) => state.fetchBusiness);
+
+  return {
+    business,
+    setBusiness,
+    loading,
+    error,
+    fetchBusiness,
+  };
 }

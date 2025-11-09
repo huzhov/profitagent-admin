@@ -24,7 +24,6 @@ import {
   Save,
   TestTube2,
   Facebook,
-  Trash2,
   RefreshCw,
   Unplug,
 } from "lucide-react";
@@ -54,6 +53,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
+import { useBusiness } from "@/context/AppContext";
 
 const waAccountSchema = z.object({
   waBusinessPortfolioId: z
@@ -78,6 +78,7 @@ const waAccountSchema = z.object({
 type WaAccountFormValues = z.infer<typeof waAccountSchema>;
 
 function AccountSettings() {
+  const { business } = useBusiness();
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<any>(null);
 
@@ -144,6 +145,34 @@ function AccountSettings() {
   return (
     <SettingsLayout>
       <div className="space-y-6">
+        {/* Information Alert when no business exists */}
+        {!business && (
+          <Card className="shadow-none border-blue-200 bg-blue-50">
+            <CardContent>
+              <div className="flex gap-3">
+                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-blue-900">
+                    Business Setup Required
+                  </p>
+                  <p className="text-sm text-blue-700">
+                    You need to create a business in the{" "}
+                    <a
+                      href="/settings/general#business-settings"
+                      className="underline font-medium hover:text-blue-900"
+                    >
+                      General Settings
+                    </a>{" "}
+                    before you can add WhatsApp Business Accounts. Once your
+                    business is created, the option to add WhatsApp accounts
+                    will appear below.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* API Connections */}
         <Card className="shadow-none">
           <CardHeader>
@@ -225,173 +254,177 @@ function AccountSettings() {
           </CardContent>
         </Card>
 
-        {/* Add New WhatsApp Business Account */}
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-green-600" />
-              Add New WhatsApp Business Account
-            </CardTitle>
-            <CardDescription>
-              Connect a new WhatsApp Business account via Facebook Login
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...waForm}>
-              <form
-                onSubmit={waForm.handleSubmit(handleAddWhatsAppAccount)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={waForm.control}
-                  name="accountName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Account Name (for identification) *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="e.g., Main Store, Fashion Line, Electronics"
-                          autoComplete="off"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        {/* Add New WhatsApp Business Account - Only show if business exists */}
+        {business && (
+          <Card className="shadow-none">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-green-600" />
+                Add New WhatsApp Business Account
+              </CardTitle>
+              <CardDescription>
+                Connect a new WhatsApp Business account via Facebook Login
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...waForm}>
+                <form
+                  onSubmit={waForm.handleSubmit(handleAddWhatsAppAccount)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={waForm.control}
+                    name="accountName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Account Name (for identification) *
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Main Store, Fashion Line, Electronics"
+                            autoComplete="off"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      className="w-fit bg-blue-600 hover:bg-blue-700"
-                      onClick={launchWhatsAppSignup}
-                    >
-                      <Facebook className="w-4 h-4 mr-2" />
-                      Login with Facebook
-                    </Button>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          tabIndex={-1}
-                          className="rounded-full p-2"
-                          type="button"
-                        >
-                          <Info className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent sideOffset={4}>
-                        Follow this flow to autopopulate fields below
-                      </TooltipContent>
-                    </Tooltip>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        className="w-fit bg-blue-600 hover:bg-blue-700"
+                        onClick={launchWhatsAppSignup}
+                      >
+                        <Facebook className="w-4 h-4 mr-2" />
+                        Login with Facebook
+                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            tabIndex={-1}
+                            className="rounded-full p-2"
+                            type="button"
+                          >
+                            <Info className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent sideOffset={4}>
+                          Follow this flow to autopopulate fields below
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={waForm.control}
+                      name="waBusinessPortfolioId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Business Portfolio ID *</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Auto-filled by Facebook"
+                              disabled={true}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={waForm.control}
+                      name="phoneNumberId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number ID *</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Auto-filled by Facebook"
+                              disabled={true}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={waForm.control}
+                      name="accessToken"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Access Token *</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Auto-filled by Facebook"
+                              disabled={true}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={waForm.control}
+                      name="wabaId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>WABA ID *</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Auto-filled by Facebook"
+                              disabled={true}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <FormField
                     control={waForm.control}
-                    name="waBusinessPortfolioId"
+                    name="pinCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Business Portfolio ID *</FormLabel>
+                        <FormLabel>Two-Step Verification PIN *</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Auto-filled by Facebook"
-                            disabled={true}
+                            maxLength={6}
+                            placeholder="Enter 6-digit PIN"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={waForm.control}
-                    name="phoneNumberId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number ID *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Auto-filled by Facebook"
-                            disabled={true}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={waForm.control}
-                    name="accessToken"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Access Token *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Auto-filled by Facebook"
-                            disabled={true}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={waForm.control}
-                    name="wabaId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>WABA ID *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Auto-filled by Facebook"
-                            disabled={true}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={waForm.control}
-                  name="pinCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Two-Step Verification PIN *</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          maxLength={6}
-                          placeholder="Enter 6-digit PIN"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Separator />
-                <div className="flex justify-end">
-                  <Button type="submit" disabled={!waForm.formState.isValid}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add WhatsApp Account
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                  <Separator />
+                  <div className="flex justify-end">
+                    <Button type="submit" disabled={!waForm.formState.isValid}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add WhatsApp Account
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Webhook Configuration */}
         <Card className="shadow-none">
