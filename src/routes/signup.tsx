@@ -7,6 +7,7 @@ export const Route = createFileRoute("/signup")({
     if (getToken() !== null) {
       throw redirect({
         to: "/",
+        replace: true,
       });
     }
   },

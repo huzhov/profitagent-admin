@@ -7,6 +7,7 @@ export const Route = createFileRoute("/login")({
     if (getToken() !== null) {
       throw redirect({
         to: "/",
+        replace: true,
       });
     }
   },

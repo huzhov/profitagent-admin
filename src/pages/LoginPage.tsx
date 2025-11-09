@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -13,9 +14,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { login } from "@/lib/auth";
+import { login } from "@/services/auth";
 import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
+import { setToken } from "@/lib/auth";
+import useUserStore from "@/store/user-store";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
@@ -23,20 +26,24 @@ const schema = z.object({
 });
 
 const LoginPage = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
     mode: "onSubmit",
   });
+  const { setUser } = useUserStore();
 
-  async function onSubmit(values: z.infer<typeof schema>) {
-    const res = await login(values.email, values.password);
-    if (res.token) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof schema>) => {
+      const data = await login(values.email, values.password);
+      setToken(data.token);
+      setUser(data.user);
       navigate({ to: "/" });
-    }
-  }
+    },
+  });
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 
@@ -58,7 +65,10 @@ const LoginPage = () => {
         </p>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit((values) => mutate(values))}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="email"
@@ -85,7 +95,7 @@ const LoginPage = () => {
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
-                        type={isVisible ? "password" : "text"}
+                        type={isVisible ? "text" : "password"}
                         placeholder="••••••••"
                         {...field}
                       />
@@ -99,7 +109,7 @@ const LoginPage = () => {
                 className="absolute inset-y-10 end-0 flex items-center z-20 px-2.5 cursor-pointer text-gray-400 rounded-e-md"
                 onClick={toggleVisibility}
               >
-                {isVisible ? <EyeOff /> : <Eye />}
+                {isVisible ? <Eye /> : <EyeOff />}
               </button>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">
@@ -107,12 +117,8 @@ const LoginPage = () => {
                 Forgot Password
               </Link>
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "Logging in…" : "Log in"}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Logging in…" : "Log in"}
             </Button>
           </form>
         </Form>
