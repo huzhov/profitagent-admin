@@ -123,3 +123,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes heartbeat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.02);
+    }
+    50% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-heartbeat {
+    animation: heartbeat 1s ease-in-out 2;
+  }
+}
