@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { ArrowLeft, ChevronDown, Upload, CircleCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  RotateCcw,
+  Send,
+  Bot,
+  User,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,19 +29,6 @@ import {
 } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMutation, useQuery } from "@tanstack/react-query";
-
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
-import { createAgent } from "@/services/agents";
-import {
-  agentSchema,
-  defaultAgentValues,
-  type AgentFormValues,
-} from "./schema";
-import { getWhatsAppList } from "@/services/integrations";
-import { useApp } from "@/context/AppContext";
 
 const agentTypeConfig = {
   onboarding: {
@@ -66,23 +61,19 @@ export default function AgentBuilder() {
     agentTypeConfig[type as keyof typeof agentTypeConfig] ||
     agentTypeConfig.onboarding;
 
-  const resolver = zodResolver(
-    agentSchema
-  ) as unknown as Resolver<AgentFormValues>;
-
-  const {
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<AgentFormValues>({
-    resolver: resolver,
-    defaultValues: defaultAgentValues,
-    mode: "onSubmit",
-  });
-
-  const { user } = useApp();
-
+  const [agentName, setAgentName] = useState("New Agent");
+  const [description, setDescription] = useState("");
+  const [objective, setObjective] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [tone, setTone] = useState("friendly");
+  const [language, setLanguage] = useState("en");
+  const [creativity, setCreativity] = useState([0.7]);
+  const [systemPrompt, setSystemPrompt] = useState("");
+  const [contextInfo, setContextInfo] = useState("");
+  const [productCatalogue, setProductCatalogue] = useState("");
+  const [highTouch, setHighTouch] = useState("");
+  const [audience, setAudience] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -106,34 +97,68 @@ export default function AgentBuilder() {
   const [isDataToolsDragging, setIsDataToolsDragging] = useState(false);
 
   // Guardrails state
+  const [restrictedTopics, setRestrictedTopics] = useState("");
   const [profanityFilter, setProfanityFilter] = useState(true);
+  const [customProfanityWords, setCustomProfanityWords] = useState("");
+  const [piiHandling, setPiiHandling] = useState(true);
+  const [escalationKeywords, setEscalationKeywords] = useState("");
+  const [brandVoiceRules, setBrandVoiceRules] = useState("");
 
   // Messaging Controls state
+  const [followUpDelay, setFollowUpDelay] = useState([24]);
+  const [maxFollowUps, setMaxFollowUps] = useState([3]);
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  const [quietHoursStart, setQuietHoursStart] = useState("22:00");
+  const [quietHoursEnd, setQuietHoursEnd] = useState("08:00");
+  const [dailyMessageLimit, setDailyMessageLimit] = useState([10]);
+  const [monthlyMessageLimit, setMonthlyMessageLimit] = useState([100]);
 
   // HITL Handover state
   const [hitlEnabled, setHitlEnabled] = useState(false);
+  const [sentimentThreshold, setSentimentThreshold] = useState([30]);
+  const [repeatedQuestionsCount, setRepeatedQuestionsCount] = useState([3]);
+  const [hitlKeywords, setHitlKeywords] = useState("");
+  const [handoverMessage, setHandoverMessage] = useState(
+    "Let me connect you with a team member who can help you better."
+  );
+
+  // WhatsApp Components state
+  const [quickRepliesEnabled, setQuickRepliesEnabled] = useState(true);
+  const [ctaButtonsEnabled, setCtaButtonsEnabled] = useState(true);
+  const [listMessagesEnabled, setListMessagesEnabled] = useState(true);
 
   // Scheduling state
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
+  const [schedulingProvider, setSchedulingProvider] = useState("calendly");
+  const [calendlyUrl, setCalendlyUrl] = useState("");
 
   // Question Sets state
   const [questionSets, setQuestionSets] = useState<File[]>([]);
   const [isQuestionSetDragging, setIsQuestionSetDragging] = useState(false);
+  const [questionSetJson, setQuestionSetJson] = useState("");
   const [questionSetInputMode, setQuestionSetInputMode] = useState<
     "upload" | "paste"
   >("upload");
 
   // Product Recommendations state
   const [recommendationsEnabled, setRecommendationsEnabled] = useState(false);
+  const [maxRecommendations, setMaxRecommendations] = useState([3]);
+  const [recommendationStrategy, setRecommendationStrategy] =
+    useState("popularity");
+  const [includeImages, setIncludeImages] = useState(true);
+
+  // Natural Conversation state
+  const [oneQuestionAtATime, setOneQuestionAtATime] = useState(true);
+  const [responsePacing, setResponsePacing] = useState([1500]);
+  const [simulateTyping, setSimulateTyping] = useState(true);
 
   // Track collapsible states
   const [openSections, setOpenSections] = useState({
     basicInfo: true,
     brandBusiness: true,
-    behavior: true,
-    aiConfig: true,
-    channels: true,
+    behavior: false,
+    aiConfig: false,
+    channels: false,
     knowledge: false,
     productCatalogue: false,
     audience: false,
@@ -154,35 +179,30 @@ export default function AgentBuilder() {
   });
 
   const [channels, setChannels] = useState({
-    whatsapp: true,
+    whatsapp: false,
     web: false,
     slack: false,
     telegram: false,
     sms: false,
   });
-
-  const [isSaved, setIsSaved] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState<
+    Array<{
+      role: "user" | "agent";
+      content: string;
+      timestamp: string;
+      type?: "info" | "loading";
+    }>
+  >([
+    {
+      role: "agent",
+      content: "Chat preview - Test how your agent responds to messages",
+      timestamp: "11:12 PM",
+      type: "info",
+    },
+  ]);
 
   const progress = 0; // Calculate based on filled fields
-
-  const { mutate } = useMutation({
-    mutationFn: async (values: z.infer<typeof agentSchema>) => {
-      const data = await createAgent(values);
-      setIsSaved(true);
-      setTimeout(() => {
-        setIsSaved(false);
-      }, 2000);
-      return data;
-    },
-  });
-
-  const { data, isFetching } = useQuery({
-    queryKey: ["whatsAppList"],
-    queryFn: async () => {
-      const data = await getWhatsAppList();
-      return data;
-    },
-  });
 
   const handleFileUpload = (file: File) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
@@ -221,13 +241,52 @@ export default function AgentBuilder() {
     }
   };
 
-  const onSubmit = (values: any) => {
-    setValue("businessId", user.businessId ?? "");
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
 
-    // Debug Submit Values
-    console.log(values);
+    const userMessage = {
+      role: "user" as const,
+      content: chatInput,
+      timestamp: new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
 
-    mutate(values);
+    setMessages([...messages, userMessage]);
+    setChatInput("");
+
+    // Add loading message
+    const loadingMessage = {
+      role: "agent" as const,
+      content: "",
+      timestamp: new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      type: "loading" as const,
+    };
+
+    setTimeout(() => {
+      setMessages((prev) => [...prev, loadingMessage]);
+    }, 300);
+
+    // Simulate agent response
+    setTimeout(() => {
+      setMessages((prev) => {
+        // Remove loading message and add actual response
+        const withoutLoading = prev.filter((msg) => msg.type !== "loading");
+        const agentMessage = {
+          role: "agent" as const,
+          content: "Thanks for your message! I'm happy to help you out. 😊",
+          timestamp: new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        return [...withoutLoading, agentMessage];
+      });
+    }, 1500);
   };
 
   return (
@@ -245,12 +304,8 @@ export default function AgentBuilder() {
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <Input
-                value={watch("agentName")}
-                onChange={(e) =>
-                  setValue("agentName", e.target.value, {
-                    shouldValidate: true,
-                  })
-                }
+                value={agentName}
+                onChange={(e) => setAgentName(e.target.value)}
                 className="text-gray-900 border-0 shadow-none px-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 max-w-md text-2xl font-semibold"
                 placeholder="New Agent"
               />
@@ -274,18 +329,10 @@ export default function AgentBuilder() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isSaved && (
-            <span className="text-green-600 text-sm flex items-center gap-1">
-              <CircleCheck className="w-4 h-4" />
-              Saved
-            </span>
-          )}
           <Button variant="outline" size="sm">
             Cancel
           </Button>
-          <Button size="sm" onClick={handleSubmit(onSubmit)}>
-            Save
-          </Button>
+          <Button size="sm">Save</Button>
         </div>
       </div>
 
@@ -320,89 +367,39 @@ export default function AgentBuilder() {
                     <CollapsibleContent>
                       <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
                         <div>
-                          <Label
-                            htmlFor="agent-name"
-                            className={
-                              errors.agentName
-                                ? "text-red-500 text-sm mt-1"
-                                : ""
-                            }
-                          >
-                            Agent Name*
-                          </Label>
+                          <Label htmlFor="agent-name">Agent Name*</Label>
                           <Input
                             id="agent-name"
                             placeholder="e.g., SalesBot Pro"
-                            className={`mt-1.5`}
-                            value={watch("agentName")}
-                            onChange={(e) =>
-                              setValue("agentName", e.target.value, {
-                                shouldValidate: true,
-                              })
-                            }
+                            value={agentName}
+                            onChange={(e) => setAgentName(e.target.value)}
+                            className="mt-1.5"
                           />
-                          {errors.agentName && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
-                              {errors.agentName.message}
-                            </p>
-                          )}
                         </div>
                         <div>
-                          <Label
-                            htmlFor="agent-description"
-                            className={
-                              errors.description
-                                ? "text-red-500 text-sm mt-1"
-                                : ""
-                            }
-                          >
+                          <Label htmlFor="agent-description">
                             Description*
                           </Label>
                           <Textarea
                             id="agent-description"
                             placeholder="Brief description of what this agent does"
                             rows={3}
-                            value={watch("description")}
-                            onChange={(e) =>
-                              setValue("description", e.target.value, {
-                                shouldValidate: true,
-                              })
-                            }
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             className="mt-1.5"
                           />
-                          {errors.description && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
-                              {errors.description.message}
-                            </p>
-                          )}
                         </div>
                         <div>
-                          <Label
-                            htmlFor="agent-objective"
-                            className={
-                              errors.objective
-                                ? "text-red-500 text-sm mt-1"
-                                : ""
-                            }
-                          >
+                          <Label htmlFor="agent-objective">
                             Primary Objective*
                           </Label>
                           <Input
                             id="agent-objective"
                             placeholder="e.g., Qualify leads and book meetings"
-                            value={watch("objective")}
-                            onChange={(e) =>
-                              setValue("objective", e.target.value, {
-                                shouldValidate: true,
-                              })
-                            }
+                            value={objective}
+                            onChange={(e) => setObjective(e.target.value)}
                             className="mt-1.5"
                           />
-                          {errors.objective && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
-                              {errors.objective.message}
-                            </p>
-                          )}
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -410,7 +407,7 @@ export default function AgentBuilder() {
                 </Collapsible>
 
                 {/* Brand & Business */}
-                {/* <Collapsible
+                <Collapsible
                   open={openSections.brandBusiness}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, brandBusiness: open })
@@ -437,25 +434,14 @@ export default function AgentBuilder() {
                           <Input
                             id="brand-name"
                             placeholder="Your company name"
-                            value={watch("brandName")}
-                            onChange={(e) =>
-                              setValue("brandName", e.target.value, {
-                                shouldValidate: true,
-                              })
-                            }
+                            value={brandName}
+                            onChange={(e) => setBrandName(e.target.value)}
                             className="mt-1.5"
                           />
                         </div>
                         <div>
                           <Label htmlFor="industry">Industry*</Label>
-                          <Select
-                            value={watch("industry")}
-                            onValueChange={(value) =>
-                              setValue("industry", value, {
-                                shouldValidate: true,
-                              })
-                            }
-                          >
+                          <Select value={industry} onValueChange={setIndustry}>
                             <SelectTrigger
                               id="industry"
                               className="mt-1.5 w-full"
@@ -481,7 +467,7 @@ export default function AgentBuilder() {
                       </div>
                     </CollapsibleContent>
                   </div>
-                </Collapsible> */}
+                </Collapsible>
 
                 {/* Agent Behavior */}
                 <Collapsible
@@ -506,18 +492,8 @@ export default function AgentBuilder() {
                       <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
                         <div>
                           <Label htmlFor="tone">Communication Tone</Label>
-                          <Select
-                            value={watch("toneOfVoice")}
-                            onValueChange={(value) =>
-                              setValue("toneOfVoice", value, {
-                                shouldValidate: true,
-                              })
-                            }
-                          >
-                            <SelectTrigger
-                              id="toneOfVoice"
-                              className="mt-1.5 w-full"
-                            >
+                          <Select value={tone} onValueChange={setTone}>
+                            <SelectTrigger id="tone" className="mt-1.5 w-full">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -531,18 +507,33 @@ export default function AgentBuilder() {
                           </Select>
                         </div>
                         <div>
+                          <Label htmlFor="language">Language</Label>
+                          <Select value={language} onValueChange={setLanguage}>
+                            <SelectTrigger
+                              id="language"
+                              className="mt-1.5 w-full"
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="en">English</SelectItem>
+                              <SelectItem value="es">Spanish</SelectItem>
+                              <SelectItem value="fr">French</SelectItem>
+                              <SelectItem value="de">German</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
                           <Label htmlFor="temperature">
-                            Creativity Level: {watch("creativity")}
+                            Creativity Level: {creativity[0]}
                           </Label>
                           <Slider
                             id="temperature"
                             min={0}
                             max={1}
                             step={0.1}
-                            value={[watch("creativity")]}
-                            onValueChange={(value) =>
-                              setValue("creativity", value[0])
-                            }
+                            value={creativity}
+                            onValueChange={setCreativity}
                             className="mt-2"
                           />
                           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -579,33 +570,15 @@ export default function AgentBuilder() {
                     <CollapsibleContent>
                       <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
                         <div>
-                          <Label
-                            htmlFor="system-prompt"
-                            className={
-                              errors.systemPrompt
-                                ? "text-red-500 text-sm mt-1"
-                                : ""
-                            }
-                          >
-                            System Prompt*
-                          </Label>
+                          <Label htmlFor="system-prompt">System Prompt*</Label>
                           <Textarea
                             id="system-prompt"
                             placeholder="Describe the agent's role, personality, and instructions..."
                             rows={6}
-                            value={watch("systemPrompt")}
-                            onChange={(e) =>
-                              setValue("systemPrompt", e.target.value, {
-                                shouldValidate: true,
-                              })
-                            }
+                            value={systemPrompt}
+                            onChange={(e) => setSystemPrompt(e.target.value)}
                             className="mt-1.5 font-mono text-sm"
                           />
-                          {errors.systemPrompt && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
-                              {errors.systemPrompt.message}
-                            </p>
-                          )}
                           <p className="text-xs text-gray-500 mt-1">
                             This defines how the AI behaves and responds
                           </p>
@@ -640,10 +613,10 @@ export default function AgentBuilder() {
                       <div className="px-6 pb-6 space-y-3 border-t border-gray-100 pt-4">
                         {[
                           { id: "whatsapp", label: "WhatsApp", emoji: "💬" },
-                          // { id: "web", label: "Web Chat", emoji: "🌐" },
-                          // { id: "slack", label: "Slack", emoji: "💼" },
-                          // { id: "telegram", label: "Telegram", emoji: "✈️" },
-                          // { id: "sms", label: "SMS", emoji: "📱" },
+                          { id: "web", label: "Web Chat", emoji: "🌐" },
+                          { id: "slack", label: "Slack", emoji: "💼" },
+                          { id: "telegram", label: "Telegram", emoji: "✈️" },
+                          { id: "sms", label: "SMS", emoji: "📱" },
                         ].map((channel) => (
                           <div
                             key={channel.id}
@@ -668,49 +641,6 @@ export default function AgentBuilder() {
                             />
                           </div>
                         ))}
-                        {channels.whatsapp ? (
-                          <div>
-                            <Label
-                              htmlFor="tone"
-                              className={
-                                errors.integrationId
-                                  ? "text-red-500 text-sm mt-1"
-                                  : ""
-                              }
-                            >
-                              WhatsApp Integration*
-                            </Label>
-                            <Select
-                              value={watch("integrationId")}
-                              onValueChange={(value) =>
-                                setValue("integrationId", value, {
-                                  shouldValidate: true,
-                                })
-                              }
-                              disabled={isFetching}
-                            >
-                              <SelectTrigger className="mt-1.5 w-full">
-                                <SelectValue placeholder="Select WhatsApp Integration" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {data?.map((whatApp) => (
-                                  <SelectItem
-                                    value={whatApp.id}
-                                    key={whatApp.id}
-                                  >
-                                    {whatApp.name} • +
-                                    {whatApp.displayPhoneNumber}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        ) : null}
-                        {errors.integrationId && (
-                          <p className="text-xs text-red-500 text-sm mt-1">
-                            {errors.integrationId.message}
-                          </p>
-                        )}
                       </div>
                     </CollapsibleContent>
                   </div>
@@ -745,10 +675,8 @@ export default function AgentBuilder() {
                             id="context-info"
                             placeholder="Product details, pricing, FAQs, company policies, etc."
                             rows={4}
-                            value={watch("contextInfo")}
-                            onChange={(e) =>
-                              setValue("contextInfo", e.target.value)
-                            }
+                            value={contextInfo}
+                            onChange={(e) => setContextInfo(e.target.value)}
                             className="mt-1.5"
                           />
                           <p className="text-xs text-gray-500 mt-1">
@@ -789,11 +717,9 @@ export default function AgentBuilder() {
                             id="product-catalogue"
                             placeholder="List products or subscription plans with details"
                             rows={6}
-                            value={watch("productPlans")}
+                            value={productCatalogue}
                             onChange={(e) =>
-                              setValue("productPlans", e.target.value, {
-                                shouldValidate: true,
-                              })
+                              setProductCatalogue(e.target.value)
                             }
                             className="mt-1.5"
                           />
@@ -872,20 +798,16 @@ export default function AgentBuilder() {
                             id="context-info"
                             placeholder="Enter audience description."
                             rows={4}
-                            value={watch("audience")}
-                            onChange={(e) =>
-                              setValue("audience", e.target.value)
-                            }
+                            value={audience}
+                            onChange={(e) => setAudience(e.target.value)}
                             className="mt-1.5"
                           />
                         </div>
                         <div>
                           <Label htmlFor="industry">Hightouch segment</Label>
                           <Select
-                            value={watch("highTouch")}
-                            onValueChange={(value) =>
-                              setValue("highTouch", value)
-                            }
+                            value={highTouch}
+                            onValueChange={setHighTouch}
                           >
                             <SelectTrigger
                               id="industry"
@@ -941,7 +863,7 @@ export default function AgentBuilder() {
                                 f.name.endsWith(".txt")
                             );
                             if (validFiles.length > 0) {
-                              setValue("productInfoDocs", [
+                              setProductInfoDocs([
                                 ...productInfoDocs,
                                 ...validFiles,
                               ]);
@@ -976,7 +898,7 @@ export default function AgentBuilder() {
                             onChange={(e) => {
                               const files = Array.from(e.target.files || []);
                               if (files.length > 0) {
-                                setValue("productInfoDocs", [
+                                setProductInfoDocs([
                                   ...productInfoDocs,
                                   ...files,
                                 ]);
@@ -1767,9 +1689,9 @@ export default function AgentBuilder() {
                             id="restricted-topics"
                             placeholder="Enter topics the agent should avoid (one per line)&#10;e.g., Politics, Religion, Controversial subjects"
                             rows={3}
-                            value={watch("restrictedTopics")}
+                            value={restrictedTopics}
                             onChange={(e) =>
-                              setValue("restrictedTopics", e.target.value)
+                              setRestrictedTopics(e.target.value)
                             }
                             className="mt-1.5"
                           />
@@ -1802,9 +1724,9 @@ export default function AgentBuilder() {
                               id="custom-profanity"
                               placeholder="Add custom words to filter (comma-separated)"
                               rows={2}
-                              value={watch("customProfanityWords")}
+                              value={customProfanityWords}
                               onChange={(e) =>
-                                setValue("customProfanityWords", e.target.value)
+                                setCustomProfanityWords(e.target.value)
                               }
                               className="mt-1.5"
                             />
@@ -1821,10 +1743,8 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                           <Switch
-                            checked={watch("piiHandling")}
-                            onCheckedChange={(check) =>
-                              setValue("piiHandling", check)
-                            }
+                            checked={piiHandling}
+                            onCheckedChange={setPiiHandling}
                           />
                         </div>
 
@@ -1836,9 +1756,9 @@ export default function AgentBuilder() {
                             id="escalation-keywords"
                             placeholder="Keywords that trigger human handover&#10;e.g., speak to manager, urgent help, complaint"
                             rows={3}
-                            value={watch("escalationKeywords")}
+                            value={escalationKeywords}
                             onChange={(e) =>
-                              setValue("escalationKeywords", e.target.value)
+                              setEscalationKeywords(e.target.value)
                             }
                             className="mt-1.5"
                           />
@@ -1856,10 +1776,8 @@ export default function AgentBuilder() {
                             id="brand-voice-rules"
                             placeholder="Define brand voice rules&#10;e.g., Always use 'we' not 'I', Avoid technical jargon, Use emojis sparingly"
                             rows={4}
-                            value={watch("brandVoiceRules")}
-                            onChange={(e) =>
-                              setValue("brandVoiceRules", e.target.value)
-                            }
+                            value={brandVoiceRules}
+                            onChange={(e) => setBrandVoiceRules(e.target.value)}
                             className="mt-1.5"
                           />
                         </div>
@@ -1894,17 +1812,15 @@ export default function AgentBuilder() {
                       <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
                         <div>
                           <Label htmlFor="follow-up-delay">
-                            Follow-up Delay: {watch("followUpDelay")} hours
+                            Follow-up Delay: {followUpDelay[0]} hours
                           </Label>
                           <Slider
                             id="follow-up-delay"
                             min={1}
                             max={168}
                             step={1}
-                            value={watch("followUpDelay")}
-                            onValueChange={(value) =>
-                              setValue("followUpDelay", value)
-                            }
+                            value={followUpDelay}
+                            onValueChange={setFollowUpDelay}
                             className="mt-2"
                           />
                           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1918,17 +1834,15 @@ export default function AgentBuilder() {
 
                         <div>
                           <Label htmlFor="max-followups">
-                            Maximum Follow-ups: {watch("maxFollowUps")}
+                            Maximum Follow-ups: {maxFollowUps[0]}
                           </Label>
                           <Slider
                             id="max-followups"
                             min={0}
                             max={10}
                             step={1}
-                            value={watch("maxFollowUps")}
-                            onValueChange={(value) =>
-                              setValue("maxFollowUps", value)
-                            }
+                            value={maxFollowUps}
+                            onValueChange={setMaxFollowUps}
                             className="mt-2"
                           />
                           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1968,9 +1882,9 @@ export default function AgentBuilder() {
                                 <Input
                                   id="quiet-start"
                                   type="time"
-                                  value={watch("quietHoursStart")}
+                                  value={quietHoursStart}
                                   onChange={(e) =>
-                                    setValue("quietHoursStart", e.target.value)
+                                    setQuietHoursStart(e.target.value)
                                   }
                                   className="mt-1.5"
                                 />
@@ -1982,9 +1896,9 @@ export default function AgentBuilder() {
                                 <Input
                                   id="quiet-end"
                                   type="time"
-                                  value={watch("quietHoursEnd")}
+                                  value={quietHoursEnd}
                                   onChange={(e) =>
-                                    setValue("quietHoursEnd", e.target.value)
+                                    setQuietHoursEnd(e.target.value)
                                   }
                                   className="mt-1.5"
                                 />
@@ -2001,18 +1915,15 @@ export default function AgentBuilder() {
                           <div className="space-y-4">
                             <div>
                               <Label htmlFor="daily-limit" className="text-sm">
-                                Daily Messages per User:{" "}
-                                {watch("dailyMessageLimit")}
+                                Daily Messages per User: {dailyMessageLimit[0]}
                               </Label>
                               <Slider
                                 id="daily-limit"
                                 min={1}
                                 max={50}
                                 step={1}
-                                value={watch("dailyMessageLimit")}
-                                onValueChange={(value) =>
-                                  setValue("dailyMessageLimit", value)
-                                }
+                                value={dailyMessageLimit}
+                                onValueChange={setDailyMessageLimit}
                                 className="mt-2"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -2026,17 +1937,15 @@ export default function AgentBuilder() {
                                 className="text-sm"
                               >
                                 Monthly Messages per User:{" "}
-                                {watch("monthlyMessageLimit")}
+                                {monthlyMessageLimit[0]}
                               </Label>
                               <Slider
                                 id="monthly-limit"
                                 min={10}
                                 max={500}
                                 step={10}
-                                value={watch("monthlyMessageLimit")}
-                                onValueChange={(value) =>
-                                  setValue("monthlyMessageLimit", value)
-                                }
+                                value={monthlyMessageLimit}
+                                onValueChange={setMonthlyMessageLimit}
                                 className="mt-2"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -2090,17 +1999,15 @@ export default function AgentBuilder() {
                             <div>
                               <Label htmlFor="sentiment-threshold">
                                 Negative Sentiment Threshold:{" "}
-                                {watch("sentimentThreshold")}%
+                                {sentimentThreshold[0]}%
                               </Label>
                               <Slider
                                 id="sentiment-threshold"
                                 min={0}
                                 max={100}
                                 step={5}
-                                value={watch("sentimentThreshold")}
-                                onValueChange={(value) =>
-                                  setValue("sentimentThreshold", value)
-                                }
+                                value={sentimentThreshold}
+                                onValueChange={setSentimentThreshold}
                                 className="mt-2"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -2112,17 +2019,15 @@ export default function AgentBuilder() {
                             <div>
                               <Label htmlFor="repeated-questions">
                                 Repeated Questions Count:{" "}
-                                {watch("repeatedQuestionsCount")}
+                                {repeatedQuestionsCount[0]}
                               </Label>
                               <Slider
                                 id="repeated-questions"
                                 min={1}
                                 max={10}
                                 step={1}
-                                value={watch("repeatedQuestionsCount")}
-                                onValueChange={(value) =>
-                                  setValue("repeatedQuestionsCount", value)
-                                }
+                                value={repeatedQuestionsCount}
+                                onValueChange={setRepeatedQuestionsCount}
                                 className="mt-2"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -2139,9 +2044,9 @@ export default function AgentBuilder() {
                                 id="hitl-keywords"
                                 placeholder="Enter keywords (one per line)&#10;e.g., speak to manager, human help, talk to person"
                                 rows={3}
-                                value={watch("hitlKeywords")}
+                                value={hitlKeywords}
                                 onChange={(e) =>
-                                  setValue("hitlKeywords", e.target.value)
+                                  setHitlKeywords(e.target.value)
                                 }
                                 className="mt-1.5"
                               />
@@ -2155,9 +2060,9 @@ export default function AgentBuilder() {
                                 id="handover-message"
                                 placeholder="Message shown when transferring to human"
                                 rows={2}
-                                value={watch("handoverMessage")}
+                                value={handoverMessage}
                                 onChange={(e) =>
-                                  setValue("handoverMessage", e.target.value)
+                                  setHandoverMessage(e.target.value)
                                 }
                                 className="mt-1.5"
                               />
@@ -2203,10 +2108,8 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                           <Switch
-                            checked={watch("quickRepliesEnabled")}
-                            onCheckedChange={(checked) =>
-                              setValue("quickRepliesEnabled", checked)
-                            }
+                            checked={quickRepliesEnabled}
+                            onCheckedChange={setQuickRepliesEnabled}
                           />
                         </div>
 
@@ -2221,10 +2124,8 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                           <Switch
-                            checked={watch("ctaButtonsEnabled")}
-                            onCheckedChange={(checked) =>
-                              setValue("ctaButtonsEnabled", checked)
-                            }
+                            checked={ctaButtonsEnabled}
+                            onCheckedChange={setCtaButtonsEnabled}
                           />
                         </div>
 
@@ -2238,10 +2139,8 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                           <Switch
-                            checked={watch("listMessagesEnabled")}
-                            onCheckedChange={(checked) =>
-                              setValue("listMessagesEnabled", checked)
-                            }
+                            checked={listMessagesEnabled}
+                            onCheckedChange={setListMessagesEnabled}
                           />
                         </div>
 
@@ -2302,10 +2201,8 @@ export default function AgentBuilder() {
                                 Calendar Provider
                               </Label>
                               <Select
-                                value={watch("schedulingProvider")}
-                                onValueChange={(value) =>
-                                  setValue("schedulingProvider", value)
-                                }
+                                value={schedulingProvider}
+                                onValueChange={setSchedulingProvider}
                               >
                                 <SelectTrigger
                                   id="scheduling-provider"
@@ -2327,7 +2224,7 @@ export default function AgentBuilder() {
                               </Select>
                             </div>
 
-                            {watch("schedulingProvider") === "calendly" && (
+                            {schedulingProvider === "calendly" && (
                               <div>
                                 <Label htmlFor="calendly-url">
                                   Calendly Event URL
@@ -2335,9 +2232,9 @@ export default function AgentBuilder() {
                                 <Input
                                   id="calendly-url"
                                   placeholder="https://calendly.com/your-link/30min"
-                                  value={watch("calendlyUrl")}
+                                  value={calendlyUrl}
                                   onChange={(e) =>
-                                    setValue("calendlyUrl", e.target.value)
+                                    setCalendlyUrl(e.target.value)
                                   }
                                   className="mt-1.5"
                                 />
@@ -2517,9 +2414,9 @@ export default function AgentBuilder() {
   ]
 }'
                               rows={12}
-                              value={watch("questionSetJson")}
+                              value={questionSetJson}
                               onChange={(e) =>
-                                setValue("questionSetJson", e.target.value)
+                                setQuestionSetJson(e.target.value)
                               }
                               className="mt-1.5 font-mono text-sm"
                             />
@@ -2586,18 +2483,15 @@ export default function AgentBuilder() {
                           <>
                             <div>
                               <Label htmlFor="max-recommendations">
-                                Max Recommendations:{" "}
-                                {watch("maxRecommendations")[0]}
+                                Max Recommendations: {maxRecommendations[0]}
                               </Label>
                               <Slider
                                 id="max-recommendations"
                                 min={1}
                                 max={10}
                                 step={1}
-                                value={watch("maxRecommendations")}
-                                onValueChange={(value) =>
-                                  setValue("maxRecommendations", value)
-                                }
+                                value={maxRecommendations}
+                                onValueChange={setMaxRecommendations}
                                 className="mt-2"
                               />
                               <p className="text-xs text-gray-500 mt-1">
@@ -2610,10 +2504,8 @@ export default function AgentBuilder() {
                                 Recommendation Strategy
                               </Label>
                               <Select
-                                value={watch("recommendationStrategy")}
-                                onValueChange={(value) =>
-                                  setValue("recommendationStrategy", value)
-                                }
+                                value={recommendationStrategy}
+                                onValueChange={setRecommendationStrategy}
                               >
                                 <SelectTrigger
                                   id="recommendation-strategy"
@@ -2648,10 +2540,8 @@ export default function AgentBuilder() {
                                 </p>
                               </div>
                               <Switch
-                                checked={watch("includeImages")}
-                                onCheckedChange={(checked) =>
-                                  setValue("includeImages", checked)
-                                }
+                                checked={includeImages}
+                                onCheckedChange={setIncludeImages}
                               />
                             </div>
                           </>
@@ -2692,26 +2582,22 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                           <Switch
-                            checked={watch("oneQuestionAtATime")}
-                            onCheckedChange={(checked) =>
-                              setValue("oneQuestionAtATime", checked)
-                            }
+                            checked={oneQuestionAtATime}
+                            onCheckedChange={setOneQuestionAtATime}
                           />
                         </div>
 
                         <div>
                           <Label htmlFor="response-pacing">
-                            Response Delay: {watch("responsePacing")}ms
+                            Response Delay: {responsePacing[0]}ms
                           </Label>
                           <Slider
                             id="response-pacing"
                             min={0}
                             max={5000}
                             step={100}
-                            value={watch("responsePacing")}
-                            onValueChange={(value) =>
-                              setValue("responsePacing", value)
-                            }
+                            value={responsePacing}
+                            onValueChange={setResponsePacing}
                             className="mt-2"
                           />
                           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -2733,10 +2619,8 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                           <Switch
-                            checked={watch("simulateTyping")}
-                            onCheckedChange={(checked) =>
-                              setValue("simulateTyping", checked)
-                            }
+                            checked={simulateTyping}
+                            onCheckedChange={setSimulateTyping}
                           />
                         </div>
 
@@ -2754,6 +2638,142 @@ export default function AgentBuilder() {
               <div className="h-20" />
             </div>
           </ScrollArea>
+        </div>
+
+        {/* Chat Preview Sidebar */}
+        <div className="w-[400px] flex-shrink-0">
+          <div className="h-full flex flex-col bg-white border-l border-gray-200">
+            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-gray-900">Chat Preview</h3>
+                  <p className="text-gray-600 text-xs mt-0.5">Your Agent</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-600"
+                  onClick={() =>
+                    setMessages([
+                      {
+                        role: "agent",
+                        content:
+                          "Chat preview - Test how your agent responds to messages",
+                        timestamp: "11:12 PM",
+                        type: "info",
+                      },
+                    ])
+                  }
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Reset
+                </Button>
+              </div>
+            </div>
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${
+                      message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`flex gap-3 max-w-[85%] ${
+                        message.role === "user"
+                          ? "flex-row-reverse"
+                          : "flex-row"
+                      }`}
+                    >
+                      <div
+                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                          message.role === "user"
+                            ? "bg-blue-600"
+                            : message.type === "info"
+                              ? "bg-gray-600"
+                              : "bg-green-600"
+                        }`}
+                      >
+                        {message.role === "user" ? (
+                          <User className="w-4 h-4 text-white" />
+                        ) : (
+                          <Bot className="w-4 h-4 text-white" />
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <div
+                          className={`rounded-lg px-4 py-2 ${
+                            message.role === "user"
+                              ? "bg-blue-600 text-white"
+                              : message.type === "info"
+                                ? "bg-yellow-50 text-yellow-900 border border-yellow-200"
+                                : message.type === "loading"
+                                  ? "bg-gray-100 text-gray-900"
+                                  : "bg-gray-100 text-gray-900"
+                          }`}
+                        >
+                          {message.type === "loading" ? (
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-1">
+                                <span
+                                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                  style={{ animationDelay: "0ms" }}
+                                ></span>
+                                <span
+                                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                  style={{ animationDelay: "150ms" }}
+                                ></span>
+                                <span
+                                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                  style={{ animationDelay: "300ms" }}
+                                ></span>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-sm whitespace-pre-wrap">
+                              {message.content}
+                            </p>
+                          )}
+                        </div>
+                        <div
+                          className={`flex items-center gap-2 px-1 ${
+                            message.role === "user"
+                              ? "justify-end"
+                              : "justify-start"
+                          }`}
+                        >
+                          <span className="text-xs text-gray-500">
+                            {message.timestamp}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Type a message to test..."
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!chatInput.trim()}
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Preview how your agent responds based on its configuration
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

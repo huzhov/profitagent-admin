@@ -16,11 +16,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ArrowLeft, Eye, Ellipsis, Workflow, Plus, Play } from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
+import { getAgent } from "@/services/agents";
+import { useQuery } from "@tanstack/react-query";
 
 export default function AgentView() {
   const navigate = useNavigate();
   const { id } = useParams({ from: "/_authenticated/agents/$id/view" });
 
+  const { data } = useQuery({
+    queryKey: ["agents"],
+    queryFn: async () => {
+      const data = await getAgent(id);
+      return data;
+    },
+  });
   // Mock data - replace with actual data fetching
   const agent = {
     id: id,
@@ -87,8 +96,8 @@ export default function AgentView() {
                   <Play className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="text-gray-900">{agent.name}</h1>
-                  <p className="text-gray-600">{agent.description}</p>
+                  <h1 className="text-gray-900">{data?.name}</h1>
+                  <p className="text-gray-600">{data?.description}</p>
                 </div>
               </div>
             </div>

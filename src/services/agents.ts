@@ -1,0 +1,30 @@
+import axiosInstance from "@/lib/axiosInstance";
+import type { AgentFormValues } from "@/components/agent-builder/schema";
+import type { AgentListResponse, AgentResponse } from "@/types/agents";
+
+export async function getAgentList(): Promise<AgentListResponse[]> {
+  const { data } = await axiosInstance.get<AgentListResponse[]>(`/agents/list`);
+  return data;
+}
+
+export async function getAgent(id: string): Promise<AgentResponse> {
+  const { data } = await axiosInstance.get<AgentResponse>(`/agents/${id}`);
+  return data;
+}
+
+export async function createAgent(
+  values: AgentFormValues
+): Promise<AgentResponse> {
+  const { data } = await axiosInstance.post<AgentResponse>(`/agents`, {
+    agentName: values?.agentName,
+    integrationId: values?.integrationId,
+    businessId: values?.businessId,
+    systemPrompt: values?.systemPrompt,
+    description: values?.description,
+    objective: values?.objective,
+    toneOfVoice: values?.toneOfVoice,
+    productPlans: values?.productPlans,
+    creativity: values?.creativity,
+  });
+  return data;
+}

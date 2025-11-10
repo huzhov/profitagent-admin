@@ -26,4 +26,14 @@ export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
     onError: handleOnError,
   }),
+  defaultOptions: {
+    queries: {
+      retry: (error: any): any => {
+        // Stop retrying on 400 (Bad Request)
+        if (error?.status === 400) {
+          return false;
+        }
+      },
+    },
+  },
 });

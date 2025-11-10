@@ -33,12 +33,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useApp } from "@/context/AppContext";
+import { useQuery } from "@tanstack/react-query";
+import { getAgentList } from "@/services/agents";
 
 export default function Agents() {
   const navigate = useNavigate();
-  const { agents, handleCloneAgent, handleDeleteAgent, toggleAgentStatus } =
-    useApp();
+  const { agents } = useApp();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["agentsList"],
+    queryFn: async () => {
+      const data = await getAgentList();
+      return data;
+    },
+  });
 
   const totalConversations = agents.reduce(
     (sum, agent) => sum + agent.conversations,
@@ -139,221 +148,229 @@ export default function Agents() {
 
       {/* Agents Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {agents.map((agent) => (
-          <Card
-            key={agent.id}
-            data-slot="card"
-            className="shadow-none py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border hover:shadow-md transition-shadow"
-          >
-            <CardHeader
-              data-slot="card-header"
-              className="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pt-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 pb-3"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIconColorClass(agent.iconColor)}`}
-                  >
-                    <Bot className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <CardTitle data-slot="card-title" className="text-lg">
-                        {agent.name}
-                      </CardTitle>
-                      <div className="flex items-center gap-1">
-                        {agent.workflows > 0 && (
-                          <>
-                            <Workflow className="w-4 h-4 text-purple-600" />
-                            <Badge
-                              data-slot="badge"
-                              variant="outline"
-                              className="text-xs bg-purple-50 text-purple-700 border-purple-200"
-                            >
-                              {agent.workflows}
-                            </Badge>
-                          </>
-                        )}
-                        {agent.tests > 0 && (
-                          <>
-                            <FlaskConical className="w-4 h-4 text-blue-600" />
-                            <Badge
-                              data-slot="badge"
-                              variant="outline"
-                              className="text-xs bg-blue-50 text-blue-700 border-blue-200"
-                            >
-                              {agent.tests}
-                            </Badge>
-                          </>
-                        )}
+        {!isLoading && data
+          ? data.map((agent) => (
+              <Card
+                key={agent.id}
+                data-slot="card"
+                className="shadow-none py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border hover:shadow-md transition-shadow"
+              >
+                <CardHeader
+                  data-slot="card-header"
+                  className="@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 pt-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6 pb-3"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIconColorClass(agents[0].iconColor)}`}
+                      >
+                        <Bot className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <CardTitle data-slot="card-title" className="text-lg">
+                            {agent.name}
+                          </CardTitle>
+                          <div className="flex items-center gap-1">
+                            {agents[0].workflows > 0 && (
+                              <>
+                                <Workflow className="w-4 h-4 text-purple-600" />
+                                <Badge
+                                  data-slot="badge"
+                                  variant="outline"
+                                  className="text-xs bg-purple-50 text-purple-700 border-purple-200"
+                                >
+                                  {agents[0].workflows}
+                                </Badge>
+                              </>
+                            )}
+                            {agents[0].tests > 0 && (
+                              <>
+                                <FlaskConical className="w-4 h-4 text-blue-600" />
+                                <Badge
+                                  data-slot="badge"
+                                  variant="outline"
+                                  className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                                >
+                                  {agents[0].tests}
+                                </Badge>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <Badge
+                          data-slot="badge"
+                          className={`text-xs border-transparent ${
+                            agent.status === "Active"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                          }`}
+                        >
+                          {agent.status === "disabled" ? "Paused" : "Active"}
+                        </Badge>
                       </div>
                     </div>
-                    <Badge
-                      data-slot="badge"
-                      className={`text-xs border-transparent ${
-                        agent.status === "Active"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
-                      }`}
-                    >
-                      {agent.status}
-                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <EllipsisVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            navigate({ to: `/agents/${agent.id}/edit` })
+                          }
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                        // onClick={() => handleCloneAgent(agent.id)}
+                        >
+                          Clone
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          // onClick={() => handleDeleteAgent(agent.id)}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <EllipsisVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
+                  <CardDescription
+                    data-slot="card-description"
+                    className="text-muted-foreground mt-2 text-md"
+                  >
+                    {agents[0].description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent
+                  data-slot="card-content"
+                  className="px-6 [&:last-child]:pb-6 space-y-4"
+                >
+                  {/* Metrics Grid */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center p-2 bg-accent/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">
+                          Conversations
+                        </p>
+                        <p className="font-semibold">
+                          {agents[0].conversations.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="text-center p-2 bg-accent/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">
+                          Conversion
+                        </p>
+                        <p className="font-semibold">
+                          {agents[0].conversionRate}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center p-2 bg-accent/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">
+                          Revenue Generated
+                        </p>
+                        <p className="font-semibold">
+                          {agents[0].revenueGenerated}
+                        </p>
+                      </div>
+                      <div className="text-center p-2 bg-accent/50 rounded-lg">
+                        <p className="text-sm text-muted-foreground">
+                          Customer Satisfaction
+                        </p>
+                        <p className="font-semibold">
+                          {agents[0].customerSatisfaction}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Active Channels */}
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Active Channels
+                    </p>
+                    <div className="flex gap-1">
+                      {agents[0].channels.map((channel, index) => (
+                        <Badge
+                          key={index}
+                          data-slot="badge"
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          {channel}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Metadata */}
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>Created {agents[0].created}</span>
+                    </div>
+                    <p>Last active: {agents[0].lastActive}</p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="space-y-2 pt-2">
+                    <Button
+                      data-slot="button"
+                      size="sm"
+                      className="w-full cursor-pointer"
                       onClick={() =>
-                        navigate({ to: `/agents/${agent.id}/edit` })
+                        navigate({ to: `/agents/${agent.id}/view` as any })
                       }
                     >
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleCloneAgent(agent.id)}
-                    >
-                      Clone
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-red-600"
-                      onClick={() => handleDeleteAgent(agent.id)}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <CardDescription
-                data-slot="card-description"
-                className="text-muted-foreground mt-2 text-md"
-              >
-                {agent.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent
-              data-slot="card-content"
-              className="px-6 [&:last-child]:pb-6 space-y-4"
-            >
-              {/* Metrics Grid */}
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-2 bg-accent/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      Conversations
-                    </p>
-                    <p className="font-semibold">
-                      {agent.conversations.toLocaleString()}
-                    </p>
+                      <Eye className="w-3 h-3 mr-1" />
+                      View Agent
+                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        data-slot="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 cursor-pointer"
+                        onClick={() =>
+                          navigate({ to: `/agents/${agent.id}/preview` as any })
+                        }
+                      >
+                        <Play className="w-3 h-3 mr-1" />
+                        Preview
+                      </Button>
+                      <Button
+                        data-slot="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 cursor-pointer"
+                      >
+                        <ChartColumn className="w-3 h-3 mr-1" />
+                        Analytics
+                      </Button>
+                      <Button
+                        data-slot="button"
+                        variant="outline"
+                        size="sm"
+                        // onClick={() => toggleAgentStatus(agent.id)}
+                        className="cursor-pointer"
+                      >
+                        {agent.status === "Active" ? (
+                          <Pause className="w-3 h-3" />
+                        ) : (
+                          <Play className="w-3 h-3" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="text-center p-2 bg-accent/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Conversion</p>
-                    <p className="font-semibold">{agent.conversionRate}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-2 bg-accent/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      Revenue Generated
-                    </p>
-                    <p className="font-semibold">{agent.revenueGenerated}</p>
-                  </div>
-                  <div className="text-center p-2 bg-accent/50 rounded-lg">
-                    <p className="text-sm text-muted-foreground">
-                      Customer Satisfaction
-                    </p>
-                    <p className="font-semibold">
-                      {agent.customerSatisfaction}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Active Channels */}
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Active Channels
-                </p>
-                <div className="flex gap-1">
-                  {agent.channels.map((channel, index) => (
-                    <Badge
-                      key={index}
-                      data-slot="badge"
-                      variant="outline"
-                      className="text-xs"
-                    >
-                      {channel}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              {/* Metadata */}
-              <div className="text-xs text-muted-foreground space-y-1">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  <span>Created {agent.created}</span>
-                </div>
-                <p>Last active: {agent.lastActive}</p>
-              </div>
-
-              {/* Actions */}
-              <div className="space-y-2 pt-2">
-                <Button
-                  data-slot="button"
-                  size="sm"
-                  className="w-full cursor-pointer"
-                  onClick={() =>
-                    navigate({ to: `/agents/${agent.id}/view` as any })
-                  }
-                >
-                  <Eye className="w-3 h-3 mr-1" />
-                  View Agent
-                </Button>
-                <div className="flex gap-2">
-                  <Button
-                    data-slot="button"
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 cursor-pointer"
-                    onClick={() =>
-                      navigate({ to: `/agents/${agent.id}/preview` as any })
-                    }
-                  >
-                    <Play className="w-3 h-3 mr-1" />
-                    Preview
-                  </Button>
-                  <Button
-                    data-slot="button"
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 cursor-pointer"
-                  >
-                    <ChartColumn className="w-3 h-3 mr-1" />
-                    Analytics
-                  </Button>
-                  <Button
-                    data-slot="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleAgentStatus(agent.id)}
-                    className="cursor-pointer"
-                  >
-                    {agent.status === "Active" ? (
-                      <Pause className="w-3 h-3" />
-                    ) : (
-                      <Play className="w-3 h-3" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </CardContent>
+              </Card>
+            ))
+          : null}
 
         {/* Create New Agent Card */}
         <Card

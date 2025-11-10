@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
-import type { Agent } from "@/types/agent";
+import type { Agent } from "@/types/agents";
 import type { User } from "@/types/user";
 import userStore from "@/store/user-store";
 import businessStore from "@/store/business-store";

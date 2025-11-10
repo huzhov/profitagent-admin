@@ -16,6 +16,8 @@ import {
 import { useState, useRef, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useApp } from "@/context/AppContext";
+import { useQuery } from "@tanstack/react-query";
+import { getAgent } from "@/services/agents";
 
 interface Message {
   id: string;
@@ -53,7 +55,7 @@ export function AgentPreview() {
 
   const { agents } = useApp();
 
-  const agent = agents.find((a) => a.id === Number(id));
+  const agent = agents[0];
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -69,6 +71,14 @@ export function AgentPreview() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ["agents"],
+    queryFn: async () => {
+      const data = await getAgent(id);
+      return data;
+    },
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -168,7 +178,7 @@ export function AgentPreview() {
     setIsTyping(false);
   };
 
-  if (!agent) {
+  if (!data) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -206,7 +216,7 @@ export function AgentPreview() {
               </div>
               <div>
                 <h1 className="text-lg sm:text-xl font-semibold">
-                  {agent.name} Preview
+                  {data.name} Preview
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground">
                   Test your agent's responses and behavior
@@ -262,10 +272,10 @@ export function AgentPreview() {
               </h3>
               <div className="text-xs lg:text-sm text-muted-foreground">
                 <p className="mb-2">
-                  <strong>Brand:</strong> {agent.name}
+                  <strong>Brand:</strong> {data.name}
                 </p>
                 <p className="mb-2">
-                  <strong>Description:</strong> {agent.description}
+                  <strong>Description:</strong> {data.description}
                 </p>
               </div>
             </div>
@@ -359,7 +369,7 @@ export function AgentPreview() {
                     >
                       {message.type === "bot" && (
                         <div className="text-xs lg:text-sm text-muted-foreground font-medium mb-1.5 lg:mb-2">
-                          {agent.name}
+                          {data.name}
                         </div>
                       )}
                       <p className="text-xs lg:text-sm whitespace-pre-line">
