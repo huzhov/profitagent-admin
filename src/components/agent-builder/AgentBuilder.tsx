@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, ChevronDown, Upload, CircleCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
-import { createAgent } from "@/services/agents";
+import { createAgent, getAgent } from "@/services/agents";
 import {
   agentSchema,
   defaultAgentValues,
@@ -61,7 +61,17 @@ const agentTypeConfig = {
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
-  const { type } = useParams({ from: "/_authenticated/agents/create/$type" });
+  const location = useLocation();
+  const isAgentCreate = location.pathname.includes("/create/");
+  const isAgentEdit = location.pathname.includes("/edit");
+  const type = isAgentCreate
+    ? useParams({ from: "/_authenticated/agents/create/$type" }).type
+    : "";
+
+  const id = isAgentEdit
+    ? useParams({ from: "/_authenticated/agents/$id/edit" }).id
+    : "";
+
   const agentConfig =
     agentTypeConfig[type as keyof typeof agentTypeConfig] ||
     agentTypeConfig.onboarding;
@@ -87,22 +97,21 @@ export default function AgentBuilder() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   // Document Library state - Lee's categories
-  const [productInfoDocs, setProductInfoDocs] = useState<File[]>([]);
+  const productInfoDocs = watch("productInfoDocs") ?? [];
+  const processWorkflowDocs = watch("processWorkflowDocs") ?? [];
+  const complianceDocs = watch("complianceDocs") ?? [];
+  const customerEducationDocs = watch("customerEducationDocs") ?? [];
+  const salesMarketingDocs = watch("salesMarketingDocs") ?? [];
+  const dataToolsDocs = watch("dataToolsDocs") ?? [];
+  const questionSets = watch("questionSets") ?? [];
   const [isProductInfoDragging, setIsProductInfoDragging] = useState(false);
-  const [processWorkflowDocs, setProcessWorkflowDocs] = useState<File[]>([]);
   const [isProcessWorkflowDragging, setIsProcessWorkflowDragging] =
     useState(false);
-  const [complianceDocs, setComplianceDocs] = useState<File[]>([]);
   const [isComplianceDragging, setIsComplianceDragging] = useState(false);
-  const [customerEducationDocs, setCustomerEducationDocs] = useState<File[]>(
-    []
-  );
   const [isCustomerEducationDragging, setIsCustomerEducationDragging] =
     useState(false);
-  const [salesMarketingDocs, setSalesMarketingDocs] = useState<File[]>([]);
   const [isSalesMarketingDragging, setIsSalesMarketingDragging] =
     useState(false);
-  const [dataToolsDocs, setDataToolsDocs] = useState<File[]>([]);
   const [isDataToolsDragging, setIsDataToolsDragging] = useState(false);
 
   // Guardrails state
@@ -118,7 +127,6 @@ export default function AgentBuilder() {
   const [schedulingEnabled, setSchedulingEnabled] = useState(false);
 
   // Question Sets state
-  const [questionSets, setQuestionSets] = useState<File[]>([]);
   const [isQuestionSetDragging, setIsQuestionSetDragging] = useState(false);
   const [questionSetInputMode, setQuestionSetInputMode] = useState<
     "upload" | "paste"
@@ -184,6 +192,28 @@ export default function AgentBuilder() {
     },
   });
 
+  const { data: agentData, isFetchedAfterMount } = useQuery({
+    queryKey: ["agents"],
+    queryFn: async () => {
+      const data = await getAgent(id);
+      return data;
+    },
+    enabled: id !== "",
+  });
+
+  useEffect(() => {
+    if (isAgentEdit && isFetchedAfterMount) {
+      setValue("agentName", agentData?.name || "");
+      setValue("description", agentData?.description || "");
+      setValue("systemPrompt", agentData?.systemPrompt || "");
+      setValue("objective", agentData?.objective || "");
+      setValue("integrationId", agentData?.wabaAccountId || "");
+      setValue("creativity", agentData?.creativity || 0);
+      setValue("toneOfVoice", agentData?.tone || "");
+      setValue("integrationId", agentData?.wabaAccountId || "");
+    }
+  }, [isFetchedAfterMount]);
+
   const handleFileUpload = (file: File) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
       setUploadedFile(file);
@@ -221,13 +251,19 @@ export default function AgentBuilder() {
     }
   };
 
+  const handleQuestionInputMode = (checked: boolean) => {
+    setValue("questionSetJson", "");
+    setValue("questionSets", []);
+    setQuestionSetInputMode(checked ? "paste" : "upload");
+  };
+
   const onSubmit = (values: any) => {
     setValue("businessId", user.businessId ?? "");
 
     // Debug Submit Values
     console.log(values);
 
-    mutate(values);
+    if (isAgentCreate) mutate(values);
   };
 
   return (
@@ -1015,7 +1051,8 @@ export default function AgentBuilder() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() =>
-                                    setProductInfoDocs(
+                                    setValue(
+                                      "productInfoDocs",
                                       productInfoDocs.filter(
                                         (_, i) => i !== index
                                       )
@@ -1069,7 +1106,7 @@ export default function AgentBuilder() {
                                 f.name.endsWith(".txt")
                             );
                             if (validFiles.length > 0) {
-                              setProcessWorkflowDocs([
+                              setValue("processWorkflowDocs", [
                                 ...processWorkflowDocs,
                                 ...validFiles,
                               ]);
@@ -1104,7 +1141,7 @@ export default function AgentBuilder() {
                             onChange={(e) => {
                               const files = Array.from(e.target.files || []);
                               if (files.length > 0) {
-                                setProcessWorkflowDocs([
+                                setValue("processWorkflowDocs", [
                                   ...processWorkflowDocs,
                                   ...files,
                                 ]);
@@ -1143,7 +1180,8 @@ export default function AgentBuilder() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() =>
-                                    setProcessWorkflowDocs(
+                                    setValue(
+                                      "processWorkflowDocs",
                                       processWorkflowDocs.filter(
                                         (_, i) => i !== index
                                       )
@@ -1197,7 +1235,7 @@ export default function AgentBuilder() {
                                 f.name.endsWith(".txt")
                             );
                             if (validFiles.length > 0) {
-                              setComplianceDocs([
+                              setValue("complianceDocs", [
                                 ...complianceDocs,
                                 ...validFiles,
                               ]);
@@ -1232,7 +1270,7 @@ export default function AgentBuilder() {
                             onChange={(e) => {
                               const files = Array.from(e.target.files || []);
                               if (files.length > 0) {
-                                setComplianceDocs([
+                                setValue("complianceDocs", [
                                   ...complianceDocs,
                                   ...files,
                                 ]);
@@ -1271,7 +1309,8 @@ export default function AgentBuilder() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() =>
-                                    setComplianceDocs(
+                                    setValue(
+                                      "complianceDocs",
                                       complianceDocs.filter(
                                         (_, i) => i !== index
                                       )
@@ -1322,10 +1361,13 @@ export default function AgentBuilder() {
                                                   f.name.endsWith(".txt")
                                               );
                                               if (validFiles.length > 0) {
-                                                setCustomerEducationDocs([
-                                                  ...customerEducationDocs,
-                                                  ...validFiles,
-                                                ]);
+                                                setValue(
+                                                  "customerEducationDocs",
+                                                  [
+                                                    ...customerEducationDocs,
+                                                    ...validFiles,
+                                                  ]
+                                                );
                                               } else {
                                                 alert(
                                                   "Please upload PDF or text documents"
@@ -1367,10 +1409,13 @@ export default function AgentBuilder() {
                                                   e.target.files || []
                                                 );
                                                 if (files.length > 0) {
-                                                  setCustomerEducationDocs([
-                                                    ...customerEducationDocs,
-                                                    ...files,
-                                                  ]);
+                                                  setValue(
+                                                    "customerEducationDocs",
+                                                    [
+                                                      ...customerEducationDocs,
+                                                      ...files,
+                                                    ]
+                                                  );
                                                 }
                                               }}
                                               className="hidden"
@@ -1411,7 +1456,8 @@ export default function AgentBuilder() {
                                                       variant="ghost"
                                                       size="sm"
                                                       onClick={() =>
-                                                        setCustomerEducationDocs(
+                                                        setValue(
+                                                          "customerEducationDocs",
                                                           customerEducationDocs.filter(
                                                             (_, i) =>
                                                               i !== index
@@ -1475,7 +1521,7 @@ export default function AgentBuilder() {
                                                   f.name.endsWith(".txt")
                                               );
                                               if (validFiles.length > 0) {
-                                                setSalesMarketingDocs([
+                                                setValue("salesMarketingDocs", [
                                                   ...salesMarketingDocs,
                                                   ...validFiles,
                                                 ]);
@@ -1518,10 +1564,13 @@ export default function AgentBuilder() {
                                                   e.target.files || []
                                                 );
                                                 if (files.length > 0) {
-                                                  setSalesMarketingDocs([
-                                                    ...salesMarketingDocs,
-                                                    ...files,
-                                                  ]);
+                                                  setValue(
+                                                    "salesMarketingDocs",
+                                                    [
+                                                      ...salesMarketingDocs,
+                                                      ...files,
+                                                    ]
+                                                  );
                                                 }
                                               }}
                                               className="hidden"
@@ -1562,7 +1611,8 @@ export default function AgentBuilder() {
                                                       variant="ghost"
                                                       size="sm"
                                                       onClick={() =>
-                                                        setSalesMarketingDocs(
+                                                        setValue(
+                                                          "salesMarketingDocs",
                                                           salesMarketingDocs.filter(
                                                             (_, i) =>
                                                               i !== index
@@ -1624,7 +1674,7 @@ export default function AgentBuilder() {
                                                   f.name.endsWith(".txt")
                                               );
                                               if (validFiles.length > 0) {
-                                                setDataToolsDocs([
+                                                setValue("dataToolsDocs", [
                                                   ...dataToolsDocs,
                                                   ...validFiles,
                                                 ]);
@@ -1665,7 +1715,7 @@ export default function AgentBuilder() {
                                                   e.target.files || []
                                                 );
                                                 if (files.length > 0) {
-                                                  setDataToolsDocs([
+                                                  setValue("dataToolsDocs", [
                                                     ...dataToolsDocs,
                                                     ...files,
                                                   ]);
@@ -1708,7 +1758,8 @@ export default function AgentBuilder() {
                                                       variant="ghost"
                                                       size="sm"
                                                       onClick={() =>
-                                                        setDataToolsDocs(
+                                                        setValue(
+                                                          "dataToolsDocs",
                                                           dataToolsDocs.filter(
                                                             (_, i) =>
                                                               i !== index
@@ -1901,9 +1952,9 @@ export default function AgentBuilder() {
                             min={1}
                             max={168}
                             step={1}
-                            value={watch("followUpDelay")}
+                            value={[watch("followUpDelay")]}
                             onValueChange={(value) =>
-                              setValue("followUpDelay", value)
+                              setValue("followUpDelay", value[0])
                             }
                             className="mt-2"
                           />
@@ -1925,9 +1976,9 @@ export default function AgentBuilder() {
                             min={0}
                             max={10}
                             step={1}
-                            value={watch("maxFollowUps")}
+                            value={[watch("maxFollowUps")]}
                             onValueChange={(value) =>
-                              setValue("maxFollowUps", value)
+                              setValue("maxFollowUps", value[0])
                             }
                             className="mt-2"
                           />
@@ -2009,9 +2060,9 @@ export default function AgentBuilder() {
                                 min={1}
                                 max={50}
                                 step={1}
-                                value={watch("dailyMessageLimit")}
+                                value={[watch("dailyMessageLimit")]}
                                 onValueChange={(value) =>
-                                  setValue("dailyMessageLimit", value)
+                                  setValue("dailyMessageLimit", value[0])
                                 }
                                 className="mt-2"
                               />
@@ -2033,9 +2084,9 @@ export default function AgentBuilder() {
                                 min={10}
                                 max={500}
                                 step={10}
-                                value={watch("monthlyMessageLimit")}
+                                value={[watch("monthlyMessageLimit")]}
                                 onValueChange={(value) =>
-                                  setValue("monthlyMessageLimit", value)
+                                  setValue("monthlyMessageLimit", value[0])
                                 }
                                 className="mt-2"
                               />
@@ -2097,9 +2148,9 @@ export default function AgentBuilder() {
                                 min={0}
                                 max={100}
                                 step={5}
-                                value={watch("sentimentThreshold")}
+                                value={[watch("sentimentThreshold")]}
                                 onValueChange={(value) =>
-                                  setValue("sentimentThreshold", value)
+                                  setValue("sentimentThreshold", value[0])
                                 }
                                 className="mt-2"
                               />
@@ -2119,9 +2170,9 @@ export default function AgentBuilder() {
                                 min={1}
                                 max={10}
                                 step={1}
-                                value={watch("repeatedQuestionsCount")}
+                                value={[watch("repeatedQuestionsCount")]}
                                 onValueChange={(value) =>
-                                  setValue("repeatedQuestionsCount", value)
+                                  setValue("repeatedQuestionsCount", value[0])
                                 }
                                 className="mt-2"
                               />
@@ -2405,9 +2456,7 @@ export default function AgentBuilder() {
                             <Switch
                               checked={questionSetInputMode === "paste"}
                               onCheckedChange={(checked) =>
-                                setQuestionSetInputMode(
-                                  checked ? "paste" : "upload"
-                                )
+                                handleQuestionInputMode(checked)
                               }
                             />
                             <span
@@ -2426,7 +2475,10 @@ export default function AgentBuilder() {
                                 setIsQuestionSetDragging(false);
                                 const file = e.dataTransfer.files[0];
                                 if (file && file.type === "application/json") {
-                                  setQuestionSets([...questionSets, file]);
+                                  setValue("questionSets", [
+                                    ...questionSets,
+                                    file,
+                                  ]);
                                 } else {
                                   alert("Please upload a JSON file");
                                 }
@@ -2455,7 +2507,10 @@ export default function AgentBuilder() {
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
-                                    setQuestionSets([...questionSets, file]);
+                                    setValue("questionSets", [
+                                      ...questionSets,
+                                      file,
+                                    ]);
                                   }
                                 }}
                                 className="hidden"
@@ -2488,7 +2543,8 @@ export default function AgentBuilder() {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() =>
-                                        setQuestionSets(
+                                        setValue(
+                                          "questionSets",
                                           questionSets.filter(
                                             (_, i) => i !== index
                                           )
@@ -2587,16 +2643,16 @@ export default function AgentBuilder() {
                             <div>
                               <Label htmlFor="max-recommendations">
                                 Max Recommendations:{" "}
-                                {watch("maxRecommendations")[0]}
+                                {watch("maxRecommendations")}
                               </Label>
                               <Slider
                                 id="max-recommendations"
                                 min={1}
                                 max={10}
                                 step={1}
-                                value={watch("maxRecommendations")}
+                                value={[watch("maxRecommendations")]}
                                 onValueChange={(value) =>
-                                  setValue("maxRecommendations", value)
+                                  setValue("maxRecommendations", value[0])
                                 }
                                 className="mt-2"
                               />
@@ -2708,9 +2764,9 @@ export default function AgentBuilder() {
                             min={0}
                             max={5000}
                             step={100}
-                            value={watch("responsePacing")}
+                            value={[watch("responsePacing")]}
                             onValueChange={(value) =>
-                              setValue("responsePacing", value)
+                              setValue("responsePacing", value[0])
                             }
                             className="mt-2"
                           />

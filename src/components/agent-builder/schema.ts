@@ -46,11 +46,6 @@ export const agentSchema = z.object({
   integrationId: z.string().min(1, "WhatsApp is Required"),
   businessId: z.string(),
 
-  // File Upload
-  uploadedFile: z
-    .union([z.instanceof(File, { message: "File is required" }), z.null()])
-    .optional(),
-
   // Document Library (Lee’s categories)
   productInfoDocs: z.array(z.instanceof(File)).optional(),
   processWorkflowDocs: z.array(z.instanceof(File)).optional(),
@@ -67,16 +62,16 @@ export const agentSchema = z.object({
   brandVoiceRules: z.string().optional(),
 
   // Messaging Controls
-  followUpDelay: z.array(z.number()).default([24]),
-  maxFollowUps: z.array(z.number()).default([3]),
+  followUpDelay: z.number().default(24),
+  maxFollowUps: z.number().default(3),
   quietHoursStart: z.string().default("22:00"),
   quietHoursEnd: z.string().default("08:00"),
-  dailyMessageLimit: z.array(z.number()).default([10]),
-  monthlyMessageLimit: z.array(z.number()).default([100]),
+  dailyMessageLimit: z.number().default(10),
+  monthlyMessageLimit: z.number().default(100),
 
   // HITL Handover
-  sentimentThreshold: z.array(z.number()).default([30]),
-  repeatedQuestionsCount: z.array(z.number()).default([3]),
+  sentimentThreshold: z.number().default(30),
+  repeatedQuestionsCount: z.number().default(3),
   hitlKeywords: z.string().optional(),
   handoverMessage: z
     .string()
@@ -96,13 +91,13 @@ export const agentSchema = z.object({
   questionSetJson: z.string().optional(),
 
   // Product Recommendations
-  maxRecommendations: z.array(z.number()).default([3]),
+  maxRecommendations: z.number().default(3),
   recommendationStrategy: z.string().default("popularity"),
   includeImages: z.boolean().default(true),
 
   // Natural Conversation
   oneQuestionAtATime: z.boolean().default(true),
-  responsePacing: z.array(z.number()).default([1500]),
+  responsePacing: z.number().default(1500),
   simulateTyping: z.boolean().default(true),
 });
 
@@ -126,7 +121,6 @@ export const defaultAgentValues: AgentFormValues = {
   integrationId: "",
   businessId: "",
 
-  uploadedFile: null,
   productInfoDocs: [],
   processWorkflowDocs: [],
   complianceDocs: [],
@@ -140,15 +134,15 @@ export const defaultAgentValues: AgentFormValues = {
   escalationKeywords: "",
   brandVoiceRules: "",
 
-  followUpDelay: [24],
-  maxFollowUps: [3],
+  followUpDelay: 24,
+  maxFollowUps: 3,
   quietHoursStart: "22:00",
   quietHoursEnd: "08:00",
-  dailyMessageLimit: [10],
-  monthlyMessageLimit: [100],
+  dailyMessageLimit: 10,
+  monthlyMessageLimit: 100,
 
-  sentimentThreshold: [30],
-  repeatedQuestionsCount: [3],
+  sentimentThreshold: 30,
+  repeatedQuestionsCount: 3,
   hitlKeywords: "",
   handoverMessage:
     "Let me connect you with a team member who can help you better.",
@@ -163,11 +157,11 @@ export const defaultAgentValues: AgentFormValues = {
   questionSets: [],
   questionSetJson: "",
 
-  maxRecommendations: [3],
+  maxRecommendations: 3,
   recommendationStrategy: "popularity",
   includeImages: true,
 
   oneQuestionAtATime: true,
-  responsePacing: [1500],
+  responsePacing: 1500,
   simulateTyping: true,
 };

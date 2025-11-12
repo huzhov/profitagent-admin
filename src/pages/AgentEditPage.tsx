@@ -1,7 +1,7 @@
-import AgentEdit from "@/components/agents/AgentEdit";
+import AgentBuilder from "@/components/agent-builder/AgentBuilder";
 
 const AgentEditPage = () => {
-  return <AgentEdit />;
+  return <AgentBuilder />;
 };
 
 export default AgentEditPage;
