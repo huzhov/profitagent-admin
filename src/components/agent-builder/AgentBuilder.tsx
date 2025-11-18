@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
-import { ArrowLeft, ChevronDown, Upload, CircleCheck } from "lucide-react";
+import { ArrowLeft, ChevronDown, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +23,6 @@ import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
 import { createAgent, getAgent } from "@/services/agents";
@@ -34,6 +33,7 @@ import {
 } from "./schema";
 import { getWhatsAppList } from "@/services/integrations";
 import { useApp } from "@/context/AppContext";
+import { stageUpload, uploadFile } from "@/services/upload";
 
 const agentTypeConfig = {
   onboarding: {
@@ -169,34 +169,46 @@ export default function AgentBuilder() {
     sms: false,
   });
 
-  const [isSaved, setIsSaved] = useState(false);
+  // const [isSaved, setIsSaved] = useState(false);
 
   const progress = 0; // Calculate based on filled fields
 
-  const { mutate } = useMutation({
-    mutationFn: async (values: z.infer<typeof agentSchema>) => {
-      const data = await createAgent(values);
-      setIsSaved(true);
-      setTimeout(() => {
-        setIsSaved(false);
-      }, 2000);
-      return data;
+  // Creating agent function
+  const { mutate: createAgentFn } = useMutation({
+    mutationFn: createAgent,
+    onSuccess: (data) => {
+      navigate({ to: `/agents/${data.id}/view` });
     },
   });
 
-  const { data, isFetching } = useQuery({
+  // Upload function
+  const { mutate: uploadFileFn } = useMutation({
+    mutationFn: uploadFile,
+  });
+
+  // Stage Upload function
+  const { mutate: stageUploadFn } = useMutation({
+    mutationFn: stageUpload,
+    onSuccess: (data, variables) => {
+      setValue("catalogS3Key", data.key);
+      setValue("catalogName", variables.filename);
+
+      // Call Upload Function
+      uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
+    },
+  });
+
+  const { data: whatsAppListData, isFetching } = useQuery({
     queryKey: ["whatsAppList"],
     queryFn: async () => {
-      const data = await getWhatsAppList();
-      return data;
+      return await getWhatsAppList();
     },
   });
 
   const { data: agentData, isFetchedAfterMount } = useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
-      const data = await getAgent(id);
-      return data;
+      return await getAgent(id);
     },
     enabled: id !== "",
   });
@@ -216,9 +228,16 @@ export default function AgentBuilder() {
 
   const handleFileUpload = (file: File) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
-      setUploadedFile(file);
       // Here you would typically process the CSV file
       console.log("File uploaded:", file.name);
+
+      setUploadedFile(file);
+
+      // Call Endpoint
+      stageUploadFn({
+        filename: file.name,
+        contentType: file.type,
+      });
     } else {
       alert("Please upload a CSV file");
     }
@@ -244,7 +263,9 @@ export default function AgentBuilder() {
     setIsDragging(false);
   };
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProductCatalogueFileInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       handleFileUpload(file);
@@ -257,13 +278,18 @@ export default function AgentBuilder() {
     setQuestionSetInputMode(checked ? "paste" : "upload");
   };
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: AgentFormValues) => {
     setValue("businessId", user.businessId ?? "");
+    setValue("agentType", agentConfig.title);
 
     // Debug Submit Values
+    values.businessId = user.businessId ?? "";
+    values.agentType = agentConfig.title;
     console.log(values);
 
-    if (isAgentCreate) mutate(values);
+    if (isAgentCreate) {
+      createAgentFn(values);
+    }
   };
 
   return (
@@ -310,12 +336,12 @@ export default function AgentBuilder() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {isSaved && (
+          {/* {isSaved && (
             <span className="text-green-600 text-sm flex items-center gap-1">
               <CircleCheck className="w-4 h-4" />
               Saved
             </span>
-          )}
+          )} */}
           <Button variant="outline" size="sm">
             Cancel
           </Button>
@@ -729,7 +755,7 @@ export default function AgentBuilder() {
                                 <SelectValue placeholder="Select WhatsApp Integration" />
                               </SelectTrigger>
                               <SelectContent>
-                                {data?.map((whatApp) => (
+                                {whatsAppListData?.map((whatApp) => (
                                   <SelectItem
                                     value={whatApp.id}
                                     key={whatApp.id}
@@ -853,7 +879,7 @@ export default function AgentBuilder() {
                             id="csv-upload"
                             type="file"
                             accept=".csv"
-                            onChange={handleFileInputChange}
+                            onChange={handleProductCatalogueFileInputChange}
                             className="hidden"
                           />
                           <div className="flex flex-col items-center gap-2">

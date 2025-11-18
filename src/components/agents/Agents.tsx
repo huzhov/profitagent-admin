@@ -222,12 +222,12 @@ export default function Agents() {
                             navigate({ to: `/agents/${agent.id}/edit` })
                           }
                         >
-                          Edit
+                          Edit Agent
                         </DropdownMenuItem>
                         <DropdownMenuItem
                         // onClick={() => handleCloneAgent(agent.id)}
                         >
-                          Clone
+                          Duplicate
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-red-600"

@@ -118,7 +118,11 @@ export default function AgentView() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Edit Agent</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate({ to: `/agents/${id}/edit` })}
+                  >
+                    Edit Agent
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Duplicate</DropdownMenuItem>
                   <DropdownMenuItem>Export</DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive">

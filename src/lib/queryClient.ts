@@ -28,6 +28,7 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
+      refetchOnWindowFocus: false,
       retry: (error: any): any => {
         // Stop retrying on 400 (Bad Request)
         if (error?.status === 400) {

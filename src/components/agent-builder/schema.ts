@@ -45,6 +45,12 @@ export const agentSchema = z.object({
   // ID
   integrationId: z.string().min(1, "WhatsApp is Required"),
   businessId: z.string(),
+  // Agent Type
+  agentType: z.string(),
+
+  // Product Catalogue
+  catalogS3Key: z.string().optional(),
+  catalogName: z.string().optional(),
 
   // Document Library (Lee’s categories)
   productInfoDocs: z.array(z.instanceof(File)).optional(),
@@ -120,6 +126,9 @@ export const defaultAgentValues: AgentFormValues = {
   audience: "",
   integrationId: "",
   businessId: "",
+  agentType: "",
+  catalogS3Key: "",
+  catalogName: "",
 
   productInfoDocs: [],
   processWorkflowDocs: [],
