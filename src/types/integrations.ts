@@ -14,3 +14,16 @@ export type WhatsAppResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type CreateWhatsApp = {
+  waBusinessPortfolioId: string;
+  accessToken: string;
+  wabaId: string;
+  accountName: string;
+  phoneNumberId: string;
+  pinCode: string;
+};
+
+export type CreateWhatsAppResponse = {
+  id: string;
+};

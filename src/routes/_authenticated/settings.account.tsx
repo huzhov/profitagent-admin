@@ -52,8 +52,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  createWhatsApp,
+  exchangeWhatsAppToken,
+  getWhatsAppList,
+} from "@/services/integrations";
+import { toast } from "sonner";
 import { useBusiness } from "@/context/AppContext";
+import { formatDistanceToNow } from "date-fns";
 
 const waAccountSchema = z.object({
   waBusinessPortfolioId: z
@@ -95,6 +103,58 @@ function AccountSettings() {
     mode: "onTouched",
   });
 
+  // Autofill Facebook form
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (!event.origin.endsWith("facebook.com")) return;
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("event data: ", payload);
+
+        if (payload.type === "WA_EMBEDDED_SIGNUP") {
+          if (
+            payload.event === "FINISH" ||
+            payload.event === "FINISH_ONLY_WABA"
+          ) {
+            const { waba_id, phone_number_id, business_id } = payload.data;
+            waForm.setValue("phoneNumberId", phone_number_id);
+            waForm.setValue("wabaId", waba_id);
+            waForm.setValue("waBusinessPortfolioId", business_id);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to parse message event data:", err);
+        // ignore parsing errors
+      }
+    };
+
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const { data: whatsAppListData, refetch } = useQuery({
+    queryKey: ["whatsAppList"],
+    queryFn: async () => {
+      return await getWhatsAppList();
+    },
+  });
+
+  const { mutate: createWhatsAppFn } = useMutation({
+    mutationFn: createWhatsApp,
+    onSuccess: () => {
+      waForm.reset();
+      toast.success("Added WhatsApp account successfully");
+      refetch();
+    },
+  });
+
+  const { mutate: exchangeWhatsAppTokenFn } = useMutation({
+    mutationFn: exchangeWhatsAppToken,
+    onSuccess: (data) => {
+      waForm.setValue("accessToken", data);
+    },
+  });
+
   const handleManageConnection = (connection: any) => {
     setSelectedConnection(connection);
     setIsManageModalOpen(true);
@@ -126,6 +186,7 @@ function AccountSettings() {
           const code = response.authResponse.code;
           console.log("response code: ", code);
           // Call backend to exchange code for token
+          exchangeWhatsAppTokenFn({ code });
         }
       },
       {
@@ -140,6 +201,7 @@ function AccountSettings() {
   const handleAddWhatsAppAccount = async (values: WaAccountFormValues) => {
     console.log("Add WhatsApp Account:", values);
     // Handle form submission
+    createWhatsAppFn(values);
   };
 
   return (
@@ -186,29 +248,7 @@ function AccountSettings() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                {
-                  name: "Main Store WhatsApp",
-                  phone: "+1 (555) 123-4567",
-                  wabaId: "1234567890123456",
-                  status: "connected",
-                  lastSync: "2 mins ago",
-                },
-                {
-                  name: "Support Line",
-                  phone: "+1 (555) 987-6543",
-                  wabaId: "6543210987654321",
-                  status: "connected",
-                  lastSync: "5 mins ago",
-                },
-                {
-                  name: "Sales Team",
-                  phone: "+1 (555) 456-7890",
-                  wabaId: "9876543210987654",
-                  status: "error",
-                  lastSync: "1 hour ago",
-                },
-              ].map((connection, index) => (
+              {whatsAppListData?.map((connection, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-4 border rounded-lg"
@@ -220,12 +260,13 @@ function AccountSettings() {
                     <div>
                       <p className="font-medium">{connection.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {connection.phone} • WABA ID: {connection.wabaId}
+                        {connection.displayPhoneNumber} • WABA ID:{" "}
+                        {connection.wabaId}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    {connection.status === "connected" ? (
+                    {connection.status === "enabled" ? (
                       <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                         <CheckCircle2 className="w-3 h-3 mr-1" />
                         Connected
@@ -237,7 +278,7 @@ function AccountSettings() {
                       </Badge>
                     )}
                     <span className="text-xs text-muted-foreground">
-                      {connection.lastSync}
+                      {formatDistanceToNow(connection.lastSyncedAt)}
                     </span>
                     <Button
                       variant="ghost"
@@ -504,10 +545,10 @@ function AccountSettings() {
                 <div className="flex-1">
                   <p className="font-medium">{selectedConnection.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {selectedConnection.phone}
+                    {selectedConnection.displayPhoneNumber}
                   </p>
                 </div>
-                {selectedConnection.status === "connected" ? (
+                {selectedConnection.status === "enabled" ? (
                   <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Connected
@@ -543,7 +584,7 @@ function AccountSettings() {
                   <Label htmlFor="manage-phone">Phone Number</Label>
                   <Input
                     id="manage-phone"
-                    defaultValue={selectedConnection.phone}
+                    defaultValue={selectedConnection.displayPhoneNumber}
                     disabled
                     className="bg-muted"
                   />
@@ -579,7 +620,9 @@ function AccountSettings() {
                 <p className="text-sm font-medium">Connection Status</p>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Last Sync</span>
-                  <span>{selectedConnection.lastSync}</span>
+                  <span>
+                    {formatDistanceToNow(selectedConnection.lastSyncedAt)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Status</span>
