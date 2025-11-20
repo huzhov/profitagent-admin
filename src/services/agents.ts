@@ -23,8 +23,12 @@ export async function createAgent(
     description: values?.description,
     objective: values?.objective,
     toneOfVoice: values?.toneOfVoice,
+    aiGuardrails: [""],
+    faqsBestAnswers: "",
     productPlans: values?.productPlans,
     creativity: values?.creativity,
+    catalogS3Key: values?.catalogS3Key,
+    catalogName: values?.catalogName,
   });
   return data;
 }

@@ -27,6 +27,7 @@ export async function uploadFile({ url, file }: Upload): Promise<void> {
     headers: {
       "Content-Type": file?.type || "application/octet-stream",
     },
+    skipAuth: true,
   });
 
   return data;

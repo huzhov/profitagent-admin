@@ -3,12 +3,23 @@ import { getToken } from "./auth";
 
 const token = getToken();
 
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    skipAuth?: boolean;
+  }
+  export interface AxiosResponse {
+    skipAuth?: boolean;
+  }
+}
+
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    if (config.skipAuth) return config; // Skip Authorization
+
     if (token) {
       config.headers.Authorization = token ? `Bearer ${token}` : "";
     }
@@ -35,6 +46,8 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (config) => {
+    if (config.skipAuth) return config; // Skip Authorization
+
     if (token) {
       config.headers.Authorization = token ? `Bearer ${token}` : "";
     }

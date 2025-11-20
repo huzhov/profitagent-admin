@@ -34,6 +34,7 @@ import {
 import { getWhatsAppList } from "@/services/integrations";
 import { useApp } from "@/context/AppContext";
 import { stageUpload, uploadFile } from "@/services/upload";
+import { toast } from "sonner";
 
 const agentTypeConfig = {
   onboarding: {
@@ -64,13 +65,9 @@ export default function AgentBuilder() {
   const location = useLocation();
   const isAgentCreate = location.pathname.includes("/create/");
   const isAgentEdit = location.pathname.includes("/edit");
-  const type = isAgentCreate
-    ? useParams({ from: "/_authenticated/agents/create/$type" }).type
-    : "";
-
-  const id = isAgentEdit
-    ? useParams({ from: "/_authenticated/agents/$id/edit" }).id
-    : "";
+  const params = useParams({ strict: false });
+  const type = params.type || "";
+  const id = params.id || "";
 
   const agentConfig =
     agentTypeConfig[type as keyof typeof agentTypeConfig] ||
@@ -177,6 +174,7 @@ export default function AgentBuilder() {
   const { mutate: createAgentFn } = useMutation({
     mutationFn: createAgent,
     onSuccess: (data) => {
+      toast.success("Agent has been created successfully");
       navigate({ to: `/agents/${data.id}/view` });
     },
   });
@@ -287,9 +285,7 @@ export default function AgentBuilder() {
     values.agentType = agentConfig.title;
     console.log(values);
 
-    if (isAgentCreate) {
-      createAgentFn(values);
-    }
+    if (isAgentCreate) createAgentFn(values);
   };
 
   return (
