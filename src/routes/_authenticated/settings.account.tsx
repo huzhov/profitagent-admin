@@ -260,7 +260,7 @@ function AccountSettings() {
                     <div>
                       <p className="font-medium">{connection.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {connection.displayPhoneNumber} • WABA ID:{" "}
+                        +{connection.displayPhoneNumber} • WABA ID:{" "}
                         {connection.wabaId}
                       </p>
                     </div>

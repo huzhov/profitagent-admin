@@ -15,7 +15,7 @@ export async function getAgent(id: string): Promise<AgentResponse> {
 export async function createAgent(
   values: AgentFormValues
 ): Promise<AgentResponse> {
-  const { data } = await axiosInstance.post<AgentResponse>(`/agents`, {
+  const payload = {
     agentName: values?.agentName,
     integrationId: values?.integrationId,
     businessId: values?.businessId,
@@ -23,11 +23,13 @@ export async function createAgent(
     description: values?.description,
     objective: values?.objective,
     toneOfVoice: values?.toneOfVoice,
-    faqsBestAnswers: values?.contextInfo,
+    faqsBestAnswers: values?.faqsBestAnswers,
     productPlans: values?.productPlans,
     creativity: values?.creativity,
     catalogS3Key: values?.catalogS3Key,
     catalogName: values?.catalogName,
-  });
+  };
+
+  const { data } = await axiosInstance.post<AgentResponse>(`/agents`, payload);
   return data;
 }

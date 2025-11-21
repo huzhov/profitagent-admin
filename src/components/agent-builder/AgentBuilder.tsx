@@ -208,7 +208,7 @@ export default function AgentBuilder() {
     queryFn: async () => {
       return await getAgent(id);
     },
-    enabled: id !== "",
+    enabled: isAgentEdit,
   });
 
   useEffect(() => {
@@ -218,6 +218,7 @@ export default function AgentBuilder() {
       setValue("systemPrompt", agentData?.systemPrompt || "");
       setValue("objective", agentData?.objective || "");
       setValue("integrationId", agentData?.wabaAccountId || "");
+      setValue("faqsBestAnswers", agentData?.faq || "");
       setValue("creativity", agentData?.creativity || 0);
       setValue("toneOfVoice", agentData?.tone || "");
       setValue("integrationId", agentData?.wabaAccountId || "");
@@ -810,9 +811,9 @@ export default function AgentBuilder() {
                             id="context-info"
                             placeholder="Product details, pricing, FAQs, company policies, etc."
                             rows={4}
-                            value={watch("contextInfo")}
+                            value={watch("faqsBestAnswers")}
                             onChange={(e) =>
-                              setValue("contextInfo", e.target.value)
+                              setValue("faqsBestAnswers", e.target.value)
                             }
                             className="mt-1.5"
                           />
