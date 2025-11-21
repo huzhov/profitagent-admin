@@ -93,44 +93,44 @@ export default function AgentBuilder() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  // Document Library state - Lee's categories
-  const productInfoDocs = watch("productInfoDocs") ?? [];
-  const processWorkflowDocs = watch("processWorkflowDocs") ?? [];
-  const complianceDocs = watch("complianceDocs") ?? [];
-  const customerEducationDocs = watch("customerEducationDocs") ?? [];
-  const salesMarketingDocs = watch("salesMarketingDocs") ?? [];
-  const dataToolsDocs = watch("dataToolsDocs") ?? [];
-  const questionSets = watch("questionSets") ?? [];
-  const [isProductInfoDragging, setIsProductInfoDragging] = useState(false);
-  const [isProcessWorkflowDragging, setIsProcessWorkflowDragging] =
-    useState(false);
-  const [isComplianceDragging, setIsComplianceDragging] = useState(false);
-  const [isCustomerEducationDragging, setIsCustomerEducationDragging] =
-    useState(false);
-  const [isSalesMarketingDragging, setIsSalesMarketingDragging] =
-    useState(false);
-  const [isDataToolsDragging, setIsDataToolsDragging] = useState(false);
+  // // Document Library state - Lee's categories
+  // const productInfoDocs = watch("productInfoDocs") ?? [];
+  // const processWorkflowDocs = watch("processWorkflowDocs") ?? [];
+  // const complianceDocs = watch("complianceDocs") ?? [];
+  // const customerEducationDocs = watch("customerEducationDocs") ?? [];
+  // const salesMarketingDocs = watch("salesMarketingDocs") ?? [];
+  // const dataToolsDocs = watch("dataToolsDocs") ?? [];
+  // const questionSets = watch("questionSets") ?? [];
+  // const [isProductInfoDragging, setIsProductInfoDragging] = useState(false);
+  // const [isProcessWorkflowDragging, setIsProcessWorkflowDragging] =
+  //   useState(false);
+  // const [isComplianceDragging, setIsComplianceDragging] = useState(false);
+  // const [isCustomerEducationDragging, setIsCustomerEducationDragging] =
+  //   useState(false);
+  // const [isSalesMarketingDragging, setIsSalesMarketingDragging] =
+  //   useState(false);
+  // const [isDataToolsDragging, setIsDataToolsDragging] = useState(false);
 
-  // Guardrails state
-  const [profanityFilter, setProfanityFilter] = useState(true);
+  // // Guardrails state
+  // const [profanityFilter, setProfanityFilter] = useState(true);
 
-  // Messaging Controls state
-  const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
+  // // Messaging Controls state
+  // const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
 
-  // HITL Handover state
-  const [hitlEnabled, setHitlEnabled] = useState(false);
+  // // HITL Handover state
+  // const [hitlEnabled, setHitlEnabled] = useState(false);
 
-  // Scheduling state
-  const [schedulingEnabled, setSchedulingEnabled] = useState(false);
+  // // Scheduling state
+  // const [schedulingEnabled, setSchedulingEnabled] = useState(false);
 
-  // Question Sets state
-  const [isQuestionSetDragging, setIsQuestionSetDragging] = useState(false);
-  const [questionSetInputMode, setQuestionSetInputMode] = useState<
-    "upload" | "paste"
-  >("upload");
+  // // Question Sets state
+  // const [isQuestionSetDragging, setIsQuestionSetDragging] = useState(false);
+  // const [questionSetInputMode, setQuestionSetInputMode] = useState<
+  //   "upload" | "paste"
+  // >("upload");
 
-  // Product Recommendations state
-  const [recommendationsEnabled, setRecommendationsEnabled] = useState(false);
+  // // Product Recommendations state
+  // const [recommendationsEnabled, setRecommendationsEnabled] = useState(false);
 
   // Track collapsible states
   const [openSections, setOpenSections] = useState({
@@ -270,11 +270,11 @@ export default function AgentBuilder() {
     }
   };
 
-  const handleQuestionInputMode = (checked: boolean) => {
-    setValue("questionSetJson", "");
-    setValue("questionSets", []);
-    setQuestionSetInputMode(checked ? "paste" : "upload");
-  };
+  // const handleQuestionInputMode = (checked: boolean) => {
+  //   setValue("questionSetJson", "");
+  //   setValue("questionSets", []);
+  //   setQuestionSetInputMode(checked ? "paste" : "upload");
+  // };
 
   const onSubmit = (values: AgentFormValues) => {
     setValue("businessId", user.businessId ?? "");
