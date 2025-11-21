@@ -92,6 +92,9 @@ export default function AgentBuilder() {
 
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [csvValidationError, setCsvValidationError] = useState<string | null>(
+    null
+  );
 
   // // Document Library state - Lee's categories
   // const productInfoDocs = watch("productInfoDocs") ?? [];
@@ -221,24 +224,97 @@ export default function AgentBuilder() {
       setValue("faqsBestAnswers", agentData?.faq || "");
       setValue("creativity", agentData?.creativity || 0);
       setValue("toneOfVoice", agentData?.tone || "");
+      setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("integrationId", agentData?.wabaAccountId || "");
     }
   }, [isFetchedAfterMount]);
 
-  const handleFileUpload = (file: File) => {
+  const validateCSV = async (file: File): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        const lines = text.split("\n").filter((line) => line.trim());
+
+        if (lines.length < 2) {
+          setCsvValidationError("CSV file is empty or has no data rows");
+          reject(new Error("CSV file is empty"));
+          return;
+        }
+
+        // Parse header row - preserve case for validation
+        const headers = lines[0].split(",").map((h) => h.trim());
+        const headersLowercase = headers.map((h) => h.toLowerCase());
+
+        // Check for required "name" field (must be lowercase)
+        if (!headers.includes("name")) {
+          // Check if they have "Name" with capital N
+          if (headersLowercase.includes("name")) {
+            setCsvValidationError(
+              'CSV header has "Name" but the backend requires lowercase "name". Please change your CSV header from "Name" to "name".'
+            );
+          } else {
+            setCsvValidationError(
+              'CSV file is missing required "name" column. Please include a lowercase "name" column in your CSV header.'
+            );
+          }
+          reject(new Error("Missing required 'name' column"));
+          return;
+        }
+
+        // Validate that data rows have content in the name column
+        const nameIndex = headers.indexOf("name");
+        const hasValidData = lines.slice(1).some((line) => {
+          const values = line.split(",");
+          return values[nameIndex]?.trim();
+        });
+
+        if (!hasValidData) {
+          setCsvValidationError(
+            "CSV file has no valid data. Please ensure at least one row has a name value."
+          );
+          reject(new Error("No valid data in CSV"));
+          return;
+        }
+
+        setCsvValidationError(null);
+        resolve(true);
+      };
+
+      reader.onerror = () => {
+        setCsvValidationError("Failed to read CSV file");
+        reject(new Error("Failed to read file"));
+      };
+
+      reader.readAsText(file);
+    });
+  };
+
+  const handleFileUpload = async (file: File) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
-      // Here you would typically process the CSV file
-      console.log("File uploaded:", file.name);
+      try {
+        // Validate CSV structure
+        await validateCSV(file);
 
-      setUploadedFile(file);
+        console.log("File uploaded:", file.name);
+        setUploadedFile(file);
 
-      // Call Endpoint
-      stageUploadFn({
-        filename: file.name,
-        contentType: file.type,
-      });
+        // Call Endpoint
+        stageUploadFn({
+          filename: file.name,
+          contentType: file.type,
+        });
+
+        toast.success("CSV file validated and ready to upload");
+      } catch (error) {
+        console.error("CSV validation failed:", error);
+        setUploadedFile(null);
+        toast.error("CSV validation failed. Please check the file format.");
+      }
     } else {
-      alert("Please upload a CSV file");
+      setCsvValidationError("Please upload a CSV file");
+      toast.error("Please upload a CSV file");
     }
   };
 
@@ -873,7 +949,9 @@ export default function AgentBuilder() {
                           className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
                             isDragging
                               ? "border-blue-500 bg-blue-50"
-                              : "border-gray-300"
+                              : csvValidationError
+                                ? "border-red-300"
+                                : "border-gray-300"
                           }`}
                           onClick={() =>
                             document.getElementById("csv-upload")?.click()
@@ -888,7 +966,13 @@ export default function AgentBuilder() {
                           />
                           <div className="flex flex-col items-center gap-2">
                             <Upload
-                              className={`w-8 h-8 ${isDragging ? "text-blue-500" : "text-gray-400"}`}
+                              className={`w-8 h-8 ${
+                                isDragging
+                                  ? "text-blue-500"
+                                  : csvValidationError
+                                    ? "text-red-400"
+                                    : "text-gray-400"
+                              }`}
                             />
                             <div>
                               <p className="text-sm font-medium text-gray-900">
@@ -904,6 +988,14 @@ export default function AgentBuilder() {
                             </div>
                           </div>
                         </div>
+
+                        {csvValidationError && (
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <p className="text-sm text-red-600">
+                              {csvValidationError}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </div>

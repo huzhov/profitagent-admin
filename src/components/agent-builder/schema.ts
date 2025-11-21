@@ -49,8 +49,8 @@ export const agentSchema = z.object({
   agentType: z.string(),
 
   // Product Catalogue
-  catalogS3Key: z.string().optional(),
-  catalogName: z.string().optional(),
+  catalogS3Key: z.string().optional().or(z.literal("")),
+  catalogName: z.string().optional().or(z.literal("")),
 
   // Document Library (Lee’s categories)
   productInfoDocs: z.array(z.instanceof(File)).optional(),

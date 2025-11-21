@@ -15,7 +15,7 @@ export async function getAgent(id: string): Promise<AgentResponse> {
 export async function createAgent(
   values: AgentFormValues
 ): Promise<AgentResponse> {
-  const payload = {
+  const payload: Record<string, any> = {
     agentName: values?.agentName,
     integrationId: values?.integrationId,
     businessId: values?.businessId,
@@ -26,9 +26,18 @@ export async function createAgent(
     faqsBestAnswers: values?.faqsBestAnswers,
     productPlans: values?.productPlans,
     creativity: values?.creativity,
-    catalogS3Key: values?.catalogS3Key,
-    catalogName: values?.catalogName,
   };
+
+  // Only include catalog fields if BOTH have non-empty values
+  if (
+    values?.catalogS3Key &&
+    values?.catalogS3Key.trim() !== "" &&
+    values?.catalogName &&
+    values?.catalogName.trim() !== ""
+  ) {
+    payload.catalogS3Key = values.catalogS3Key;
+    payload.catalogName = values.catalogName;
+  }
 
   const { data } = await axiosInstance.post<AgentResponse>(`/agents`, payload);
   return data;
