@@ -61,7 +61,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BusinessVertical } from "@/components/agent-builder/types";
 import { useBusiness, useApp } from "@/context/AppContext";
 import { createBusiness } from "@/services/business";
-import type { Business } from "@/context/types";
 import { toast } from "sonner";
 
 const businessFormSchema = z.object({

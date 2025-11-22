@@ -2,8 +2,6 @@ import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
 import { Button } from "../ui/button";
 import { Plus, Power } from "lucide-react";
-import { useState } from "react";
-import { CreateAgentModal } from "@/components/agents/CreateAgentModal";
 import { useNavigate } from "@tanstack/react-router";
 import { removeToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
@@ -12,8 +10,6 @@ import { getInitials } from "@/helper/getInitials";
 export default function SidebarContainer() {
   const navigate = useNavigate();
   const { user, clearUser } = useUserStore();
-
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleLogout = () => {
     removeToken();
@@ -27,7 +23,7 @@ export default function SidebarContainer() {
       <div className="p-4">
         <Button
           className="w-full mb-4"
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={() => navigate({ to: "/agents/create" })}
         >
           <Plus className="w-4 h-4 mr-2" />
           Create Agent
@@ -56,15 +52,6 @@ export default function SidebarContainer() {
           <span>Log Out</span>
         </button>
       </div>
-
-      {/* Create Agent Modal */}
-      <CreateAgentModal
-        open={isCreateModalOpen}
-        onOpenChange={setIsCreateModalOpen}
-        onSelectAgentType={(agentTypeId) => {
-          navigate({ to: `/agents/create/${agentTypeId}` as any });
-        }}
-      />
     </aside>
   );
 }

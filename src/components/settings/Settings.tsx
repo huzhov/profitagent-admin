@@ -23,21 +23,15 @@ import {
   Plus,
   CheckCircle2,
   AlertCircle,
-  Webhook,
   Key,
   Users,
   Info,
   Settings as SettingsIcon,
   Save,
-  TestTube2,
   Pencil,
   Facebook,
   Camera,
   Mail,
-  Phone,
-  Building2,
-  Briefcase,
-  X,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -676,64 +670,6 @@ export default function Settings() {
                   </div>
                 </form>
               </Form>
-            </CardContent>
-          </Card>
-
-          {/* Webhook Configuration */}
-          <Card className="shadow-none">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Webhook className="w-5 h-5" />
-                Webhook Configuration
-              </CardTitle>
-              <CardDescription>
-                Configure webhooks for real-time message delivery
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="webhookUrl">Webhook URL</Label>
-                <Input
-                  id="webhookUrl"
-                  placeholder="https://your-domain.com/webhook"
-                  autoComplete="off"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="verifyToken">Verify Token</Label>
-                <Input
-                  id="verifyToken"
-                  placeholder="Your verification token"
-                  autoComplete="off"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="webhookSecret">Webhook Secret</Label>
-                <Input
-                  id="webhookSecret"
-                  type="password"
-                  placeholder="Your webhook secret"
-                  autoComplete="off"
-                />
-              </div>
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-900">
-                  <strong>Note:</strong> Make sure your webhook endpoint is
-                  publicly accessible and can handle POST requests from Meta's
-                  servers.
-                </p>
-              </div>
-              <Separator />
-              <div className="flex justify-end gap-2">
-                <Button variant="outline">
-                  <TestTube2 className="w-4 h-4 mr-2" />
-                  Test Webhook
-                </Button>
-                <Button>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Configuration
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
