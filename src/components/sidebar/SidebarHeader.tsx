@@ -1,26 +1,17 @@
-import { Badge } from "../ui/badge";
-import logo from "/logo.svg";
+import { LogoIcon } from "@/components/assets/index";
 
 export default function SidebarHeader() {
   return (
     <div className="p-6 border-b border-border">
-      <div className="flex items-center space-x-3">
-        <img src={logo} alt="ProfitAgent" className="h-10 w-10" />
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+          <LogoIcon className="w-5 h-5 text-primary-foreground" />
+        </div>
         <div>
-          <h1 className="text-xl font-bold text-card-foreground">
-            ProfitAgent.AI
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            WhatsApp Revenue Engine
-          </p>
+          <h1 className="text-lg font-semibold">ProfitAgent</h1>
+          <p className="text-sm text-muted-foreground">AI Sales Platform</p>
         </div>
       </div>
-      <Badge
-        variant="secondary"
-        className="bg-green-100 text-green-800 border-green-200 mt-2 text-xs"
-      >
-        Official Partner
-      </Badge>
     </div>
   );
 }

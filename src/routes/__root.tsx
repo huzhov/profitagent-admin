@@ -14,23 +14,44 @@ const DASHBOARD_ROUTES = [
   "/business-settings",
   "/reporting",
   "/agents",
+  "/workflows",
+  "/ab-testing",
+  "/templates",
+  "/intelligence",
+  "/settings",
 ];
+
+const AGENT_VIEW_PATTERN = /^\/agents\/[^/]+\/view$/;
 
 const RootLayout = () => {
   const { location } = useRouterState();
-  const isDashboardRoute = DASHBOARD_ROUTES.some((route) => {
-    if (route === "/") {
-      return location.pathname === "/";
-    }
-    return (
-      location.pathname === route || location.pathname.startsWith(`${route}/`)
-    );
-  });
+
+  // Exclude agent creation routes from dashboard layout
+  // const isAgentCreationRoute = location.pathname.startsWith("/agents/create/");
+  // const isAgentEditRoute =
+  //   location.pathname.startsWith("/agents") &&
+  //   location.pathname.endsWith("/edit");
+
+  // Check if current path matches agent view pattern
+  const isAgentViewRoute = AGENT_VIEW_PATTERN.test(location.pathname);
+
+  const isDashboardRoute =
+    // !isAgentCreationRoute &&
+    // !isAgentEditRoute &&
+    isAgentViewRoute ||
+    DASHBOARD_ROUTES.some((route) => {
+      if (route === "/") {
+        return location.pathname === "/";
+      }
+      return (
+        location.pathname === route || location.pathname.startsWith(`${route}/`)
+      );
+    });
 
   return (
     <>
       {isDashboardRoute ? (
-        <div className="min-h-screen bg-background flex">
+        <div className="flex h-screen bg-background">
           <SidebarContainer />
           <MainContentLayout>
             <Outlet />

@@ -52,7 +52,8 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Empty, EmptyTitle, EmptyDescription, EmptyContent } from "../ui/empty";
-import { MessageSquare, Plus, Info } from "lucide-react";
+import { MessageSquare, Plus, Info, Database } from "lucide-react";
+import CRMIntegration from "./CRMIntegration";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 // avatar used in Users tab which is currently commented out
 import { Badge } from "../ui/badge";
@@ -229,7 +230,7 @@ export default function IntegrationsManagement() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-card-foreground">
@@ -242,6 +243,24 @@ export default function IntegrationsManagement() {
       </div>
 
       <div className="grid gap-6">
+        {/* CRM Integration Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Database className="h-5 w-5 text-purple-600" />
+              <span>CRM Integration</span>
+            </CardTitle>
+            <CardDescription>
+              Connect your CRM platform to automatically sync leads and customer
+              data
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CRMIntegration />
+          </CardContent>
+        </Card>
+
+        {/* WhatsApp Integration Section */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">

@@ -1,71 +1,94 @@
 import {
-  BarChart3,
-  Grid3X3,
+  House,
   Bot,
+  Workflow,
+  FlaskConical,
+  ChartColumn,
+  Zap,
   MessageSquare,
-  Blocks,
-  Building2,
+  Settings,
 } from "lucide-react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Badge } from "../ui/badge";
+import { useApp } from "@/context/AppContext";
 
 export default function SidebarNavigation() {
   const navigate = useNavigate();
+  const { agents } = useApp();
   const { location } = useRouterState();
   const currentPath = location.pathname;
+
   const mainSections = [
-    { id: "builder", title: "Agent Builder", icon: Bot, route: "/" },
+    { id: "home", title: "Home", icon: House, route: "/" },
+    {
+      id: "agents",
+      title: "Agents",
+      icon: Bot,
+      route: "/agents",
+      badge: agents?.length.toString(),
+    },
+    {
+      id: "workflows",
+      title: "Workflows",
+      icon: Workflow,
+      route: "/workflows",
+    },
+    {
+      id: "testing",
+      title: "A/B Testing",
+      icon: FlaskConical,
+      route: "/ab-testing",
+    },
+    {
+      id: "templates",
+      title: "Templates",
+      icon: ChartColumn,
+      route: "/templates",
+    },
+    {
+      id: "intelligence",
+      title: "Intelligence",
+      icon: Zap,
+      route: "/intelligence",
+    },
     {
       id: "messages",
       title: "Messages",
       icon: MessageSquare,
       route: "/messages",
     },
-    {
-      id: "integrations",
-      title: "Integrations",
-      icon: Blocks,
-      route: "/integrations",
-    },
-    {
-      id: "business-settings",
-      title: "Business Settings",
-      icon: Building2,
-      route: "/business-settings",
-    },
-    {
-      id: "reporting",
-      title: "Reporting",
-      icon: BarChart3,
-      route: "/reporting",
-    },
-    { id: "agents", title: "Agents Hub", icon: Grid3X3, route: "/agents" },
+    { id: "settings", title: "Settings", icon: Settings, route: "/settings" },
   ];
 
   return (
-    <nav className="flex-1 p-4">
-      <div className="space-y-2">
+    <nav className="flex-1 px-4">
+      <ul className="space-y-2">
         {mainSections.map((section) => {
           const Icon = section.icon;
-          const isActive =
-            currentPath === section.route ||
-            currentPath.startsWith(`${section.route}/`);
+          const isActive = currentPath === section.route;
 
           return (
-            <button
-              key={section.id}
-              onClick={() => navigate({ to: section.route })}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left ${
-                isActive
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "hover:bg-muted text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Icon className="h-5 w-5" />
-              <span className="font-medium">{section.title}</span>
-            </button>
+            <li key={section.id}>
+              <button
+                onClick={() => navigate({ to: section.route })}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors cursor-pointer ${
+                  isActive
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span>{section.title}</span>
+                {section.badge && (
+                  <Badge variant="secondary" className="ml-auto">
+                    {section.badge}
+                  </Badge>
+                )}
+              </button>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </nav>
   );
 }

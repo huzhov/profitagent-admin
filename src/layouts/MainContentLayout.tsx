@@ -5,9 +5,5 @@ export default function MainContentLayout({
 }: {
   children: ReactNode;
 }) {
-  return (
-    <main className="flex-1 overflow-auto">
-      <div className="container mx-auto px-8 py-8">{children}</div>
-    </main>
-  );
+  return <main className="flex-1 overflow-auto">{children}</main>;
 }

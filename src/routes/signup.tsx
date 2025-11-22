@@ -1,6 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import SignupPage from "@/pages/SignupPage";
+import { getToken } from "@/lib/auth";
 
 export const Route = createFileRoute("/signup")({
+  beforeLoad: async ({}) => {
+    if (!getToken()) {
+      throw redirect({
+        to: "/",
+        replace: true,
+      });
+    }
+  },
   component: SignupPage,
 });

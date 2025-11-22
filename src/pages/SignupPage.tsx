@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signup } from "@/lib/auth";
+import { signup } from "@/services/auth";
+import { LogoIcon } from "@/components/assets/index";
+import useUserStore from "@/store/user-store";
+import { setToken } from "@/lib/auth";
 
 const schema = z
   .object({
@@ -33,24 +37,39 @@ const SignupPage = () => {
     defaultValues: { email: "", name: "", password: "", confirmPassword: "" },
     mode: "onSubmit",
   });
+  const { setUser } = useUserStore();
 
-  async function onSubmit(values: z.infer<typeof schema>) {
-    const res = await signup(values);
-    if (res.token) {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof schema>) => {
+      const data = await signup(values);
+      setToken(data.token);
+      setUser(data.user);
       navigate({ to: "/" });
-    }
-  }
+    },
+  });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm border rounded-lg p-6 shadow-sm bg-card">
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <LogoIcon className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold">ProfitAgent</h1>
+            <p className="text-sm text-muted-foreground">AI Sales Platform</p>
+          </div>
+        </div>
         <h1 className="text-xl font-semibold mb-1">Sign up</h1>
         <p className="text-sm text-muted-foreground mb-6">
           Create your account to continue.
         </p>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit((values) => mutate(values))}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -111,12 +130,8 @@ const SignupPage = () => {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? "Creating account…" : "Sign up"}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Creating account…" : "Sign up"}
             </Button>
           </form>
         </Form>

@@ -1,7 +1,8 @@
-import AgentsHub from "@/components/agents-hub/AgentsHub";
+import { memo } from "react";
+import Agents from "@/components/agents/Agents";
 
-const AgentsHubPage = () => {
-  return <AgentsHub />;
+const AgentsPage = () => {
+  return <Agents />;
 };
 
-export default AgentsHubPage;
+export default memo(AgentsPage);

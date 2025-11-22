@@ -10,33 +10,42 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ReportingRouteImport } from './routes/reporting'
-import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
-import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as IntegrationsRouteImport } from './routes/integrations'
-import { Route as BusinessSettingsRouteImport } from './routes/business-settings'
-import { Route as AgentsRouteImport } from './routes/agents'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedWorkflowsRouteImport } from './routes/_authenticated/workflows'
+import { Route as AuthenticatedTestingRouteImport } from './routes/_authenticated/testing'
+import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedReportingRouteImport } from './routes/_authenticated/reporting'
+import { Route as AuthenticatedPrivacyPolicyRouteImport } from './routes/_authenticated/privacy-policy'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedIntelligenceRouteImport } from './routes/_authenticated/intelligence'
+import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated/integrations'
+import { Route as AuthenticatedBusinessSettingsRouteImport } from './routes/_authenticated/business-settings'
+import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
+import { Route as AuthenticatedAbTestingRouteImport } from './routes/_authenticated/ab-testing'
+import { Route as AuthenticatedWorkflowsIndexRouteImport } from './routes/_authenticated/workflows.index'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
+import { Route as AuthenticatedReportingIndexRouteImport } from './routes/_authenticated/reporting.index'
+import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents.index'
+import { Route as AuthenticatedAbTestingIndexRouteImport } from './routes/_authenticated/ab-testing.index'
+import { Route as AuthenticatedWorkflowsNewRouteImport } from './routes/_authenticated/workflows.new'
+import { Route as AuthenticatedSettingsReportingRouteImport } from './routes/_authenticated/settings.reporting'
+import { Route as AuthenticatedSettingsGeneralRouteImport } from './routes/_authenticated/settings.general'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings.account'
+import { Route as AuthenticatedReportingVolumeMetricsRouteImport } from './routes/_authenticated/reporting.volume-metrics'
+import { Route as AuthenticatedReportingEngagementRouteImport } from './routes/_authenticated/reporting.engagement'
+import { Route as AuthenticatedReportingBusinessOutcomesRouteImport } from './routes/_authenticated/reporting.business-outcomes'
+import { Route as AuthenticatedAgentsCreateRouteImport } from './routes/_authenticated/agents.create'
+import { Route as AuthenticatedAbTestingCreateRouteImport } from './routes/_authenticated/ab-testing.create'
+import { Route as AuthenticatedAgentsIdViewRouteImport } from './routes/_authenticated/agents.$id.view'
+import { Route as AuthenticatedAgentsIdPreviewRouteImport } from './routes/_authenticated/agents.$id.preview'
+import { Route as AuthenticatedAgentsIdEditRouteImport } from './routes/_authenticated/agents.$id.edit'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportingRoute = ReportingRouteImport.update({
-  id: '/reporting',
-  path: '/reporting',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -44,106 +53,385 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IntegrationsRoute = IntegrationsRouteImport.update({
-  id: '/integrations',
-  path: '/integrations',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BusinessSettingsRoute = BusinessSettingsRouteImport.update({
-  id: '/business-settings',
-  path: '/business-settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AgentsRoute = AgentsRouteImport.update({
-  id: '/agents',
-  path: '/agents',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedWorkflowsRoute = AuthenticatedWorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTestingRoute = AuthenticatedTestingRouteImport.update({
+  id: '/testing',
+  path: '/testing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedReportingRoute = AuthenticatedReportingRouteImport.update({
+  id: '/reporting',
+  path: '/reporting',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPrivacyPolicyRoute =
+  AuthenticatedPrivacyPolicyRouteImport.update({
+    id: '/privacy-policy',
+    path: '/privacy-policy',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedIntelligenceRoute =
+  AuthenticatedIntelligenceRouteImport.update({
+    id: '/intelligence',
+    path: '/intelligence',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedIntegrationsRoute =
+  AuthenticatedIntegrationsRouteImport.update({
+    id: '/integrations',
+    path: '/integrations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBusinessSettingsRoute =
+  AuthenticatedBusinessSettingsRouteImport.update({
+    id: '/business-settings',
+    path: '/business-settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAgentsRoute = AuthenticatedAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAbTestingRoute = AuthenticatedAbTestingRouteImport.update({
+  id: '/ab-testing',
+  path: '/ab-testing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedWorkflowsIndexRoute =
+  AuthenticatedWorkflowsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedWorkflowsRoute,
+  } as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedReportingIndexRoute =
+  AuthenticatedReportingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
+const AuthenticatedAgentsIndexRoute =
+  AuthenticatedAgentsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
+const AuthenticatedAbTestingIndexRoute =
+  AuthenticatedAbTestingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAbTestingRoute,
+  } as any)
+const AuthenticatedWorkflowsNewRoute =
+  AuthenticatedWorkflowsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedWorkflowsRoute,
+  } as any)
+const AuthenticatedSettingsReportingRoute =
+  AuthenticatedSettingsReportingRouteImport.update({
+    id: '/reporting',
+    path: '/reporting',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsGeneralRoute =
+  AuthenticatedSettingsGeneralRouteImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedReportingVolumeMetricsRoute =
+  AuthenticatedReportingVolumeMetricsRouteImport.update({
+    id: '/volume-metrics',
+    path: '/volume-metrics',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
+const AuthenticatedReportingEngagementRoute =
+  AuthenticatedReportingEngagementRouteImport.update({
+    id: '/engagement',
+    path: '/engagement',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
+const AuthenticatedReportingBusinessOutcomesRoute =
+  AuthenticatedReportingBusinessOutcomesRouteImport.update({
+    id: '/business-outcomes',
+    path: '/business-outcomes',
+    getParentRoute: () => AuthenticatedReportingRoute,
+  } as any)
+const AuthenticatedAgentsCreateRoute =
+  AuthenticatedAgentsCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
+const AuthenticatedAbTestingCreateRoute =
+  AuthenticatedAbTestingCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedAbTestingRoute,
+  } as any)
+const AuthenticatedAgentsIdViewRoute =
+  AuthenticatedAgentsIdViewRouteImport.update({
+    id: '/$id/view',
+    path: '/$id/view',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
+const AuthenticatedAgentsIdPreviewRoute =
+  AuthenticatedAgentsIdPreviewRouteImport.update({
+    id: '/$id/preview',
+    path: '/$id/preview',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
+const AuthenticatedAgentsIdEditRoute =
+  AuthenticatedAgentsIdEditRouteImport.update({
+    id: '/$id/edit',
+    path: '/$id/edit',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/agents': typeof AgentsRoute
-  '/business-settings': typeof BusinessSettingsRoute
-  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/reporting': typeof ReportingRoute
   '/signup': typeof SignupRoute
+  '/ab-testing': typeof AuthenticatedAbTestingRouteWithChildren
+  '/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/business-settings': typeof AuthenticatedBusinessSettingsRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
+  '/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/messages': typeof AuthenticatedMessagesRoute
+  '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
+  '/reporting': typeof AuthenticatedReportingRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/testing': typeof AuthenticatedTestingRoute
+  '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
+  '/': typeof AuthenticatedIndexRoute
+  '/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/agents/create': typeof AuthenticatedAgentsCreateRoute
+  '/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
+  '/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
+  '/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/general': typeof AuthenticatedSettingsGeneralRoute
+  '/settings/reporting': typeof AuthenticatedSettingsReportingRoute
+  '/workflows/new': typeof AuthenticatedWorkflowsNewRoute
+  '/ab-testing/': typeof AuthenticatedAbTestingIndexRoute
+  '/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/reporting/': typeof AuthenticatedReportingIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/workflows/': typeof AuthenticatedWorkflowsIndexRoute
+  '/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
+  '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
+  '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/agents': typeof AgentsRoute
-  '/business-settings': typeof BusinessSettingsRoute
-  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/reporting': typeof ReportingRoute
   '/signup': typeof SignupRoute
+  '/business-settings': typeof AuthenticatedBusinessSettingsRoute
+  '/integrations': typeof AuthenticatedIntegrationsRoute
+  '/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/messages': typeof AuthenticatedMessagesRoute
+  '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
+  '/templates': typeof AuthenticatedTemplatesRoute
+  '/testing': typeof AuthenticatedTestingRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/agents/create': typeof AuthenticatedAgentsCreateRoute
+  '/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
+  '/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
+  '/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/settings/general': typeof AuthenticatedSettingsGeneralRoute
+  '/settings/reporting': typeof AuthenticatedSettingsReportingRoute
+  '/workflows/new': typeof AuthenticatedWorkflowsNewRoute
+  '/ab-testing': typeof AuthenticatedAbTestingIndexRoute
+  '/agents': typeof AuthenticatedAgentsIndexRoute
+  '/reporting': typeof AuthenticatedReportingIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/workflows': typeof AuthenticatedWorkflowsIndexRoute
+  '/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
+  '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
+  '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/agents': typeof AgentsRoute
-  '/business-settings': typeof BusinessSettingsRoute
-  '/integrations': typeof IntegrationsRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/messages': typeof MessagesRoute
-  '/privacy-policy': typeof PrivacyPolicyRoute
-  '/reporting': typeof ReportingRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/ab-testing': typeof AuthenticatedAbTestingRouteWithChildren
+  '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/_authenticated/business-settings': typeof AuthenticatedBusinessSettingsRoute
+  '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
+  '/_authenticated/intelligence': typeof AuthenticatedIntelligenceRoute
+  '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
+  '/_authenticated/reporting': typeof AuthenticatedReportingRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
+  '/_authenticated/testing': typeof AuthenticatedTestingRoute
+  '/_authenticated/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/_authenticated/agents/create': typeof AuthenticatedAgentsCreateRoute
+  '/_authenticated/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
+  '/_authenticated/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
+  '/_authenticated/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
+  '/_authenticated/settings/general': typeof AuthenticatedSettingsGeneralRoute
+  '/_authenticated/settings/reporting': typeof AuthenticatedSettingsReportingRoute
+  '/_authenticated/workflows/new': typeof AuthenticatedWorkflowsNewRoute
+  '/_authenticated/ab-testing/': typeof AuthenticatedAbTestingIndexRoute
+  '/_authenticated/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/_authenticated/reporting/': typeof AuthenticatedReportingIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/workflows/': typeof AuthenticatedWorkflowsIndexRoute
+  '/_authenticated/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
+  '/_authenticated/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
+  '/_authenticated/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
+    | '/login'
+    | '/signup'
+    | '/ab-testing'
     | '/agents'
     | '/business-settings'
     | '/integrations'
-    | '/login'
+    | '/intelligence'
     | '/messages'
     | '/privacy-policy'
     | '/reporting'
-    | '/signup'
+    | '/settings'
+    | '/templates'
+    | '/testing'
+    | '/workflows'
+    | '/'
+    | '/ab-testing/create'
+    | '/agents/create'
+    | '/reporting/business-outcomes'
+    | '/reporting/engagement'
+    | '/reporting/volume-metrics'
+    | '/settings/account'
+    | '/settings/general'
+    | '/settings/reporting'
+    | '/workflows/new'
+    | '/ab-testing/'
+    | '/agents/'
+    | '/reporting/'
+    | '/settings/'
+    | '/workflows/'
+    | '/agents/$id/edit'
+    | '/agents/$id/preview'
+    | '/agents/$id/view'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/agents'
+    | '/login'
+    | '/signup'
     | '/business-settings'
     | '/integrations'
-    | '/login'
+    | '/intelligence'
     | '/messages'
     | '/privacy-policy'
+    | '/templates'
+    | '/testing'
+    | '/'
+    | '/ab-testing/create'
+    | '/agents/create'
+    | '/reporting/business-outcomes'
+    | '/reporting/engagement'
+    | '/reporting/volume-metrics'
+    | '/settings/account'
+    | '/settings/general'
+    | '/settings/reporting'
+    | '/workflows/new'
+    | '/ab-testing'
+    | '/agents'
     | '/reporting'
-    | '/signup'
+    | '/settings'
+    | '/workflows'
+    | '/agents/$id/edit'
+    | '/agents/$id/preview'
+    | '/agents/$id/view'
   id:
     | '__root__'
-    | '/'
-    | '/agents'
-    | '/business-settings'
-    | '/integrations'
+    | '/_authenticated'
     | '/login'
-    | '/messages'
-    | '/privacy-policy'
-    | '/reporting'
     | '/signup'
+    | '/_authenticated/ab-testing'
+    | '/_authenticated/agents'
+    | '/_authenticated/business-settings'
+    | '/_authenticated/integrations'
+    | '/_authenticated/intelligence'
+    | '/_authenticated/messages'
+    | '/_authenticated/privacy-policy'
+    | '/_authenticated/reporting'
+    | '/_authenticated/settings'
+    | '/_authenticated/templates'
+    | '/_authenticated/testing'
+    | '/_authenticated/workflows'
+    | '/_authenticated/'
+    | '/_authenticated/ab-testing/create'
+    | '/_authenticated/agents/create'
+    | '/_authenticated/reporting/business-outcomes'
+    | '/_authenticated/reporting/engagement'
+    | '/_authenticated/reporting/volume-metrics'
+    | '/_authenticated/settings/account'
+    | '/_authenticated/settings/general'
+    | '/_authenticated/settings/reporting'
+    | '/_authenticated/workflows/new'
+    | '/_authenticated/ab-testing/'
+    | '/_authenticated/agents/'
+    | '/_authenticated/reporting/'
+    | '/_authenticated/settings/'
+    | '/_authenticated/workflows/'
+    | '/_authenticated/agents/$id/edit'
+    | '/_authenticated/agents/$id/preview'
+    | '/_authenticated/agents/$id/view'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AgentsRoute: typeof AgentsRoute
-  BusinessSettingsRoute: typeof BusinessSettingsRoute
-  IntegrationsRoute: typeof IntegrationsRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  MessagesRoute: typeof MessagesRoute
-  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
-  ReportingRoute: typeof ReportingRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -156,27 +444,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reporting': {
-      id: '/reporting'
-      path: '/reporting'
-      fullPath: '/reporting'
-      preLoaderRoute: typeof ReportingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -184,46 +451,358 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/integrations': {
-      id: '/integrations'
-      path: '/integrations'
-      fullPath: '/integrations'
-      preLoaderRoute: typeof IntegrationsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/business-settings': {
-      id: '/business-settings'
-      path: '/business-settings'
-      fullPath: '/business-settings'
-      preLoaderRoute: typeof BusinessSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agents': {
-      id: '/agents'
-      path: '/agents'
-      fullPath: '/agents'
-      preLoaderRoute: typeof AgentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/workflows': {
+      id: '/_authenticated/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof AuthenticatedWorkflowsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/testing': {
+      id: '/_authenticated/testing'
+      path: '/testing'
+      fullPath: '/testing'
+      preLoaderRoute: typeof AuthenticatedTestingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/templates': {
+      id: '/_authenticated/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/reporting': {
+      id: '/_authenticated/reporting'
+      path: '/reporting'
+      fullPath: '/reporting'
+      preLoaderRoute: typeof AuthenticatedReportingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/privacy-policy': {
+      id: '/_authenticated/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof AuthenticatedPrivacyPolicyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/intelligence': {
+      id: '/_authenticated/intelligence'
+      path: '/intelligence'
+      fullPath: '/intelligence'
+      preLoaderRoute: typeof AuthenticatedIntelligenceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/integrations': {
+      id: '/_authenticated/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AuthenticatedIntegrationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/business-settings': {
+      id: '/_authenticated/business-settings'
+      path: '/business-settings'
+      fullPath: '/business-settings'
+      preLoaderRoute: typeof AuthenticatedBusinessSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/agents': {
+      id: '/_authenticated/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AuthenticatedAgentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ab-testing': {
+      id: '/_authenticated/ab-testing'
+      path: '/ab-testing'
+      fullPath: '/ab-testing'
+      preLoaderRoute: typeof AuthenticatedAbTestingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/workflows/': {
+      id: '/_authenticated/workflows/'
+      path: '/'
+      fullPath: '/workflows/'
+      preLoaderRoute: typeof AuthenticatedWorkflowsIndexRouteImport
+      parentRoute: typeof AuthenticatedWorkflowsRoute
+    }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/reporting/': {
+      id: '/_authenticated/reporting/'
+      path: '/'
+      fullPath: '/reporting/'
+      preLoaderRoute: typeof AuthenticatedReportingIndexRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
+    '/_authenticated/agents/': {
+      id: '/_authenticated/agents/'
+      path: '/'
+      fullPath: '/agents/'
+      preLoaderRoute: typeof AuthenticatedAgentsIndexRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
+    '/_authenticated/ab-testing/': {
+      id: '/_authenticated/ab-testing/'
+      path: '/'
+      fullPath: '/ab-testing/'
+      preLoaderRoute: typeof AuthenticatedAbTestingIndexRouteImport
+      parentRoute: typeof AuthenticatedAbTestingRoute
+    }
+    '/_authenticated/workflows/new': {
+      id: '/_authenticated/workflows/new'
+      path: '/new'
+      fullPath: '/workflows/new'
+      preLoaderRoute: typeof AuthenticatedWorkflowsNewRouteImport
+      parentRoute: typeof AuthenticatedWorkflowsRoute
+    }
+    '/_authenticated/settings/reporting': {
+      id: '/_authenticated/settings/reporting'
+      path: '/reporting'
+      fullPath: '/settings/reporting'
+      preLoaderRoute: typeof AuthenticatedSettingsReportingRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/general': {
+      id: '/_authenticated/settings/general'
+      path: '/general'
+      fullPath: '/settings/general'
+      preLoaderRoute: typeof AuthenticatedSettingsGeneralRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/reporting/volume-metrics': {
+      id: '/_authenticated/reporting/volume-metrics'
+      path: '/volume-metrics'
+      fullPath: '/reporting/volume-metrics'
+      preLoaderRoute: typeof AuthenticatedReportingVolumeMetricsRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
+    '/_authenticated/reporting/engagement': {
+      id: '/_authenticated/reporting/engagement'
+      path: '/engagement'
+      fullPath: '/reporting/engagement'
+      preLoaderRoute: typeof AuthenticatedReportingEngagementRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
+    '/_authenticated/reporting/business-outcomes': {
+      id: '/_authenticated/reporting/business-outcomes'
+      path: '/business-outcomes'
+      fullPath: '/reporting/business-outcomes'
+      preLoaderRoute: typeof AuthenticatedReportingBusinessOutcomesRouteImport
+      parentRoute: typeof AuthenticatedReportingRoute
+    }
+    '/_authenticated/agents/create': {
+      id: '/_authenticated/agents/create'
+      path: '/create'
+      fullPath: '/agents/create'
+      preLoaderRoute: typeof AuthenticatedAgentsCreateRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
+    '/_authenticated/ab-testing/create': {
+      id: '/_authenticated/ab-testing/create'
+      path: '/create'
+      fullPath: '/ab-testing/create'
+      preLoaderRoute: typeof AuthenticatedAbTestingCreateRouteImport
+      parentRoute: typeof AuthenticatedAbTestingRoute
+    }
+    '/_authenticated/agents/$id/view': {
+      id: '/_authenticated/agents/$id/view'
+      path: '/$id/view'
+      fullPath: '/agents/$id/view'
+      preLoaderRoute: typeof AuthenticatedAgentsIdViewRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
+    '/_authenticated/agents/$id/preview': {
+      id: '/_authenticated/agents/$id/preview'
+      path: '/$id/preview'
+      fullPath: '/agents/$id/preview'
+      preLoaderRoute: typeof AuthenticatedAgentsIdPreviewRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
+    '/_authenticated/agents/$id/edit': {
+      id: '/_authenticated/agents/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/agents/$id/edit'
+      preLoaderRoute: typeof AuthenticatedAgentsIdEditRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
     }
   }
 }
 
+interface AuthenticatedAbTestingRouteChildren {
+  AuthenticatedAbTestingCreateRoute: typeof AuthenticatedAbTestingCreateRoute
+  AuthenticatedAbTestingIndexRoute: typeof AuthenticatedAbTestingIndexRoute
+}
+
+const AuthenticatedAbTestingRouteChildren: AuthenticatedAbTestingRouteChildren =
+  {
+    AuthenticatedAbTestingCreateRoute: AuthenticatedAbTestingCreateRoute,
+    AuthenticatedAbTestingIndexRoute: AuthenticatedAbTestingIndexRoute,
+  }
+
+const AuthenticatedAbTestingRouteWithChildren =
+  AuthenticatedAbTestingRoute._addFileChildren(
+    AuthenticatedAbTestingRouteChildren,
+  )
+
+interface AuthenticatedAgentsRouteChildren {
+  AuthenticatedAgentsCreateRoute: typeof AuthenticatedAgentsCreateRoute
+  AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
+  AuthenticatedAgentsIdEditRoute: typeof AuthenticatedAgentsIdEditRoute
+  AuthenticatedAgentsIdPreviewRoute: typeof AuthenticatedAgentsIdPreviewRoute
+  AuthenticatedAgentsIdViewRoute: typeof AuthenticatedAgentsIdViewRoute
+}
+
+const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
+  AuthenticatedAgentsCreateRoute: AuthenticatedAgentsCreateRoute,
+  AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
+  AuthenticatedAgentsIdEditRoute: AuthenticatedAgentsIdEditRoute,
+  AuthenticatedAgentsIdPreviewRoute: AuthenticatedAgentsIdPreviewRoute,
+  AuthenticatedAgentsIdViewRoute: AuthenticatedAgentsIdViewRoute,
+}
+
+const AuthenticatedAgentsRouteWithChildren =
+  AuthenticatedAgentsRoute._addFileChildren(AuthenticatedAgentsRouteChildren)
+
+interface AuthenticatedReportingRouteChildren {
+  AuthenticatedReportingBusinessOutcomesRoute: typeof AuthenticatedReportingBusinessOutcomesRoute
+  AuthenticatedReportingEngagementRoute: typeof AuthenticatedReportingEngagementRoute
+  AuthenticatedReportingVolumeMetricsRoute: typeof AuthenticatedReportingVolumeMetricsRoute
+  AuthenticatedReportingIndexRoute: typeof AuthenticatedReportingIndexRoute
+}
+
+const AuthenticatedReportingRouteChildren: AuthenticatedReportingRouteChildren =
+  {
+    AuthenticatedReportingBusinessOutcomesRoute:
+      AuthenticatedReportingBusinessOutcomesRoute,
+    AuthenticatedReportingEngagementRoute:
+      AuthenticatedReportingEngagementRoute,
+    AuthenticatedReportingVolumeMetricsRoute:
+      AuthenticatedReportingVolumeMetricsRoute,
+    AuthenticatedReportingIndexRoute: AuthenticatedReportingIndexRoute,
+  }
+
+const AuthenticatedReportingRouteWithChildren =
+  AuthenticatedReportingRoute._addFileChildren(
+    AuthenticatedReportingRouteChildren,
+  )
+
+interface AuthenticatedSettingsRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
+  AuthenticatedSettingsGeneralRoute: typeof AuthenticatedSettingsGeneralRoute
+  AuthenticatedSettingsReportingRoute: typeof AuthenticatedSettingsReportingRoute
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+}
+
+const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
+  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
+  AuthenticatedSettingsGeneralRoute: AuthenticatedSettingsGeneralRoute,
+  AuthenticatedSettingsReportingRoute: AuthenticatedSettingsReportingRoute,
+  AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+}
+
+const AuthenticatedSettingsRouteWithChildren =
+  AuthenticatedSettingsRoute._addFileChildren(
+    AuthenticatedSettingsRouteChildren,
+  )
+
+interface AuthenticatedWorkflowsRouteChildren {
+  AuthenticatedWorkflowsNewRoute: typeof AuthenticatedWorkflowsNewRoute
+  AuthenticatedWorkflowsIndexRoute: typeof AuthenticatedWorkflowsIndexRoute
+}
+
+const AuthenticatedWorkflowsRouteChildren: AuthenticatedWorkflowsRouteChildren =
+  {
+    AuthenticatedWorkflowsNewRoute: AuthenticatedWorkflowsNewRoute,
+    AuthenticatedWorkflowsIndexRoute: AuthenticatedWorkflowsIndexRoute,
+  }
+
+const AuthenticatedWorkflowsRouteWithChildren =
+  AuthenticatedWorkflowsRoute._addFileChildren(
+    AuthenticatedWorkflowsRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedAbTestingRoute: typeof AuthenticatedAbTestingRouteWithChildren
+  AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
+  AuthenticatedBusinessSettingsRoute: typeof AuthenticatedBusinessSettingsRoute
+  AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
+  AuthenticatedIntelligenceRoute: typeof AuthenticatedIntelligenceRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedPrivacyPolicyRoute: typeof AuthenticatedPrivacyPolicyRoute
+  AuthenticatedReportingRoute: typeof AuthenticatedReportingRouteWithChildren
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
+  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
+  AuthenticatedTestingRoute: typeof AuthenticatedTestingRoute
+  AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRouteWithChildren
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAbTestingRoute: AuthenticatedAbTestingRouteWithChildren,
+  AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
+  AuthenticatedBusinessSettingsRoute: AuthenticatedBusinessSettingsRoute,
+  AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
+  AuthenticatedIntelligenceRoute: AuthenticatedIntelligenceRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedPrivacyPolicyRoute: AuthenticatedPrivacyPolicyRoute,
+  AuthenticatedReportingRoute: AuthenticatedReportingRouteWithChildren,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
+  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
+  AuthenticatedTestingRoute: AuthenticatedTestingRoute,
+  AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRouteWithChildren,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AgentsRoute: AgentsRoute,
-  BusinessSettingsRoute: BusinessSettingsRoute,
-  IntegrationsRoute: IntegrationsRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
-  MessagesRoute: MessagesRoute,
-  PrivacyPolicyRoute: PrivacyPolicyRoute,
-  ReportingRoute: ReportingRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
