@@ -28,29 +28,39 @@ export const defaultValues: AgentBuilderFormValues = {
 };
 
 export const agentSchema = z.object({
-  // Basic Info
-  agentName: z.string().min(1, "Agent name is required"),
+  // Basic Info - Required fields per API
+  agentName: z
+    .string()
+    .min(3, "Agent name must be at least 3 characters")
+    .max(100, "Agent name must not exceed 100 characters"),
   description: z.string().min(1, "Description is required"),
   objective: z.string().min(1, "Objective is required"),
+  systemPrompt: z.string().min(1, "System Prompt is required"),
+
+  // Optional Basic Info
   brandName: z.string().optional(),
   industry: z.string().optional(),
   toneOfVoice: z.string().default("friendly"),
   language: z.string().default("en"),
   creativity: z.number().default(0.7),
-  systemPrompt: z.string().min(1, "System Prompt is required"),
+  contextInfo: z.string().optional(),
   faqsBestAnswers: z.string().optional(),
   productPlans: z.string().optional(),
   highTouch: z.string().optional(),
-  audience: z.string().optional(),
-  // ID
-  integrationId: z.string().min(1, "WhatsApp is Required"),
-  businessId: z.string(),
-  // Agent Type
-  agentType: z.string(),
+  agentType: z.string().optional(),
 
-  // Product Catalogue
-  catalogS3Key: z.string().optional().or(z.literal("")),
-  catalogName: z.string().optional().or(z.literal("")),
+  // WhatsApp Integration - Required
+  whatsappIntegrationId: z.string().uuid("Please select a WhatsApp number"),
+
+  // Product Catalogue - Required
+  catalogS3Key: z
+    .string()
+    .min(1, "Product catalog is required")
+    .max(2048, "Catalog path too long"),
+  catalogName: z
+    .string()
+    .min(1, "Catalog name is required")
+    .max(100, "Catalog name must not exceed 100 characters"),
 
   // Document Library (Lee’s categories)
   productInfoDocs: z.array(z.instanceof(File)).optional(),
@@ -120,13 +130,12 @@ export const defaultAgentValues: AgentFormValues = {
   language: "en",
   creativity: 0.7,
   systemPrompt: "",
+  contextInfo: "",
   faqsBestAnswers: "",
   productPlans: "",
   highTouch: "",
-  audience: "",
-  integrationId: "",
-  businessId: "",
   agentType: "",
+  whatsappIntegrationId: "",
   catalogS3Key: "",
   catalogName: "",
 

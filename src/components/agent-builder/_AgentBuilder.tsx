@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, ChevronDown, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -32,46 +31,16 @@ import {
   type AgentFormValues,
 } from "./schema";
 import { getWhatsAppList } from "@/services/integrations";
-import { useApp } from "@/context/AppContext";
 import { stageUpload, uploadFile } from "@/services/upload";
 import { toast } from "sonner";
-
-const agentTypeConfig = {
-  onboarding: {
-    title: "Onboarding Agent",
-    color: "blue",
-    bgColor: "bg-blue-50",
-    textColor: "text-blue-600",
-    borderColor: "border-blue-200",
-  },
-  sales: {
-    title: "Sales Agent",
-    color: "green",
-    bgColor: "bg-green-50",
-    textColor: "text-green-600",
-    borderColor: "border-green-200",
-  },
-  support: {
-    title: "Support Agent",
-    color: "purple",
-    bgColor: "bg-purple-50",
-    textColor: "text-purple-600",
-    borderColor: "border-purple-200",
-  },
-};
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAgentCreate = location.pathname.includes("/create/");
+  const isAgentCreate = location.pathname.includes("/create");
   const isAgentEdit = location.pathname.includes("/edit");
   const params = useParams({ strict: false });
-  const type = params.type || "";
   const id = params.id || "";
-
-  const agentConfig =
-    agentTypeConfig[type as keyof typeof agentTypeConfig] ||
-    agentTypeConfig.onboarding;
 
   const resolver = zodResolver(
     agentSchema
@@ -88,10 +57,10 @@ export default function AgentBuilder() {
     mode: "onSubmit",
   });
 
-  const { user } = useApp();
-
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const csvFileInputRef = useRef<HTMLInputElement>(null);
+  const jsonFileInputRef = useRef<HTMLInputElement>(null);
 
   // Document Library state - Lee's categories
   const productInfoDocs = watch("productInfoDocs") ?? [];
@@ -196,7 +165,7 @@ export default function AgentBuilder() {
     },
   });
 
-  const { data: whatsAppListData, isFetching } = useQuery({
+  const { data: whatsAppList } = useQuery({
     queryKey: ["whatsAppList"],
     queryFn: async () => {
       return await getWhatsAppList();
@@ -217,10 +186,8 @@ export default function AgentBuilder() {
       setValue("description", agentData?.description || "");
       setValue("systemPrompt", agentData?.systemPrompt || "");
       setValue("objective", agentData?.objective || "");
-      setValue("integrationId", agentData?.wabaAccountId || "");
       setValue("creativity", agentData?.creativity || 0);
       setValue("toneOfVoice", agentData?.tone || "");
-      setValue("integrationId", agentData?.wabaAccountId || "");
     }
   }, [isFetchedAfterMount]);
 
@@ -277,15 +244,46 @@ export default function AgentBuilder() {
   };
 
   const onSubmit = (values: AgentFormValues) => {
-    setValue("businessId", user.businessId ?? "");
-    setValue("agentType", agentConfig.title);
-
     // Debug Submit Values
-    values.businessId = user.businessId ?? "";
-    values.agentType = agentConfig.title;
-    console.log(values);
+    console.log("Agent Creation Payload:", values);
 
     if (isAgentCreate) createAgentFn(values);
+  };
+
+  const onError = (errors: any) => {
+    console.log("Validation Errors:", errors);
+
+    // Auto-open sections with errors
+    const updatedSections = { ...openSections };
+    if (errors.agentName || errors.description || errors.objective) {
+      updatedSections.basicInfo = true;
+    }
+    if (errors.systemPrompt) {
+      updatedSections.aiConfig = true;
+    }
+    if (errors.whatsappIntegrationId) {
+      updatedSections.channels = true;
+    }
+    if (errors.catalogS3Key || errors.catalogName) {
+      updatedSections.productCatalogue = true;
+    }
+    setOpenSections(updatedSections);
+
+    // Show error toast
+    const errorMessages: string[] = [];
+    if (errors.agentName) errorMessages.push("Agent Name");
+    if (errors.description) errorMessages.push("Description");
+    if (errors.objective) errorMessages.push("Objective");
+    if (errors.systemPrompt) errorMessages.push("System Prompt");
+    if (errors.whatsappIntegrationId) errorMessages.push("WhatsApp Number");
+    if (errors.catalogS3Key || errors.catalogName)
+      errorMessages.push("Product Catalog");
+
+    if (errorMessages.length > 0) {
+      toast.error(
+        `Please complete the following required fields: ${errorMessages.join(", ")}`
+      );
+    }
   };
 
   return (
@@ -312,11 +310,6 @@ export default function AgentBuilder() {
                 className="text-gray-900 border-0 shadow-none px-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 max-w-md text-2xl font-semibold"
                 placeholder="New Agent"
               />
-              <Badge
-                className={`${agentConfig.bgColor} ${agentConfig.textColor} ${agentConfig.borderColor} border`}
-              >
-                {agentConfig.title}
-              </Badge>
             </div>
             <div className="flex items-center gap-2 mt-1">
               <div className="flex-1 max-w-xs bg-gray-200 rounded-full h-1.5">
@@ -338,11 +331,15 @@ export default function AgentBuilder() {
               Saved
             </span>
           )} */}
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate({ to: "/agents" })}
+          >
             Cancel
           </Button>
-          <Button size="sm" onClick={handleSubmit(onSubmit)}>
-            Save
+          <Button size="sm" onClick={handleSubmit(onSubmit, onError)}>
+            Save Agent
           </Button>
         </div>
       </div>
@@ -353,6 +350,23 @@ export default function AgentBuilder() {
         <div className="flex-1 overflow-auto">
           <ScrollArea className="h-full">
             <div className="max-w-3xl mx-auto py-8 px-6">
+              {/* Required Fields Notice */}
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="text-sm font-semibold text-blue-900 mb-2">
+                  Required Fields
+                </h4>
+                <p className="text-sm text-blue-800">
+                  Please complete all fields marked with{" "}
+                  <span className="text-red-500">*</span> to create your agent:
+                </p>
+                <ul className="mt-2 text-sm text-blue-800 list-disc list-inside space-y-1">
+                  <li>Agent Name, Description, Objective</li>
+                  <li>System Prompt</li>
+                  <li>WhatsApp Number (in Channels section)</li>
+                  <li>Product Catalog (CSV file upload)</li>
+                </ul>
+              </div>
+
               <div className="space-y-4">
                 {/* Basic Information */}
                 <Collapsible
@@ -400,7 +414,7 @@ export default function AgentBuilder() {
                             }
                           />
                           {errors.agentName && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
+                            <p className="text-sm text-red-500 mt-1">
                               {errors.agentName.message}
                             </p>
                           )}
@@ -429,7 +443,7 @@ export default function AgentBuilder() {
                             className="mt-1.5"
                           />
                           {errors.description && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
+                            <p className="text-sm text-red-500 mt-1">
                               {errors.description.message}
                             </p>
                           )}
@@ -457,7 +471,7 @@ export default function AgentBuilder() {
                             className="mt-1.5"
                           />
                           {errors.objective && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
+                            <p className="text-sm text-red-500 mt-1">
                               {errors.objective.message}
                             </p>
                           )}
@@ -660,7 +674,7 @@ export default function AgentBuilder() {
                             className="mt-1.5 font-mono text-sm"
                           />
                           {errors.systemPrompt && (
-                            <p className="text-xs text-red-500 text-sm mt-1">
+                            <p className="text-sm text-red-500 mt-1">
                               {errors.systemPrompt.message}
                             </p>
                           )}
@@ -680,14 +694,17 @@ export default function AgentBuilder() {
                     setOpenSections({ ...openSections, channels: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div
+                    className={`bg-white rounded-lg border shadow-sm ${errors.whatsappIntegrationId ? "border-red-500" : "border-gray-200"}`}
+                  >
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
                           Channels
+                          <span className="text-red-500 text-sm">*</span>
                         </h3>
                         <p className="text-gray-600 text-sm">
-                          Where your agent will operate
+                          Select where your agent will operate (Required)
                         </p>
                       </div>
                       <ChevronDown
@@ -726,48 +743,57 @@ export default function AgentBuilder() {
                             />
                           </div>
                         ))}
-                        {channels.whatsapp ? (
-                          <div>
+
+                        {channels.whatsapp && (
+                          <div className="mt-4">
                             <Label
-                              htmlFor="tone"
+                              htmlFor="whatsapp-number"
                               className={
-                                errors.integrationId
-                                  ? "text-red-500 text-sm mt-1"
+                                errors.whatsappIntegrationId
+                                  ? "text-red-500"
                                   : ""
                               }
                             >
-                              WhatsApp Integration*
+                              Select WhatsApp Number*
                             </Label>
                             <Select
-                              value={watch("integrationId")}
+                              value={watch("whatsappIntegrationId")}
                               onValueChange={(value) =>
-                                setValue("integrationId", value, {
+                                setValue("whatsappIntegrationId", value, {
                                   shouldValidate: true,
                                 })
                               }
-                              disabled={isFetching}
                             >
-                              <SelectTrigger className="mt-1.5 w-full">
-                                <SelectValue placeholder="Select WhatsApp Integration" />
+                              <SelectTrigger
+                                id="whatsapp-number"
+                                className={`mt-1.5 w-full ${errors.whatsappIntegrationId ? "border-red-500" : ""}`}
+                              >
+                                <SelectValue placeholder="Select WhatsApp number" />
                               </SelectTrigger>
                               <SelectContent>
-                                {whatsAppListData?.map((whatApp) => (
+                                {whatsAppList?.map((whatsapp) => (
                                   <SelectItem
-                                    value={whatApp.id}
-                                    key={whatApp.id}
+                                    key={whatsapp.id}
+                                    value={whatsapp.id}
                                   >
-                                    {whatApp.name} • +
-                                    {whatApp.displayPhoneNumber}
+                                    {whatsapp.displayPhoneNumber} (
+                                    {whatsapp.name})
                                   </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
+                            {errors.whatsappIntegrationId && (
+                              <p className="text-sm text-red-500 mt-1">
+                                {errors.whatsappIntegrationId.message}
+                              </p>
+                            )}
+                            {!whatsAppList?.length && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                No WhatsApp numbers available. Please add one in
+                                Integrations.
+                              </p>
+                            )}
                           </div>
-                        ) : null}
-                        {errors.integrationId && (
-                          <p className="text-xs text-red-500 text-sm mt-1">
-                            {errors.integrationId.message}
-                          </p>
                         )}
                       </div>
                     </CollapsibleContent>
@@ -825,12 +851,17 @@ export default function AgentBuilder() {
                     setOpenSections({ ...openSections, productCatalogue: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div
+                    className={`bg-white rounded-lg border shadow-sm ${errors.catalogS3Key || errors.catalogName ? "border-red-500" : "border-gray-200"}`}
+                  >
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
-                        <h3 className="text-gray-900">Product Catalogue</h3>
+                        <h3 className="text-gray-900 flex items-center gap-2">
+                          Product Catalogue
+                          <span className="text-red-500 text-sm">*</span>
+                        </h3>
                         <p className="text-gray-600 text-sm">
-                          Subscription Plans
+                          Upload CSV file with product data (Required)
                         </p>
                       </div>
                       <ChevronDown
@@ -858,105 +889,59 @@ export default function AgentBuilder() {
                         </div>
 
                         {/* Drag and Drop Upload Zone */}
-                        <div
-                          onDrop={handleDrop}
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 ${
-                            isDragging
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() =>
-                            document.getElementById("csv-upload")?.click()
-                          }
-                        >
-                          <input
-                            id="csv-upload"
-                            type="file"
-                            accept=".csv"
-                            onChange={handleProductCatalogueFileInputChange}
-                            className="hidden"
-                          />
-                          <div className="flex flex-col items-center gap-2">
-                            <Upload
-                              className={`w-8 h-8 ${isDragging ? "text-blue-500" : "text-gray-400"}`}
-                            />
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                {uploadedFile
-                                  ? uploadedFile.name
-                                  : "Upload CSV Product Catalog"}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {uploadedFile
-                                  ? "Click to upload a different file"
-                                  : "Drag and drop your CSV file here, or click to browse"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible>
-
-                {/* Audience*/}
-                <Collapsible
-                  open={openSections.audience}
-                  onOpenChange={(open) =>
-                    setOpenSections({ ...openSections, audience: open })
-                  }
-                >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
-                      <div className="text-left">
-                        <h3 className="text-gray-900">Audience</h3>
-                        <p className="text-gray-600 text-sm">
-                          Choose how you want to add your audience.
-                        </p>
-                      </div>
-                      <ChevronDown
-                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.audience ? "" : "-rotate-90"}`}
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
                         <div>
-                          <Label htmlFor="context-info">
-                            Audience description
-                          </Label>
-                          <Textarea
-                            id="context-info"
-                            placeholder="Enter audience description."
-                            rows={4}
-                            value={watch("audience")}
-                            onChange={(e) =>
-                              setValue("audience", e.target.value)
-                            }
-                            className="mt-1.5"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="industry">Hightouch segment</Label>
-                          <Select
-                            value={watch("highTouch")}
-                            onValueChange={(value) =>
-                              setValue("highTouch", value)
+                          <Label
+                            className={
+                              errors.catalogS3Key ? "text-red-500" : ""
                             }
                           >
-                            <SelectTrigger
-                              id="industry"
-                              className="mt-1.5 w-full"
-                            >
-                              <SelectValue placeholder="Select Hightouch" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="technology">
-                                Stay at home mums
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                            Upload Product Catalog (CSV)*
+                          </Label>
+                          <div
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 mt-1.5 ${
+                              isDragging
+                                ? "border-blue-500 bg-blue-50"
+                                : errors.catalogS3Key
+                                  ? "border-red-500 bg-red-50"
+                                  : "border-gray-300"
+                            }`}
+                            onClick={() => csvFileInputRef.current?.click()}
+                          >
+                            <input
+                              ref={csvFileInputRef}
+                              id="csv-upload"
+                              type="file"
+                              accept=".csv"
+                              onChange={handleProductCatalogueFileInputChange}
+                              className="hidden"
+                            />
+                            <div className="flex flex-col items-center gap-2">
+                              <Upload
+                                className={`w-8 h-8 ${isDragging ? "text-blue-500" : errors.catalogS3Key ? "text-red-500" : "text-gray-400"}`}
+                              />
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">
+                                  {uploadedFile
+                                    ? uploadedFile.name
+                                    : "Upload CSV Product Catalog"}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {uploadedFile
+                                    ? "Click to upload a different file"
+                                    : "Drag and drop your CSV file here, or click to browse"}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          {(errors.catalogS3Key || errors.catalogName) && (
+                            <p className="text-sm text-red-500 mt-1">
+                              {errors.catalogS3Key?.message ||
+                                errors.catalogName?.message}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </CollapsibleContent>
@@ -2518,11 +2503,10 @@ export default function AgentBuilder() {
                                   ? "border-blue-500 bg-blue-50"
                                   : "border-gray-300"
                               }`}
-                              onClick={() =>
-                                document.getElementById("json-upload")?.click()
-                              }
+                              onClick={() => jsonFileInputRef.current?.click()}
                             >
                               <input
+                                ref={jsonFileInputRef}
                                 id="json-upload"
                                 type="file"
                                 accept=".json"

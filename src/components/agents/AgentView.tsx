@@ -18,18 +18,20 @@ import { ArrowLeft, Eye, Ellipsis, Workflow, Plus, Play } from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { getAgent } from "@/services/agents";
 import { useQuery } from "@tanstack/react-query";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function AgentView() {
   const navigate = useNavigate();
   const { id } = useParams({ from: "/_authenticated/agents/$id/view" });
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
       const data = await getAgent(id);
       return data;
     },
   });
+
   // Mock data - replace with actual data fetching
   const agent = {
     id: id,
@@ -74,6 +76,14 @@ export default function AgentView() {
       lastUpdated: "3 days ago",
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
