@@ -37,8 +37,8 @@ import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_auth
 import { Route as AuthenticatedReportingVolumeMetricsRouteImport } from './routes/_authenticated/reporting.volume-metrics'
 import { Route as AuthenticatedReportingEngagementRouteImport } from './routes/_authenticated/reporting.engagement'
 import { Route as AuthenticatedReportingBusinessOutcomesRouteImport } from './routes/_authenticated/reporting.business-outcomes'
+import { Route as AuthenticatedAgentsCreateRouteImport } from './routes/_authenticated/agents.create'
 import { Route as AuthenticatedAbTestingCreateRouteImport } from './routes/_authenticated/ab-testing.create'
-import { Route as AuthenticatedAgentsCreateTypeRouteImport } from './routes/_authenticated/agents.create.$type'
 import { Route as AuthenticatedAgentsIdViewRouteImport } from './routes/_authenticated/agents.$id.view'
 import { Route as AuthenticatedAgentsIdPreviewRouteImport } from './routes/_authenticated/agents.$id.preview'
 import { Route as AuthenticatedAgentsIdEditRouteImport } from './routes/_authenticated/agents.$id.edit'
@@ -198,17 +198,17 @@ const AuthenticatedReportingBusinessOutcomesRoute =
     path: '/business-outcomes',
     getParentRoute: () => AuthenticatedReportingRoute,
   } as any)
+const AuthenticatedAgentsCreateRoute =
+  AuthenticatedAgentsCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedAgentsRoute,
+  } as any)
 const AuthenticatedAbTestingCreateRoute =
   AuthenticatedAbTestingCreateRouteImport.update({
     id: '/create',
     path: '/create',
     getParentRoute: () => AuthenticatedAbTestingRoute,
-  } as any)
-const AuthenticatedAgentsCreateTypeRoute =
-  AuthenticatedAgentsCreateTypeRouteImport.update({
-    id: '/create/$type',
-    path: '/create/$type',
-    getParentRoute: () => AuthenticatedAgentsRoute,
   } as any)
 const AuthenticatedAgentsIdViewRoute =
   AuthenticatedAgentsIdViewRouteImport.update({
@@ -246,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/': typeof AuthenticatedIndexRoute
   '/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/agents/create': typeof AuthenticatedAgentsCreateRoute
   '/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
   '/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
   '/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
@@ -261,7 +262,6 @@ export interface FileRoutesByFullPath {
   '/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
   '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
-  '/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -275,6 +275,7 @@ export interface FileRoutesByTo {
   '/testing': typeof AuthenticatedTestingRoute
   '/': typeof AuthenticatedIndexRoute
   '/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/agents/create': typeof AuthenticatedAgentsCreateRoute
   '/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
   '/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
   '/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
@@ -290,7 +291,6 @@ export interface FileRoutesByTo {
   '/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
   '/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
-  '/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -311,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/ab-testing/create': typeof AuthenticatedAbTestingCreateRoute
+  '/_authenticated/agents/create': typeof AuthenticatedAgentsCreateRoute
   '/_authenticated/reporting/business-outcomes': typeof AuthenticatedReportingBusinessOutcomesRoute
   '/_authenticated/reporting/engagement': typeof AuthenticatedReportingEngagementRoute
   '/_authenticated/reporting/volume-metrics': typeof AuthenticatedReportingVolumeMetricsRoute
@@ -326,7 +327,6 @@ export interface FileRoutesById {
   '/_authenticated/agents/$id/edit': typeof AuthenticatedAgentsIdEditRoute
   '/_authenticated/agents/$id/preview': typeof AuthenticatedAgentsIdPreviewRoute
   '/_authenticated/agents/$id/view': typeof AuthenticatedAgentsIdViewRoute
-  '/_authenticated/agents/create/$type': typeof AuthenticatedAgentsCreateTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -347,6 +347,7 @@ export interface FileRouteTypes {
     | '/workflows'
     | '/'
     | '/ab-testing/create'
+    | '/agents/create'
     | '/reporting/business-outcomes'
     | '/reporting/engagement'
     | '/reporting/volume-metrics'
@@ -362,7 +363,6 @@ export interface FileRouteTypes {
     | '/agents/$id/edit'
     | '/agents/$id/preview'
     | '/agents/$id/view'
-    | '/agents/create/$type'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -376,6 +376,7 @@ export interface FileRouteTypes {
     | '/testing'
     | '/'
     | '/ab-testing/create'
+    | '/agents/create'
     | '/reporting/business-outcomes'
     | '/reporting/engagement'
     | '/reporting/volume-metrics'
@@ -391,7 +392,6 @@ export interface FileRouteTypes {
     | '/agents/$id/edit'
     | '/agents/$id/preview'
     | '/agents/$id/view'
-    | '/agents/create/$type'
   id:
     | '__root__'
     | '/_authenticated'
@@ -411,6 +411,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workflows'
     | '/_authenticated/'
     | '/_authenticated/ab-testing/create'
+    | '/_authenticated/agents/create'
     | '/_authenticated/reporting/business-outcomes'
     | '/_authenticated/reporting/engagement'
     | '/_authenticated/reporting/volume-metrics'
@@ -426,7 +427,6 @@ export interface FileRouteTypes {
     | '/_authenticated/agents/$id/edit'
     | '/_authenticated/agents/$id/preview'
     | '/_authenticated/agents/$id/view'
-    | '/_authenticated/agents/create/$type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -633,19 +633,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportingBusinessOutcomesRouteImport
       parentRoute: typeof AuthenticatedReportingRoute
     }
+    '/_authenticated/agents/create': {
+      id: '/_authenticated/agents/create'
+      path: '/create'
+      fullPath: '/agents/create'
+      preLoaderRoute: typeof AuthenticatedAgentsCreateRouteImport
+      parentRoute: typeof AuthenticatedAgentsRoute
+    }
     '/_authenticated/ab-testing/create': {
       id: '/_authenticated/ab-testing/create'
       path: '/create'
       fullPath: '/ab-testing/create'
       preLoaderRoute: typeof AuthenticatedAbTestingCreateRouteImport
       parentRoute: typeof AuthenticatedAbTestingRoute
-    }
-    '/_authenticated/agents/create/$type': {
-      id: '/_authenticated/agents/create/$type'
-      path: '/create/$type'
-      fullPath: '/agents/create/$type'
-      preLoaderRoute: typeof AuthenticatedAgentsCreateTypeRouteImport
-      parentRoute: typeof AuthenticatedAgentsRoute
     }
     '/_authenticated/agents/$id/view': {
       id: '/_authenticated/agents/$id/view'
@@ -688,19 +688,19 @@ const AuthenticatedAbTestingRouteWithChildren =
   )
 
 interface AuthenticatedAgentsRouteChildren {
+  AuthenticatedAgentsCreateRoute: typeof AuthenticatedAgentsCreateRoute
   AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
   AuthenticatedAgentsIdEditRoute: typeof AuthenticatedAgentsIdEditRoute
   AuthenticatedAgentsIdPreviewRoute: typeof AuthenticatedAgentsIdPreviewRoute
   AuthenticatedAgentsIdViewRoute: typeof AuthenticatedAgentsIdViewRoute
-  AuthenticatedAgentsCreateTypeRoute: typeof AuthenticatedAgentsCreateTypeRoute
 }
 
 const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
+  AuthenticatedAgentsCreateRoute: AuthenticatedAgentsCreateRoute,
   AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
   AuthenticatedAgentsIdEditRoute: AuthenticatedAgentsIdEditRoute,
   AuthenticatedAgentsIdPreviewRoute: AuthenticatedAgentsIdPreviewRoute,
   AuthenticatedAgentsIdViewRoute: AuthenticatedAgentsIdViewRoute,
-  AuthenticatedAgentsCreateTypeRoute: AuthenticatedAgentsCreateTypeRoute,
 }
 
 const AuthenticatedAgentsRouteWithChildren =
