@@ -350,23 +350,6 @@ export default function AgentBuilder() {
         <div className="flex-1 overflow-auto">
           <ScrollArea className="h-full">
             <div className="max-w-3xl mx-auto py-8 px-6">
-              {/* Required Fields Notice */}
-              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2">
-                  Required Fields
-                </h4>
-                <p className="text-sm text-blue-800">
-                  Please complete all fields marked with{" "}
-                  <span className="text-red-500">*</span> to create your agent:
-                </p>
-                <ul className="mt-2 text-sm text-blue-800 list-disc list-inside space-y-1">
-                  <li>Agent Name, Description, Objective</li>
-                  <li>System Prompt</li>
-                  <li>WhatsApp Number (in Channels section)</li>
-                  <li>Product Catalog (CSV file upload)</li>
-                </ul>
-              </div>
-
               <div className="space-y-4">
                 {/* Basic Information */}
                 <Collapsible
@@ -400,7 +383,7 @@ export default function AgentBuilder() {
                                 : ""
                             }
                           >
-                            Agent Name*
+                            Agent Name<span className="text-red-500">*</span>
                           </Label>
                           <Input
                             id="agent-name"
@@ -428,7 +411,7 @@ export default function AgentBuilder() {
                                 : ""
                             }
                           >
-                            Description*
+                            Description<span className="text-red-500">*</span>
                           </Label>
                           <Textarea
                             id="agent-description"
@@ -457,7 +440,8 @@ export default function AgentBuilder() {
                                 : ""
                             }
                           >
-                            Primary Objective*
+                            Primary Objective
+                            <span className="text-red-500">*</span>
                           </Label>
                           <Input
                             id="agent-objective"
@@ -659,7 +643,7 @@ export default function AgentBuilder() {
                                 : ""
                             }
                           >
-                            System Prompt*
+                            System Prompt<span className="text-red-500">*</span>
                           </Label>
                           <Textarea
                             id="system-prompt"
@@ -754,7 +738,8 @@ export default function AgentBuilder() {
                                   : ""
                               }
                             >
-                              Select WhatsApp Number*
+                              Select WhatsApp Number
+                              <span className="text-red-500">*</span>
                             </Label>
                             <Select
                               value={watch("whatsappIntegrationId")}
@@ -895,7 +880,8 @@ export default function AgentBuilder() {
                               errors.catalogS3Key ? "text-red-500" : ""
                             }
                           >
-                            Upload Product Catalog (CSV)*
+                            Upload Product Catalog (CSV)
+                            <span className="text-red-500">*</span>
                           </Label>
                           <div
                             onDrop={handleDrop}
