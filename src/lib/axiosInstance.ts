@@ -1,7 +1,5 @@
 import axios from "axios";
-import { getToken } from "./auth";
-
-const token = getToken();
+import { getToken, removeToken } from "./auth";
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -20,15 +18,17 @@ axiosInstance.interceptors.request.use(
   (config) => {
     if (config.skipAuth) return config; // Skip Authorization
 
+    // Get token dynamically on each request
+    const token = getToken();
     if (token) {
-      config.headers.Authorization = token ? `Bearer ${token}` : "";
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error: any) => {
+  (error: unknown) => {
     if (axios.isAxiosError(error)) {
       const errData = error.response?.data;
-      let msg =
+      const msg =
         errData?.message ||
         errData?.error?.message ||
         errData?.error ||
@@ -45,18 +45,20 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (config) => {
-    if (config.skipAuth) return config; // Skip Authorization
-
-    if (token) {
-      config.headers.Authorization = token ? `Bearer ${token}` : "";
-    }
-    return config;
+  (response) => {
+    return response;
   },
-  (error: any) => {
+  (error: unknown) => {
     if (axios.isAxiosError(error)) {
+      // Handle 401 Unauthorized - token expired or invalid
+      if (error.response?.status === 401) {
+        removeToken();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
       const errData = error.response?.data;
-      let msg =
+      const msg =
         errData?.message ||
         errData?.error?.message ||
         errData?.error ||

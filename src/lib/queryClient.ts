@@ -1,6 +1,11 @@
 import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+interface HttpError extends Error {
+  status?: number;
+  message: string;
+}
+
 const publicRoutes = ["/login", "/signup"];
 
 const isPublicRoute = publicRoutes.some((route) => {
@@ -9,7 +14,7 @@ const isPublicRoute = publicRoutes.some((route) => {
   );
 });
 
-const handleOnError = (error: any) => {
+const handleOnError = (error: HttpError) => {
   // Redirect to login
   if (error.status === 401 && !isPublicRoute) {
     localStorage.clear();
@@ -29,11 +34,13 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: (error: any): any => {
+      retry: (failureCount: number, error: unknown): boolean => {
         // Stop retrying on 400 (Bad Request)
-        if (error?.status === 400) {
+        if ((error as HttpError)?.status === 400) {
           return false;
         }
+        // Default retry logic
+        return failureCount < 3;
       },
     },
   },

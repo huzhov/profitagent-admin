@@ -16,13 +16,11 @@ import {
   MessageSquare,
   CheckCircle2,
   AlertCircle,
-  Webhook,
   Key,
   Plus,
   Info,
   Settings as SettingsIcon,
   Save,
-  TestTube2,
   Facebook,
   RefreshCw,
   Unplug,
@@ -55,9 +53,9 @@ import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  createWhatsApp,
+  createWhatsAppIntegration,
   exchangeWhatsAppToken,
-  getWhatsAppList,
+  listWhatsAppIntegrations,
 } from "@/services/integrations";
 import { toast } from "sonner";
 import { useBusiness } from "@/context/AppContext";
@@ -135,12 +133,12 @@ function AccountSettings() {
   const { data: whatsAppListData, refetch } = useQuery({
     queryKey: ["whatsAppList"],
     queryFn: async () => {
-      return await getWhatsAppList();
+      return await listWhatsAppIntegrations();
     },
   });
 
   const { mutate: createWhatsAppFn } = useMutation({
-    mutationFn: createWhatsApp,
+    mutationFn: createWhatsAppIntegration,
     onSuccess: () => {
       waForm.reset();
       toast.success("Added WhatsApp account successfully");
@@ -466,64 +464,6 @@ function AccountSettings() {
             </CardContent>
           </Card>
         )}
-
-        {/* Webhook Configuration */}
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Webhook className="w-5 h-5" />
-              Webhook Configuration
-            </CardTitle>
-            <CardDescription>
-              Configure webhooks for real-time message delivery
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="webhookUrl">Webhook URL</Label>
-              <Input
-                id="webhookUrl"
-                placeholder="https://your-domain.com/webhook"
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="verifyToken">Verify Token</Label>
-              <Input
-                id="verifyToken"
-                placeholder="Your verification token"
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="webhookSecret">Webhook Secret</Label>
-              <Input
-                id="webhookSecret"
-                type="password"
-                placeholder="Your webhook secret"
-                autoComplete="off"
-              />
-            </div>
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-900">
-                <strong>Note:</strong> Make sure your webhook endpoint is
-                publicly accessible and can handle POST requests from Meta's
-                servers.
-              </p>
-            </div>
-            <Separator />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">
-                <TestTube2 className="w-4 h-4 mr-2" />
-                Test Webhook
-              </Button>
-              <Button>
-                <Save className="w-4 h-4 mr-2" />
-                Save Configuration
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Manage Connection Modal */}
