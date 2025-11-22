@@ -34,7 +34,7 @@ interface CRMConnection {
 }
 
 export default function CRMIntegration() {
-  const [connections, setConnections] = useState<CRMConnection[]>([
+  const [connections] = useState<CRMConnection[]>([
     {
       id: "1",
       platform: "airtable",

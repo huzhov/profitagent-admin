@@ -14,14 +14,14 @@ export async function exchangeWhatsAppToken(values: any): Promise<string> {
   return data;
 }
 
-export async function getWhatsAppList(): Promise<WhatsAppResponse[]> {
+export async function listWhatsAppIntegrations(): Promise<WhatsAppResponse[]> {
   const { data } = await axiosInstance.get<WhatsAppResponse[]>(
     `/integrations/whatsapp`
   );
   return data;
 }
 
-export async function createWhatsApp(
+export async function createWhatsAppIntegration(
   values: CreateWhatsApp
 ): Promise<CreateWhatsAppResponse> {
   const { data } = await axiosInstance.post<CreateWhatsAppResponse>(
@@ -30,4 +30,8 @@ export async function createWhatsApp(
   );
 
   return data;
+}
+
+export async function getWhatsAppList(): Promise<WhatsAppResponse[]> {
+  return listWhatsAppIntegrations();
 }
