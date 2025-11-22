@@ -814,9 +814,9 @@ export default function AgentBuilder() {
                             id="context-info"
                             placeholder="Product details, pricing, FAQs, company policies, etc."
                             rows={4}
-                            value={watch("contextInfo")}
+                            value={watch("contextInfo") as string}
                             onChange={(e) =>
-                              setValue("contextInfo", e.target.value)
+                              setValue("contextInfo", e.target.value as any)
                             }
                             className="mt-1.5"
                           />

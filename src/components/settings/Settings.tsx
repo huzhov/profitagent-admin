@@ -18,7 +18,6 @@ import {
   Shield,
   BarChart3,
   MessageSquare,
-  Activity,
   DollarSign,
   Plus,
   CheckCircle2,
@@ -725,7 +724,7 @@ export default function Settings() {
             >
               <CardHeader>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-3">
-                  <Activity className="w-6 h-6 text-green-600" />
+                  <BarChart3 className="w-6 h-6 text-green-600" />
                 </div>
                 <CardTitle>Engagement Quality</CardTitle>
                 <CardDescription>
