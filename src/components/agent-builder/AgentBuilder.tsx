@@ -209,7 +209,7 @@ export default function AgentBuilder() {
   const {
     data: agentData,
     isFetchedAfterMount,
-    isLoading: isAgentLoading,
+    isPending: isAgentLoading,
   } = useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
@@ -217,14 +217,6 @@ export default function AgentBuilder() {
     },
     enabled: isAgentEdit,
   });
-
-  if (isAgentEdit && isAgentLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
 
   useEffect(() => {
     if (isAgentEdit && isFetchedAfterMount) {
@@ -400,6 +392,14 @@ export default function AgentBuilder() {
     }
   };
 
+  if (isAgentEdit && isAgentLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -439,12 +439,6 @@ export default function AgentBuilder() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {/* {isSaved && (
-            <span className="text-green-600 text-sm flex items-center gap-1">
-              <CircleCheck className="w-4 h-4" />
-              Saved
-            </span>
-          )} */}
           <Button
             variant="outline"
             size="sm"
@@ -578,80 +572,6 @@ export default function AgentBuilder() {
                     </CollapsibleContent>
                   </div>
                 </Collapsible>
-
-                {/* Brand & Business */}
-                {/* <Collapsible
-                  open={openSections.brandBusiness}
-                  onOpenChange={(open) =>
-                    setOpenSections({ ...openSections, brandBusiness: open })
-                  }
-                >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
-                      <div className="text-left">
-                        <h3 className="text-gray-900 flex items-center gap-2">
-                          Brand & Business
-                        </h3>
-                        <p className="text-gray-600 text-sm">
-                          Company information and industry
-                        </p>
-                      </div>
-                      <ChevronDown
-                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.brandBusiness ? "" : "-rotate-90"}`}
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
-                        <div>
-                          <Label htmlFor="brand-name">Brand Name*</Label>
-                          <Input
-                            id="brand-name"
-                            placeholder="Your company name"
-                            value={watch("brandName")}
-                            onChange={(e) =>
-                              setValue("brandName", e.target.value, {
-                                shouldValidate: true,
-                              })
-                            }
-                            className="mt-1.5"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="industry">Industry*</Label>
-                          <Select
-                            value={watch("industry")}
-                            onValueChange={(value) =>
-                              setValue("industry", value, {
-                                shouldValidate: true,
-                              })
-                            }
-                          >
-                            <SelectTrigger
-                              id="industry"
-                              className="mt-1.5 w-full"
-                            >
-                              <SelectValue placeholder="Select industry" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="technology">
-                                Technology
-                              </SelectItem>
-                              <SelectItem value="finance">Finance</SelectItem>
-                              <SelectItem value="healthcare">
-                                Healthcare
-                              </SelectItem>
-                              <SelectItem value="retail">Retail</SelectItem>
-                              <SelectItem value="education">
-                                Education
-                              </SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible> */}
 
                 {/* Agent Behavior */}
                 <Collapsible
