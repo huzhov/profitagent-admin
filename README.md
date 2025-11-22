@@ -69,7 +69,7 @@ Remove the proxy (or adjust the environment variable back to an absolute URL) wh
 - React 19 with the Vite 7 build toolchain
 - TypeScript for static typing
 - Shadcn as a design system
-- TanStack Router and TanStack Table for routing and data presentation
+- TanStack for routing and querying
 - Axios, React Hook Form, and Zod for data fetching, forms, and validation
 - Tailwind CSS (via `@tailwindcss/vite`) for utility-first styling
 - Radix UI primitives, shadcn/ui patterns, and lucide/tabler icons for the component system
@@ -80,4 +80,4 @@ Use `npm run build` to generate the static assets under `dist/`. Deploy the cont
 
 ## Swagger UI
 
-Swagger is accessible on https://profitagent.onrender.com/docs
+Swagger is accessible on ${VITE_BACKEND_URL}/docs
