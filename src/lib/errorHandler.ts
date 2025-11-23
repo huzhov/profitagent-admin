@@ -17,6 +17,17 @@ export function setupGlobalErrorHandling() {
     (event: PromiseRejectionEvent) => {
       // Best-effort extraction of a useful message
       const reason = (event as any).reason;
+
+      // Skip errors from axios (they're handled by mutation onError callbacks)
+      if (
+        reason?.status ||
+        reason?.message?.includes("(401)") ||
+        reason?.message?.includes("(404)") ||
+        reason?.message?.includes("(500)")
+      ) {
+        return;
+      }
+
       let message = "An error occurred";
       if (typeof reason === "string") message = reason;
       else if (reason?.message && typeof reason.message === "string")
