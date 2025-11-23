@@ -52,9 +52,13 @@ axiosInstance.interceptors.response.use(
     if (axios.isAxiosError(error)) {
       // Handle 401 Unauthorized - token expired or invalid
       if (error.response?.status === 401) {
-        removeToken();
-        window.location.href = "/login";
-        return Promise.reject(error);
+        // Don't redirect if already on login or signup page
+        const currentPath = window.location.pathname;
+        if (currentPath !== "/login" && currentPath !== "/signup") {
+          removeToken();
+          window.location.href = "/login";
+          return Promise.reject(error);
+        }
       }
 
       const errData = error.response?.data;

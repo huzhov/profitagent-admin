@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -14,9 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signup } from "@/services/auth";
+import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
-import useUserStore from "@/store/user-store";
-import { setToken } from "@/lib/auth";
+import { toast } from "sonner";
 
 const schema = z
   .object({
@@ -37,16 +38,35 @@ const SignupPage = () => {
     defaultValues: { email: "", name: "", password: "", confirmPassword: "" },
     mode: "onSubmit",
   });
-  const { setUser } = useUserStore();
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
 
   const { mutate, isPending } = useMutation({
+    mutationKey: ["signup"],
     mutationFn: async (values: z.infer<typeof schema>) => {
-      const data = await signup(values);
-      setToken(data.token);
-      setUser(data.user);
-      navigate({ to: "/" });
+      await signup(values);
+    },
+    retry: false,
+    onSuccess: () => {
+      toast.success("Account created successfully! Please log in.", {
+        duration: 5000,
+      });
+      navigate({ to: "/login" });
+    },
+    onError: (error: any) => {
+      const message = error?.message || "Failed to create account";
+      toast.error(message, {
+        duration: 5000,
+      });
     },
   });
+
+  const togglePasswordVisibility = () =>
+    setIsPasswordVisible((prevState) => !prevState);
+  const toggleConfirmPasswordVisibility = () =>
+    setIsConfirmPasswordVisible((prevState) => !prevState);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -102,33 +122,67 @@ const SignupPage = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type={isPasswordVisible ? "text" : "password"}
+                        placeholder="••••••••"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-10 end-0 flex items-center z-20 px-2.5 cursor-pointer text-gray-400 rounded-e-md"
+                onClick={togglePasswordVisibility}
+              >
+                {isPasswordVisible ? (
+                  <Eye className="w-4 h-4" />
+                ) : (
+                  <EyeOff className="w-4 h-4" />
+                )}
+              </button>
+            </div>
 
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type={isConfirmPasswordVisible ? "text" : "password"}
+                        placeholder="••••••••"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-10 end-0 flex items-center z-20 px-2.5 cursor-pointer text-gray-400 rounded-e-md"
+                onClick={toggleConfirmPasswordVisibility}
+              >
+                {isConfirmPasswordVisible ? (
+                  <Eye className="w-4 h-4" />
+                ) : (
+                  <EyeOff className="w-4 h-4" />
+                )}
+              </button>
+            </div>
 
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Creating account…" : "Sign up"}

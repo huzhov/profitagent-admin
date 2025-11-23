@@ -19,6 +19,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { setToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
+import { toast } from "sonner";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
@@ -37,11 +38,19 @@ const LoginPage = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const { mutate, isPending } = useMutation({
+    mutationKey: ["login"],
     mutationFn: async (values: z.infer<typeof schema>) => {
       const data = await login(values.email, values.password);
       setToken(data.token);
       setUser(data.user);
       navigate({ to: "/" });
+    },
+    retry: false,
+    onError: (error: any) => {
+      const message = error?.message || "Invalid email or password";
+      toast.error(message, {
+        duration: 5000,
+      });
     },
   });
 
@@ -109,7 +118,11 @@ const LoginPage = () => {
                 className="absolute inset-y-10 end-0 flex items-center z-20 px-2.5 cursor-pointer text-gray-400 rounded-e-md"
                 onClick={toggleVisibility}
               >
-                {isVisible ? <Eye /> : <EyeOff />}
+                {isVisible ? (
+                  <Eye className="w-4 h-4" />
+                ) : (
+                  <EyeOff className="w-4 h-4" />
+                )}
               </button>
             </div>
             <div className="mt-4 text-xs text-muted-foreground">

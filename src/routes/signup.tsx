@@ -4,7 +4,7 @@ import { getToken } from "@/lib/auth";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: async ({}) => {
-    if (!getToken()) {
+    if (getToken()) {
       throw redirect({
         to: "/",
         replace: true,
