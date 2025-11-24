@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { apiJson } from "@/lib/http";
 import { PageHeader } from "@/components/ui/page-header";
+import { Spinner } from "../ui/spinner";
 
 export default function Messages() {
   const [conversationId, setConversationId] = useState<string>("");
@@ -108,8 +109,8 @@ export default function Messages() {
 
       <div className="flex-1 overflow-y-auto rounded-lg border bg-background p-4 space-y-8 scrollbar-thin h-[calc(100vh-16rem)]">
         {loading && (
-          <div className="text-center text-sm text-muted-foreground py-10">
-            Loading…
+          <div className="flex items-center justify-center h-full">
+            <Spinner size="lg" />
           </div>
         )}
         {error && (
@@ -117,7 +118,7 @@ export default function Messages() {
             {error}
           </div>
         )}
-        {Object.keys(groupedMessages).length === 0 && (
+        {!loading && Object.keys(groupedMessages).length === 0 && (
           <div className="text-center text-sm text-muted-foreground py-10">
             No messages.
           </div>
