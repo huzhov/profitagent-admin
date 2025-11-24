@@ -49,7 +49,7 @@ const LoginPage = () => {
     onError: (error: any) => {
       const message = error?.message || "Invalid email or password";
       toast.error(message, {
-        duration: 5000,
+        duration: 3000,
       });
     },
   });

@@ -9,6 +9,7 @@ export function setupGlobalErrorHandling() {
   window.addEventListener("error", (event: ErrorEvent) => {
     const message =
       event.error?.message || event.message || "An error occurred";
+
     toast.error(message);
   });
 
@@ -33,6 +34,7 @@ export function setupGlobalErrorHandling() {
       else if (reason?.message && typeof reason.message === "string")
         message = reason.message;
       else if (reason instanceof Error) message = reason.message;
+
       toast.error(message);
     }
   );

@@ -16,9 +16,8 @@ import {
 import { useState, useRef, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useApp } from "@/context/AppContext";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { getAgent } from "@/services/agents";
-import { Spinner } from "@/components/ui/spinner";
 
 interface Message {
   id: string;
@@ -73,7 +72,7 @@ export function AgentPreview() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ["agents"],
     queryFn: async () => {
       const data = await getAgent(id);
@@ -178,14 +177,6 @@ export function AgentPreview() {
     setInputValue("");
     setIsTyping(false);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
 
   if (!data) {
     return (

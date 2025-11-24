@@ -32,7 +32,7 @@ if (!rootElement.innerHTML) {
       <AppProvider>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
-          <Toaster position="bottom-center" richColors />
+          <Toaster position="bottom-center" richColors visibleToasts={1} />
         </QueryClientProvider>
       </AppProvider>
     </StrictMode>
