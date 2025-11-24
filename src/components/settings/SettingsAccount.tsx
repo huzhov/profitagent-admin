@@ -147,6 +147,7 @@ export default function SettingsAccount() {
       mutationFn: createWhatsAppIntegration,
       onSuccess: () => {
         waForm.reset();
+        toast.dismiss();
         toast.success("Added WhatsApp account successfully");
         refetch();
       },

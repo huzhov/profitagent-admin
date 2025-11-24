@@ -149,6 +149,7 @@ export default function AgentBuilder() {
     useMutation({
       mutationFn: createAgent,
       onSuccess: (data) => {
+        toast.dismiss();
         toast.success("Agent has been created successfully");
         navigate({ to: `/agents/${data.id}/view` });
       },
@@ -156,7 +157,7 @@ export default function AgentBuilder() {
         // Handle specific error types
         if (error.response?.status === 500) {
           const errorData = error.response?.data;
-
+          toast.dismiss();
           if (errorData?.error === "PrismaClientKnownRequestError") {
             toast.error(
               "Database error: The selected WhatsApp integration may not be valid or accessible. Please verify your WhatsApp number selection.",
@@ -292,6 +293,7 @@ export default function AgentBuilder() {
   };
 
   const handleFileUpload = async (file: File) => {
+    toast.dismiss();
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
       try {
         // Validate CSV structure
@@ -357,6 +359,7 @@ export default function AgentBuilder() {
   };
 
   const onError = (errors: FieldErrors<AgentFormValues>) => {
+    toast.dismiss();
     // Auto-open sections with errors
     const updatedSections = { ...openSections };
     if (errors.agentName || errors.description || errors.objective) {

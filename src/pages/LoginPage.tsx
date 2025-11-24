@@ -48,6 +48,7 @@ const LoginPage = () => {
     retry: false,
     onError: (error: any) => {
       const message = error?.message || "Invalid email or password";
+      toast.dismiss();
       toast.error(message, {
         duration: 5000,
       });

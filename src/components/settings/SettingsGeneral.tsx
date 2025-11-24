@@ -146,6 +146,7 @@ export default function SettingsGeneral() {
 
   const handleCreateBusiness = async (values: BusinessFormValues) => {
     setSubmitting(true);
+    toast.dismiss();
     try {
       // Create business via API
       const newBusiness = await createBusiness({

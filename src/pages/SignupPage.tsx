@@ -50,6 +50,7 @@ const SignupPage = () => {
     },
     retry: false,
     onSuccess: () => {
+      toast.dismiss();
       toast.success("Account created successfully! Please log in.", {
         duration: 5000,
       });
@@ -57,6 +58,7 @@ const SignupPage = () => {
     },
     onError: (error: any) => {
       const message = error?.message || "Failed to create account";
+      toast.dismiss();
       toast.error(message, {
         duration: 5000,
       });
