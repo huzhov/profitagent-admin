@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
-import { ArrowLeft, ChevronDown, Upload } from "lucide-react";
+import { ArrowLeft, ChevronDown, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -145,42 +145,43 @@ export default function AgentBuilder() {
   const progress = 0; // Calculate based on filled fields
 
   // Creating agent function
-  const { mutate: createAgentFn } = useMutation({
-    mutationFn: createAgent,
-    onSuccess: (data) => {
-      toast.success("Agent has been created successfully");
-      navigate({ to: `/agents/${data.id}/view` });
-    },
-    onError: (error: AxiosError<{ error?: string; message?: string }>) => {
-      // Handle specific error types
-      if (error.response?.status === 500) {
-        const errorData = error.response?.data;
+  const { mutate: createAgentFn, isPending: isCreateAgentPending } =
+    useMutation({
+      mutationFn: createAgent,
+      onSuccess: (data) => {
+        toast.success("Agent has been created successfully");
+        navigate({ to: `/agents/${data.id}/view` });
+      },
+      onError: (error: AxiosError<{ error?: string; message?: string }>) => {
+        // Handle specific error types
+        if (error.response?.status === 500) {
+          const errorData = error.response?.data;
 
-        if (errorData?.error === "PrismaClientKnownRequestError") {
+          if (errorData?.error === "PrismaClientKnownRequestError") {
+            toast.error(
+              "Database error: The selected WhatsApp integration may not be valid or accessible. Please verify your WhatsApp number selection.",
+              { duration: 5000 }
+            );
+          } else {
+            toast.error(
+              "Server error occurred while creating the agent. Please try again or contact support.",
+              { duration: 5000 }
+            );
+          }
+        } else if (error.response?.status === 400) {
           toast.error(
-            "Database error: The selected WhatsApp integration may not be valid or accessible. Please verify your WhatsApp number selection.",
+            error.response?.data?.message ||
+              "Invalid data provided. Please check all required fields.",
             { duration: 5000 }
           );
         } else {
           toast.error(
-            "Server error occurred while creating the agent. Please try again or contact support.",
+            "Failed to create agent. Please check your connection and try again.",
             { duration: 5000 }
           );
         }
-      } else if (error.response?.status === 400) {
-        toast.error(
-          error.response?.data?.message ||
-            "Invalid data provided. Please check all required fields.",
-          { duration: 5000 }
-        );
-      } else {
-        toast.error(
-          "Failed to create agent. Please check your connection and try again.",
-          { duration: 5000 }
-        );
-      }
-    },
-  });
+      },
+    });
 
   // Upload function
   const { mutate: uploadFileFn } = useMutation({
@@ -206,11 +207,7 @@ export default function AgentBuilder() {
     },
   });
 
-  const {
-    data: agentData,
-    isFetchedAfterMount,
-    isPending: isAgentLoading,
-  } = useQuery({
+  const { data: agentData, isPending: isAgentLoading } = useQuery({
     queryKey: ["agents"],
     queryFn: async () => {
       return await getAgent(id);
@@ -219,7 +216,7 @@ export default function AgentBuilder() {
   });
 
   useEffect(() => {
-    if (isAgentEdit && isFetchedAfterMount) {
+    if (agentData) {
       setValue("agentName", agentData?.name || "");
       setValue("description", agentData?.description || "");
       setValue("systemPrompt", agentData?.systemPrompt || "");
@@ -230,7 +227,7 @@ export default function AgentBuilder() {
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
     }
-  }, [isFetchedAfterMount]);
+  }, [agentData]);
 
   const validateCSV = async (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -309,6 +306,7 @@ export default function AgentBuilder() {
         });
 
         toast.success("CSV file validated and ready to upload");
+        setCsvValidationError(null);
       } catch {
         setUploadedFile(null);
         toast.error("CSV validation failed. Please check the file format.");
@@ -446,8 +444,18 @@ export default function AgentBuilder() {
           >
             Cancel
           </Button>
-          <Button size="sm" onClick={handleSubmit(onSubmit, onError)}>
-            Save Agent
+          <Button
+            size="sm"
+            onClick={handleSubmit(onSubmit, onError)}
+            disabled={isCreateAgentPending}
+          >
+            {isCreateAgentPending ? (
+              <div className="w-18 flex justify-center">
+                <Loader2 className="animate-spin" />
+              </div>
+            ) : (
+              "Save Agent"
+            )}
           </Button>
         </div>
       </div>
