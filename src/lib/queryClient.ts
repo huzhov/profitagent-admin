@@ -21,7 +21,9 @@ const handleOnError = (error: HttpError) => {
     location.replace("/login");
   }
   toast.dismiss();
-  toast.error(error.message);
+  toast.error(error.message.replace("(401)", ""), {
+    duration: 3000,
+  });
 };
 
 export const queryClient = new QueryClient({
