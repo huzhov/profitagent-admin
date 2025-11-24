@@ -21,9 +21,9 @@ import {
   Info,
   Settings as SettingsIcon,
   Save,
-  Facebook,
   RefreshCw,
   Unplug,
+  Loader2,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,6 +60,8 @@ import {
 import { toast } from "sonner";
 import { useBusiness } from "@/context/AppContext";
 import { formatDistanceToNow } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
+import { MetaIcon } from "@/components/assets";
 
 const waAccountSchema = z.object({
   waBusinessPortfolioId: z
@@ -130,21 +132,26 @@ function AccountSettings() {
     return () => window.removeEventListener("message", handler);
   }, []);
 
-  const { data: whatsAppListData, refetch } = useQuery({
+  const {
+    data: whatsAppListData,
+    isLoading: isWhatsAppListLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["whatsAppList"],
     queryFn: async () => {
       return await listWhatsAppIntegrations();
     },
   });
 
-  const { mutate: createWhatsAppFn } = useMutation({
-    mutationFn: createWhatsAppIntegration,
-    onSuccess: () => {
-      waForm.reset();
-      toast.success("Added WhatsApp account successfully");
-      refetch();
-    },
-  });
+  const { mutate: createWhatsAppFn, isPending: isCreateWhatAppPending } =
+    useMutation({
+      mutationFn: createWhatsAppIntegration,
+      onSuccess: () => {
+        waForm.reset();
+        toast.success("Added WhatsApp account successfully");
+        refetch();
+      },
+    });
 
   const { mutate: exchangeWhatsAppTokenFn } = useMutation({
     mutationFn: exchangeWhatsAppToken,
@@ -246,49 +253,71 @@ function AccountSettings() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {whatsAppListData?.map((connection, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <MessageSquare className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{connection.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        +{connection.displayPhoneNumber} • WABA ID:{" "}
-                        {connection.wabaId}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {connection.status === "enabled" ? (
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                        Connected
-                      </Badge>
-                    ) : (
-                      <Badge variant="destructive">
-                        <AlertCircle className="w-3 h-3 mr-1" />
-                        Error
-                      </Badge>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(connection.lastSyncedAt)}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleManageConnection(connection)}
+              {isWhatsAppListLoading
+                ? [1, 2, 3]?.map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-4 border rounded-lg"
                     >
-                      <SettingsIcon className="w-4 h-4 mr-2" />
-                      Manage
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                          <Skeleton className="w-10 h-10" />
+                        </div>
+                        <div>
+                          <Skeleton className="w-20 h-5" />
+                          <Skeleton className="w-50 h-5 mt-1" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="w-20 h-5 mr-1" />
+                        <Skeleton className="w-15 h-5 mr-1" />
+                        <Skeleton className="w-20 h-5 mr-2" />
+                      </div>
+                    </div>
+                  ))
+                : whatsAppListData?.map((connection, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <MessageSquare className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{connection.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            +{connection.displayPhoneNumber} • WABA ID:{" "}
+                            {connection.wabaId}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {connection.status === "enabled" ? (
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            Connected
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive">
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            Error
+                          </Badge>
+                        )}
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(connection.lastSyncedAt)} ago
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleManageConnection(connection)}
+                        >
+                          <SettingsIcon className="w-4 h-4 mr-2" />
+                          Manage
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
             </div>
           </CardContent>
         </Card>
@@ -338,8 +367,8 @@ function AccountSettings() {
                         className="w-fit bg-blue-600 hover:bg-blue-700"
                         onClick={launchWhatsAppSignup}
                       >
-                        <Facebook className="w-4 h-4 mr-2" />
-                        Login with Facebook
+                        <MetaIcon className="w-4 h-4 mr-2" />
+                        Login with Meta
                       </Button>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -454,8 +483,17 @@ function AccountSettings() {
 
                   <Separator />
                   <div className="flex justify-end">
-                    <Button type="submit" disabled={!waForm.formState.isValid}>
-                      <Plus className="w-4 h-4 mr-2" />
+                    <Button
+                      type="submit"
+                      disabled={
+                        !waForm.formState.isValid || isCreateWhatAppPending
+                      }
+                    >
+                      {isCreateWhatAppPending ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Plus className="w-4 h-4 mr-2" />
+                      )}
                       Add WhatsApp Account
                     </Button>
                   </div>
@@ -561,7 +599,7 @@ function AccountSettings() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Last Sync</span>
                   <span>
-                    {formatDistanceToNow(selectedConnection.lastSyncedAt)}
+                    {formatDistanceToNow(selectedConnection.lastSyncedAt)} ago
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
