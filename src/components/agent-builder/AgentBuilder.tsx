@@ -53,6 +53,7 @@ export default function AgentBuilder() {
     handleSubmit,
     setValue,
     watch,
+    setError,
     formState: { errors },
   } = useForm<AgentFormValues>({
     resolver: resolver,
@@ -175,11 +176,13 @@ export default function AgentBuilder() {
               "Invalid data provided. Please check all required fields.",
             { duration: 5000 }
           );
-        } else {
-          toast.error(
-            "Failed to create agent. Please check your connection and try again.",
-            { duration: 5000 }
-          );
+        }
+
+        if (error?.message === "Agent with this name already exists (403)") {
+          setError("agentName", {
+            type: "manual",
+            message: "Agent with this name already exists",
+          });
         }
       },
     });
