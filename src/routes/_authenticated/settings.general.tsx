@@ -62,6 +62,7 @@ import { BusinessVertical } from "@/components/agent-builder/types";
 import { useBusiness, useApp } from "@/context/AppContext";
 import { createBusiness } from "@/services/business";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const businessFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -302,10 +303,26 @@ function GeneralSettings() {
           </CardHeader>
           <CardContent>
             {businessLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <p className="text-sm text-muted-foreground">
-                  Loading business...
-                </p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Business Name</Label>
+                    <Skeleton className="w-25 h-5" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">
+                      Industry Vertical
+                    </Label>
+                    <Skeleton className="w-25 h-5" />
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex justify-end">
+                  <Button variant="outline" size="sm" disabled>
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Edit Business
+                  </Button>
+                </div>
               </div>
             ) : business ? (
               <div className="space-y-4">
