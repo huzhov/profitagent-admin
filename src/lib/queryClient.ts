@@ -20,7 +20,7 @@ const handleOnError = (error: HttpError) => {
     localStorage.clear();
     location.replace("/login");
   }
-  toast.dismiss();
+
   toast.error(error.message.replace("(401)", ""), {
     duration: 3000,
   });

@@ -19,6 +19,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { setToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
+import { toast } from "sonner";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
@@ -45,6 +46,12 @@ const LoginPage = () => {
       navigate({ to: "/" });
     },
     retry: false,
+    onError: (error: any) => {
+      const message = error?.message || "Invalid email or password";
+      toast.error(message, {
+        duration: 3000,
+      });
+    },
   });
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
