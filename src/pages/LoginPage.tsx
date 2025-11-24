@@ -19,7 +19,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { setToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
-import { toast } from "sonner";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
