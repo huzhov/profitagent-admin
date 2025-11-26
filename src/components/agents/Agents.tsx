@@ -35,6 +35,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getAgentList } from "@/services/agents";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBusiness } from "@/context/AppContext";
+import StatsCards from "../common/StatsCards";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -79,65 +80,7 @@ export default function Agents() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center gap-2">
-              <Bot className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-muted-foreground">
-                Total Agents
-              </span>
-            </div>
-            <p className="text-2xl font-semibold">{data?.length ?? 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-muted-foreground">
-                Active Tests
-              </span>
-            </div>
-            <p className="text-2xl font-semibold">
-              {agents.reduce((sum, agent) => sum + agent.tests, 0)}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-muted-foreground">Visits</span>
-            </div>
-            <p className="text-2xl font-semibold">
-              {totalConversations.toLocaleString()}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-orange-600" />
-              <span className="text-sm text-muted-foreground">Engagements</span>
-            </div>
-            <p className="text-2xl font-semibold">{avgConversion.toFixed(0)}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center gap-2">
-              <MousePointerClick className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm text-muted-foreground">Clicks</span>
-            </div>
-            <p className="text-2xl font-semibold">0</p>
-          </CardContent>
-        </Card>
-      </div>
+      <StatsCards totalAgent={data?.length ?? 0} />
 
       {/* Agents Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

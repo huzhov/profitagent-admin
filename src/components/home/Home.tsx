@@ -6,21 +6,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
-import {
-  Plus,
-  Bot,
-  MessageSquare,
-  TrendingUp,
-  DollarSign,
-  Zap,
-  Users,
-} from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
+import StatsCards from "@/components/common/StatsCards";
+import { useQuery } from "@tanstack/react-query";
+import { getAgentList } from "@/services/agents";
+import { useBusiness } from "@/context/AppContext";
+import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "../ui/skeleton";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { business } = useBusiness();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["agentsList"],
+    queryFn: async () => {
+      const data = await getAgentList();
+      return data;
+    },
+    enabled: business !== null,
+  });
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -34,59 +41,7 @@ export default function Home() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active Agents</p>
-                <p className="text-2xl font-semibold">0</p>
-              </div>
-              <Bot className="w-8 h-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Total Conversations
-                </p>
-                <p className="text-2xl font-semibold">0</p>
-              </div>
-              <MessageSquare className="w-8 h-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Conversion Rate</p>
-                <p className="text-2xl font-semibold">0%</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="py-0 shadow-none rounded-xl border">
-          <CardContent className="[&:last-child]:pb-6 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Revenue Generated
-                </p>
-                <p className="text-2xl font-semibold">$0</p>
-              </div>
-              <DollarSign className="w-8 h-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StatsCards totalAgent={data?.length ?? 0} />
 
       {/* Recent Agents and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -102,71 +57,78 @@ export default function Home() {
               variant="outline"
               size="sm"
               className="shadow-none cursor-pointer"
+              onClick={() => navigate({ to: "/agents" })}
             >
               View All
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="items-center justify-center">
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                    <Bot className="w-5 h-5" />
+              {isLoading ? (
+                [1, 2, 3].map((d) => (
+                  <div
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                    key={d}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+                        <Skeleton className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <Skeleton className="w-15 h-6" />
+                        <Skeleton className="w-25 h-4 mt-1" />
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Skeleton className="w-15 h-6" />
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">SalesBot Pro</p>
-                    <p className="text-sm text-muted-foreground">
-                      1,247 conversations
+                ))
+              ) : data ? (
+                data?.slice(0, 3)?.map((agent, index) => (
+                  <div
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                    key={index}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+                        <Bot className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{agent.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          0 conversations
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge>
+                        {agent.status === "disabled" ? "Paused" : "Active"}
+                      </Badge>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center">
+                  <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                    <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4">
+                      <Bot className="w-6 h-6 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-medium mb-2">Create New Agent</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Set up a new AI agent to handle customer interactions and
+                      drive conversions
                     </p>
+                    <Button
+                      data-slot="button"
+                      onClick={() => navigate({ to: "/agents/create" })}
+                      className="cursor-pointer"
+                    >
+                      Get Started
+                    </Button>
                   </div>
                 </div>
-                <div className="text-right">
-                  <Badge>Active</Badge>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    2 mins ago
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                    <Bot className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Support Assistant</p>
-                    <p className="text-sm text-muted-foreground">
-                      892 conversations
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Badge>Active</Badge>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    5 mins ago
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-                    <Bot className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Lead Qualifier</p>
-                    <p className="text-sm text-muted-foreground">
-                      634 conversations
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Badge variant="secondary">Paused</Badge>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    1 hour ago
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -188,6 +150,7 @@ export default function Home() {
             <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
+              onClick={() => navigate({ to: "/messages" })}
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               View Messages
@@ -195,17 +158,18 @@ export default function Home() {
             <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
+              onClick={() => navigate({ to: "/intelligence" })}
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               Analytics Dashboard
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
             >
               <Users className="w-4 h-4 mr-2" />
               Browse Templates
-            </Button>
+            </Button> */}
           </CardContent>
         </Card>
       </div>
@@ -251,7 +215,7 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Increase sales with personalized recommendations, dynamic pricing,
+              Increase sales with personalised recommendations, dynamic pricing,
               and targeted offers.
             </p>
           </CardContent>
