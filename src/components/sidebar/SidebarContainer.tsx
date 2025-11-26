@@ -1,7 +1,6 @@
 import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
-import { Button } from "../ui/button";
-import { Plus, Power } from "lucide-react";
+import { Power } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { removeToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";

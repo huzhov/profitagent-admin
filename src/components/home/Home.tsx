@@ -102,9 +102,9 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge>
+                      {/* <Badge>
                         {agent.status === "disabled" ? "Paused" : "Active"}
-                      </Badge>
+                      </Badge> */}
                     </div>
                   </div>
                 ))

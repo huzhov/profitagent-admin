@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Unplug,
   Loader2,
+  Building2,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,18 +50,33 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { createBusiness } from "@/services/business";
 import {
   createWhatsAppIntegration,
   exchangeWhatsAppToken,
   listWhatsAppIntegrations,
 } from "@/services/integrations";
+import {
+  Empty,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
 import { toast } from "sonner";
-import { useBusiness } from "@/context/AppContext";
+import { useBusiness, useApp } from "@/context/AppContext";
 import { formatDistanceToNow } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MetaIcon } from "@/components/assets";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BusinessVertical } from "@/components/agent-builder/types";
 
 const waAccountSchema = z.object({
   waBusinessPortfolioId: z
@@ -84,10 +100,17 @@ const waAccountSchema = z.object({
 
 type WaAccountFormValues = z.infer<typeof waAccountSchema>;
 
+const businessFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  vertical: z.string().min(1, "Vertical is required"),
+});
+
+type BusinessFormValues = z.infer<typeof businessFormSchema>;
+
 export default function SettingsAccount() {
-  const { business } = useBusiness();
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<any>(null);
+  const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
 
   const waForm = useForm<WaAccountFormValues>({
     resolver: zodResolver(waAccountSchema),
@@ -209,9 +232,165 @@ export default function SettingsAccount() {
     createWhatsAppFn(values);
   };
 
+  const {
+    business,
+    setBusiness,
+    fetchBusiness,
+    loading: businessLoading,
+  } = useBusiness();
+  const { user, setUser } = useApp();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [highlightBusiness, setHighlightBusiness] = useState(false);
+  const businessCardRef = useRef<HTMLDivElement>(null);
+
+  const businessForm = useForm<BusinessFormValues>({
+    resolver: zodResolver(businessFormSchema),
+    defaultValues: { name: "", vertical: "" },
+    mode: "onChange",
+  });
+
+  // Fetch business data when user changes or component mounts
+  useEffect(() => {
+    fetchBusiness(user);
+  }, [user?.businessId, fetchBusiness]);
+
+  // Handle hash navigation and highlight
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === "#business-settings") {
+      // Scroll to the section
+      businessCardRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Trigger highlight animation
+      setHighlightBusiness(true);
+      const timer = setTimeout(() => {
+        setHighlightBusiness(false);
+      }, 2000); // Remove highlight after 2 seconds (2 pulses)
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleCreateBusiness = async (values: BusinessFormValues) => {
+    setSubmitting(true);
+
+    try {
+      // Create business via API
+      const newBusiness = await createBusiness({
+        name: values.name,
+        vertical: values.vertical,
+      });
+
+      // Update business in Zustand store
+      setBusiness(newBusiness);
+
+      // Update user with businessId
+      if (user && newBusiness.id) {
+        const updatedUser = { ...user, businessId: newBusiness.id };
+        setUser(updatedUser);
+      }
+
+      toast.success("Business created successfully!");
+      setIsBusinessModalOpen(false);
+      businessForm.reset();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create business");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <SettingsLayout>
       <div className="space-y-6">
+        <Card
+          ref={businessCardRef}
+          className={`shadow-none ${
+            highlightBusiness
+              ? "animate-heartbeat ring-2 ring-blue-500 ring-offset-4 bg-blue-50/50 shadow-lg shadow-blue-200/50"
+              : ""
+          }`}
+          id="business-settings"
+        >
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Business Settings
+            </CardTitle>
+            <CardDescription>
+              Manage your business details and information
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {businessLoading ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Business Name</Label>
+                    <Skeleton className="w-25 h-5" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">
+                      Industry Vertical
+                    </Label>
+                    <Skeleton className="w-25 h-5" />
+                  </div>
+                </div>
+                {/* <Separator />
+                <div className="flex justify-end">
+                  <Button variant="outline" size="sm" disabled>
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Edit Business
+                  </Button>
+                </div> */}
+              </div>
+            ) : business ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Business Name</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {business.name}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">
+                      Industry Vertical
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {business.vertical}
+                    </p>
+                  </div>
+                </div>
+                {/* <Separator />
+                <div className="flex justify-end">
+                  <Button variant="outline" size="sm">
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Edit Business
+                  </Button>
+                </div> */}
+              </div>
+            ) : (
+              <Empty>
+                <EmptyTitle>No business assigned</EmptyTitle>
+                <EmptyDescription>
+                  You haven't created a business yet. Set up your business to
+                  get started.
+                </EmptyDescription>
+                <EmptyContent>
+                  <Button onClick={() => setIsBusinessModalOpen(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Business
+                  </Button>
+                </EmptyContent>
+              </Empty>
+            )}
+          </CardContent>
+        </Card>
         {/* Information Alert when no business exists */}
         {!business && (
           <Card className="shadow-none border-blue-200 bg-blue-50">
@@ -223,16 +402,9 @@ export default function SettingsAccount() {
                     Business Setup Required
                   </p>
                   <p className="text-sm text-blue-700">
-                    You need to create a business in the{" "}
-                    <a
-                      href="/settings/general#business-settings"
-                      className="underline font-medium hover:text-blue-900"
-                    >
-                      General Settings
-                    </a>{" "}
-                    before you can add WhatsApp Business Accounts. Once your
-                    business is created, the option to add WhatsApp accounts
-                    will appear below.
+                    You need to create a business before you can add WhatsApp
+                    Business Accounts. Once your business is created, the option
+                    to add WhatsApp accounts will appear below.
                   </p>
                 </div>
               </div>
@@ -503,6 +675,111 @@ export default function SettingsAccount() {
           </Card>
         )}
       </div>
+
+      {/* Business Modal */}
+      <Dialog open={isBusinessModalOpen} onOpenChange={setIsBusinessModalOpen}>
+        <DialogContent className="max-w-md w-full">
+          <DialogHeader>
+            <DialogTitle>Add Business</DialogTitle>
+            <DialogDescription>
+              Set up your business information
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...businessForm}>
+            <form
+              className="space-y-6 mt-4"
+              onSubmit={businessForm.handleSubmit(handleCreateBusiness)}
+            >
+              <FormField
+                control={businessForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="business-name">Business Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="business-name"
+                        placeholder="Enter business name"
+                        className="mt-1"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={businessForm.control}
+                name="vertical"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="business-vertical">
+                      Industry Vertical
+                    </FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      defaultValue={undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select industry category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={BusinessVertical.Entertainment}>
+                          Entertainment
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Ecommerce}>
+                          E-commerce
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Saas}>
+                          SaaS
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Retail}>
+                          Retail
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Healthcare}>
+                          Healthcare
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Finance}>
+                          Finance
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Education}>
+                          Education
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.Travel}>
+                          Travel & Hospitality
+                        </SelectItem>
+                        <SelectItem value={BusinessVertical.RealEstate}>
+                          Real Estate
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsBusinessModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submitting || !businessForm.formState.isValid}
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Create Business
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       {/* Manage Connection Modal */}
       <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>

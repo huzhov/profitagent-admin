@@ -1,9 +1,9 @@
 import {
   House,
   Bot,
-  Workflow,
-  FlaskConical,
-  ChartColumn,
+  // Workflow,
+  // FlaskConical,
+  // ChartColumn,
   Zap,
   MessageSquare,
   Settings,
@@ -45,12 +45,12 @@ export default function SidebarNavigation() {
     //   icon: ChartColumn,
     //   route: "/templates",
     // },
-    // {
-    //   id: "intelligence",
-    //   title: "Intelligence",
-    //   icon: Zap,
-    //   route: "/intelligence",
-    // },
+    {
+      id: "intelligence",
+      title: "Intelligence",
+      icon: Zap,
+      route: "/intelligence",
+    },
     {
       id: "messages",
       title: "Messages",

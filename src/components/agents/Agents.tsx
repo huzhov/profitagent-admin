@@ -14,12 +14,9 @@ import {
   EllipsisVertical,
   Eye,
   FlaskConical,
-  MessageSquare,
   Pause,
   Play,
   Plus,
-  TrendingUp,
-  MousePointerClick,
   Workflow,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -51,13 +48,13 @@ export default function Agents() {
     enabled: business !== null,
   });
 
-  const totalConversations = agents.reduce(
-    (sum, agent) => sum + agent.conversations,
-    0
-  );
-  const avgConversion =
-    agents.reduce((sum, agent) => sum + parseFloat(agent.conversionRate), 0) /
-    agents.length;
+  // const totalConversations = agents.reduce(
+  //   (sum, agent) => sum + agent.conversations,
+  //   0
+  // );
+  // const avgConversion =
+  //   agents.reduce((sum, agent) => sum + parseFloat(agent.conversionRate), 0) /
+  //   agents.length;
 
   const getIconColorClass = (color: string) => {
     const colorMap: { [key: string]: string } = {
