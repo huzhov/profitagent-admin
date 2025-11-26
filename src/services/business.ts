@@ -66,3 +66,18 @@ export async function getCurrentUserBusiness(user: {
     return null;
   }
 }
+
+/**
+ * Check if a business exists by name
+ */
+export async function checkIfBusinessExists(
+  name: string
+): Promise<{ exists: boolean }> {
+  const { data } = await axiosInstance.get<{ exists: boolean }>(
+    `/businesses/exists`,
+    {
+      params: { name },
+    }
+  );
+  return data;
+}
