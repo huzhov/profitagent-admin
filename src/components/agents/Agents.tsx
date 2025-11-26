@@ -45,7 +45,7 @@ export default function Agents() {
       const data = await getAgentList();
       return data;
     },
-    enabled: business !== null,
+    enabled: !business,
   });
 
   // const totalConversations = agents.reduce(
