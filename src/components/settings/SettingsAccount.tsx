@@ -111,6 +111,23 @@ export default function SettingsAccount() {
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<any>(null);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
+  const {
+    business,
+    setBusiness,
+    fetchBusiness,
+    loading: businessLoading,
+  } = useBusiness();
+  const { user, setUser } = useApp();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [highlightBusiness, setHighlightBusiness] = useState(false);
+  const businessCardRef = useRef<HTMLDivElement>(null);
+
+  const businessForm = useForm<BusinessFormValues>({
+    resolver: zodResolver(businessFormSchema),
+    defaultValues: { name: "", vertical: "" },
+    mode: "onChange",
+  });
 
   const waForm = useForm<WaAccountFormValues>({
     resolver: zodResolver(waAccountSchema),
@@ -152,6 +169,31 @@ export default function SettingsAccount() {
 
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
+  }, []);
+
+  // Fetch business data when user changes or component mounts
+  useEffect(() => {
+    fetchBusiness(user);
+  }, [user?.businessId, fetchBusiness]);
+
+  // Handle hash navigation and highlight
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === "#business-settings") {
+      // Scroll to the section
+      businessCardRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Trigger highlight animation
+      setHighlightBusiness(true);
+      const timer = setTimeout(() => {
+        setHighlightBusiness(false);
+      }, 2000); // Remove highlight after 2 seconds (2 pulses)
+
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const {
@@ -231,49 +273,6 @@ export default function SettingsAccount() {
     // Handle form submission
     createWhatsAppFn(values);
   };
-
-  const {
-    business,
-    setBusiness,
-    fetchBusiness,
-    loading: businessLoading,
-  } = useBusiness();
-  const { user, setUser } = useApp();
-
-  const [submitting, setSubmitting] = useState(false);
-  const [highlightBusiness, setHighlightBusiness] = useState(false);
-  const businessCardRef = useRef<HTMLDivElement>(null);
-
-  const businessForm = useForm<BusinessFormValues>({
-    resolver: zodResolver(businessFormSchema),
-    defaultValues: { name: "", vertical: "" },
-    mode: "onChange",
-  });
-
-  // Fetch business data when user changes or component mounts
-  useEffect(() => {
-    fetchBusiness(user);
-  }, [user?.businessId, fetchBusiness]);
-
-  // Handle hash navigation and highlight
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash === "#business-settings") {
-      // Scroll to the section
-      businessCardRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-
-      // Trigger highlight animation
-      setHighlightBusiness(true);
-      const timer = setTimeout(() => {
-        setHighlightBusiness(false);
-      }, 2000); // Remove highlight after 2 seconds (2 pulses)
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   const handleCreateBusiness = async (values: BusinessFormValues) => {
     setSubmitting(true);

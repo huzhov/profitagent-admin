@@ -20,6 +20,7 @@ import { LogoIcon } from "@/components/assets/index";
 import { setToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
 import { toast } from "sonner";
+import { useBusiness } from "@/context/AppContext";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
@@ -37,15 +38,20 @@ const LoginPage = () => {
 
   const [isVisible, setIsVisible] = useState(false);
 
+  const { fetchBusiness } = useBusiness();
+
   const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
     mutationFn: async (values: z.infer<typeof schema>) => {
-      const data = await login(values.email, values.password);
-      setToken(data.token);
-      setUser(data.user);
-      navigate({ to: "/" });
+      return await login(values.email, values.password);
     },
     retry: false,
+    onSuccess: (data) => {
+      setToken(data.token);
+      setUser(data.user);
+      fetchBusiness(data.user);
+      navigate({ to: "/" });
+    },
     onError: (error: any) => {
       const message = error?.message || "Invalid email or password";
       toast.error(message, {

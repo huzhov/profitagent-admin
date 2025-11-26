@@ -14,6 +14,9 @@ import {
 import { apiJson } from "@/lib/http";
 import { PageHeader } from "@/components/ui/page-header";
 import { Spinner } from "../ui/spinner";
+import { useBusiness } from "@/context/AppContext";
+import { Card, CardContent } from "@/components/ui/card";
+import { Info } from "lucide-react";
 
 export default function Messages() {
   const [conversationId, setConversationId] = useState<string>("");
@@ -22,60 +25,66 @@ export default function Messages() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { business } = useBusiness();
+
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        setLoading(true);
-        const convs = await apiJson<Conversation[]>(
-          `${import.meta.env.VITE_BACKEND_URL}/conversations`
-        );
-        if (!alive) return;
-        setConversations(convs);
-        // default to most recent conversation
-        if (convs.length && !conversationId) {
-          const first = convs[0].id;
-          setConversationId(first);
-          const msgs = await apiJson<GroupedMessages>(
-            `${import.meta.env.VITE_BACKEND_URL}/messages?conversationId=${first}`
+    if (!business === null) {
+      let alive = true;
+      (async () => {
+        try {
+          setLoading(true);
+          const convs = await apiJson<Conversation[]>(
+            `${import.meta.env.VITE_BACKEND_URL}/conversations`
           );
           if (!alive) return;
-          setGroupedMessages(msgs);
+          setConversations(convs);
+          // default to most recent conversation
+          if (convs.length && !conversationId) {
+            const first = convs[0].id;
+            setConversationId(first);
+            const msgs = await apiJson<GroupedMessages>(
+              `${import.meta.env.VITE_BACKEND_URL}/messages?conversationId=${first}`
+            );
+            if (!alive) return;
+            setGroupedMessages(msgs);
+          }
+        } catch (e: any) {
+          if (!alive) return;
+          setError(e?.message ?? "Failed to load data");
+        } finally {
+          if (alive) setLoading(false);
         }
-      } catch (e: any) {
-        if (!alive) return;
-        setError(e?.message ?? "Failed to load data");
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
+      })();
+      return () => {
+        alive = false;
+      };
+    }
   }, []);
 
   // Fetch messages when conversation changes (from dropdown)
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      if (!conversationId) return;
-      try {
-        setLoading(true);
-        const msgs = await apiJson<GroupedMessages>(
-          `${import.meta.env.VITE_BACKEND_URL}/messages?conversationId=${conversationId}`
-        );
-        if (!alive) return;
-        setGroupedMessages(msgs);
-      } catch (e: any) {
-        if (!alive) return;
-        setError(e?.message ?? "Failed to load messages");
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
+    if (!business === null) {
+      let alive = true;
+      (async () => {
+        if (!conversationId) return;
+        try {
+          setLoading(true);
+          const msgs = await apiJson<GroupedMessages>(
+            `${import.meta.env.VITE_BACKEND_URL}/messages?conversationId=${conversationId}`
+          );
+          if (!alive) return;
+          setGroupedMessages(msgs);
+        } catch (e: any) {
+          if (!alive) return;
+          setError(e?.message ?? "Failed to load messages");
+        } finally {
+          if (alive) setLoading(false);
+        }
+      })();
+      return () => {
+        alive = false;
+      };
+    }
   }, [conversationId]);
 
   return (
@@ -92,7 +101,11 @@ export default function Messages() {
           <label className="text-xs font-medium text-muted-foreground pl-1">
             Conversation
           </label>
-          <Select value={conversationId} onValueChange={setConversationId}>
+          <Select
+            value={conversationId}
+            onValueChange={setConversationId}
+            disabled={conversations.length === 0}
+          >
             <SelectTrigger className="min-w-[200px]">
               <SelectValue placeholder="Select conversation" />
             </SelectTrigger>
@@ -108,68 +121,98 @@ export default function Messages() {
       </div>
 
       <div className="flex-1 overflow-y-auto rounded-lg border bg-background p-4 space-y-8 scrollbar-thin h-[calc(100vh-16rem)]">
-        {loading && (
+        {!business ? (
           <div className="flex items-center justify-center h-full">
-            <Spinner size="lg" />
-          </div>
-        )}
-        {error && (
-          <div className="text-center text-sm text-destructive py-10">
-            {error}
-          </div>
-        )}
-        {!loading && Object.keys(groupedMessages).length === 0 && (
-          <div className="text-center text-sm text-muted-foreground py-10">
-            No messages.
-          </div>
-        )}
-        {Object.values(groupedMessages).map((group) => (
-          <div key={group.dateKey} className="space-y-4">
-            <div className="flex justify-center">
-              <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-medium">
-                {group.formattedDate}
-              </span>
-            </div>
-            <div className="space-y-2">
-              {group.messages.map((m, i) => {
-                const prev = group.messages[i - 1];
-                const isFirstOfCluster =
-                  !prev ||
-                  prev.direction !== m.direction ||
-                  new Date(m.time).getTime() - new Date(prev.time).getTime() >
-                    1000 * 60 * 10;
-                const isOutgoing = m.direction === MessageDirection.Out;
-                return (
-                  <div
-                    key={m.id}
-                    className={`flex w-full ${isOutgoing ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[70%] rounded-lg px-3 py-2 text-sm shadow-sm ring-1 ring-border whitespace-pre-line leading-relaxed flex items-end gap-2 ${
-                        isOutgoing
-                          ? "bg-emerald-500 text-emerald-50 ring-emerald-500/60"
-                          : "bg-accent text-accent-foreground ring-accent/40"
-                      } ${isFirstOfCluster ? "mt-2" : "mt-0.5"}`}
-                    >
-                      <span className="min-w-0 break-words flex-1">
-                        {m.content}
-                      </span>
-                      <span
-                        className={`text-[10px] font-medium opacity-70 shrink-0 ${
-                          isOutgoing
-                            ? "text-emerald-100"
-                            : "text-muted-foreground"
-                        }`}
+            <Card className="shadow-none border-blue-200 bg-blue-50">
+              <CardContent>
+                <div className="flex gap-3">
+                  <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-blue-900">
+                      Business Setup Required
+                    </p>
+                    <p className="text-sm text-blue-700">
+                      You need to create a business in the{" "}
+                      <a
+                        href="/settings/account#business-settings"
+                        className="underline font-medium hover:text-blue-900"
                       >
-                        {m.time}
-                      </span>
-                    </div>
+                        Account & Integration Settings
+                      </a>{" "}
+                      before you can use Messages.
+                    </p>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        ))}
+        ) : (
+          <>
+            {loading && (
+              <div className="flex items-center justify-center h-full">
+                <Spinner size="lg" />
+              </div>
+            )}
+            {error && (
+              <div className="text-center text-sm text-destructive py-10">
+                {error}
+              </div>
+            )}
+            {!loading && Object.keys(groupedMessages).length === 0 && (
+              <div className="text-center text-sm text-muted-foreground py-10">
+                No messages.
+              </div>
+            )}
+            {Object.values(groupedMessages).map((group) => (
+              <div key={group.dateKey} className="space-y-4">
+                <div className="flex justify-center">
+                  <span className="text-xs px-3 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                    {group.formattedDate}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {group.messages.map((m, i) => {
+                    const prev = group.messages[i - 1];
+                    const isFirstOfCluster =
+                      !prev ||
+                      prev.direction !== m.direction ||
+                      new Date(m.time).getTime() -
+                        new Date(prev.time).getTime() >
+                        1000 * 60 * 10;
+                    const isOutgoing = m.direction === MessageDirection.Out;
+                    return (
+                      <div
+                        key={m.id}
+                        className={`flex w-full ${isOutgoing ? "justify-end" : "justify-start"}`}
+                      >
+                        <div
+                          className={`max-w-[70%] rounded-lg px-3 py-2 text-sm shadow-sm ring-1 ring-border whitespace-pre-line leading-relaxed flex items-end gap-2 ${
+                            isOutgoing
+                              ? "bg-emerald-500 text-emerald-50 ring-emerald-500/60"
+                              : "bg-accent text-accent-foreground ring-accent/40"
+                          } ${isFirstOfCluster ? "mt-2" : "mt-0.5"}`}
+                        >
+                          <span className="min-w-0 break-words flex-1">
+                            {m.content}
+                          </span>
+                          <span
+                            className={`text-[10px] font-medium opacity-70 shrink-0 ${
+                              isOutgoing
+                                ? "text-emerald-100"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {m.time}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
