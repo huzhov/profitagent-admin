@@ -13,7 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getAgentList } from "@/services/agents";
 import { useBusiness } from "@/context/AppContext";
 import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "../ui/skeleton";
 
 export default function Home() {
