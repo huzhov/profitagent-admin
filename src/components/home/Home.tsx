@@ -47,7 +47,7 @@ export default function Home() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between">
-            <div>
+            <div className="flex flex-col gap-1.5">
               <CardTitle>Recent Agents</CardTitle>
               <CardDescription>
                 Your most recently active AI agents
