@@ -101,11 +101,11 @@ export default function Home() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    {/* <div className="text-right">
                       <Badge>
                         {agent.status === "disabled" ? "Paused" : "Active"}
                       </Badge>
-                    </div>
+                    </div> */}
                   </div>
                 ))
               ) : (
