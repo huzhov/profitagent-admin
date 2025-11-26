@@ -20,7 +20,8 @@ export default function SidebarContainer() {
   return (
     <aside className="w-64 bg-card border-r border-border h-screen flex flex-col">
       <SidebarHeader />
-      <div className="p-4">
+      <div className="p-4" />
+      {/* <div className="p-4">
         <Button
           className="w-full mb-4"
           onClick={() => navigate({ to: "/agents/create" })}
@@ -28,7 +29,7 @@ export default function SidebarContainer() {
           <Plus className="w-4 h-4 mr-2" />
           Create Agent
         </Button>
-      </div>
+      </div> */}
       <SidebarNavigation />
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3">
