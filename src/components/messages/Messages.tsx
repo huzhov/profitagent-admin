@@ -28,7 +28,7 @@ export default function Messages() {
   const { business } = useBusiness();
 
   useEffect(() => {
-    if (!business === null) {
+    if (business) {
       let alive = true;
       (async () => {
         try {
@@ -63,7 +63,7 @@ export default function Messages() {
 
   // Fetch messages when conversation changes (from dropdown)
   useEffect(() => {
-    if (!business === null) {
+    if (business) {
       let alive = true;
       (async () => {
         if (!conversationId) return;
@@ -159,7 +159,7 @@ export default function Messages() {
               </div>
             )}
             {!loading && Object.keys(groupedMessages).length === 0 && (
-              <div className="text-center text-sm text-muted-foreground py-10">
+              <div className="text-center text-sm text-muted-foreground flex items-center justify-center h-full">
                 No messages.
               </div>
             )}
