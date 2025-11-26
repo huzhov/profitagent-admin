@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, ChevronDown, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ValidatedInput } from "@/components/ui/validated-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -24,8 +25,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver, type FieldErrors } from "react-hook-form";
-import { createAgent, getAgent } from "@/services/agents";
+import { useForm } from "react-hook-form";
+import type { Resolver, FieldErrors } from "react-hook-form";
+import { createAgent, getAgent, checkIfAgentExists } from "@/services/agents";
+import { useNameValidation } from "@/hooks/useNameValidation";
 import {
   agentSchema,
   defaultAgentValues,
@@ -67,45 +70,6 @@ export default function AgentBuilder() {
     null
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // // Document Library state - Lee's categories
-  // const productInfoDocs = watch("productInfoDocs") ?? [];
-  // const processWorkflowDocs = watch("processWorkflowDocs") ?? [];
-  // const complianceDocs = watch("complianceDocs") ?? [];
-  // const customerEducationDocs = watch("customerEducationDocs") ?? [];
-  // const salesMarketingDocs = watch("salesMarketingDocs") ?? [];
-  // const dataToolsDocs = watch("dataToolsDocs") ?? [];
-  // const questionSets = watch("questionSets") ?? [];
-  // const [isProductInfoDragging, setIsProductInfoDragging] = useState(false);
-  // const [isProcessWorkflowDragging, setIsProcessWorkflowDragging] =
-  //   useState(false);
-  // const [isComplianceDragging, setIsComplianceDragging] = useState(false);
-  // const [isCustomerEducationDragging, setIsCustomerEducationDragging] =
-  //   useState(false);
-  // const [isSalesMarketingDragging, setIsSalesMarketingDragging] =
-  //   useState(false);
-  // const [isDataToolsDragging, setIsDataToolsDragging] = useState(false);
-
-  // // Guardrails state
-  // const [profanityFilter, setProfanityFilter] = useState(true);
-
-  // // Messaging Controls state
-  // const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
-
-  // // HITL Handover state
-  // const [hitlEnabled, setHitlEnabled] = useState(false);
-
-  // // Scheduling state
-  // const [schedulingEnabled, setSchedulingEnabled] = useState(false);
-
-  // // Question Sets state
-  // const [isQuestionSetDragging, setIsQuestionSetDragging] = useState(false);
-  // const [questionSetInputMode, setQuestionSetInputMode] = useState<
-  //   "upload" | "paste"
-  // >("upload");
-
-  // // Product Recommendations state
-  // const [recommendationsEnabled, setRecommendationsEnabled] = useState(false);
 
   // Track collapsible states
   const [openSections, setOpenSections] = useState({
@@ -195,8 +159,8 @@ export default function AgentBuilder() {
   const { mutate: stageUploadFn } = useMutation({
     mutationFn: stageUpload,
     onSuccess: (data, variables) => {
-      setValue("catalogS3Key", data.key);
-      setValue("catalogName", variables.filename);
+      setValue("catalogS3Key", data.key, { shouldValidate: true });
+      setValue("catalogName", variables.filename, { shouldValidate: true });
 
       // Call Upload Function
       uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
@@ -230,7 +194,17 @@ export default function AgentBuilder() {
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
     }
-  }, [agentData]);
+  }, [agentData, setValue]);
+
+  // Name validation using custom hook
+  const agentName = watch("agentName");
+  const nameValidation = useNameValidation({
+    name: agentName,
+    checkExists: checkIfAgentExists,
+    setError,
+    fieldName: "agentName",
+    enabled: isAgentCreate, // Only validate in create mode
+  });
 
   const validateCSV = async (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -311,11 +285,17 @@ export default function AgentBuilder() {
         toast.success("CSV file validated and ready to upload");
         setCsvValidationError(null);
       } catch {
+        // Clear form values and uploaded file when validation fails
         setUploadedFile(null);
+        setValue("catalogS3Key", "", { shouldValidate: true });
+        setValue("catalogName", "", { shouldValidate: true });
         toast.error("CSV validation failed. Please check the file format.");
       }
     } else {
       setCsvValidationError("Please upload a CSV file");
+      setUploadedFile(null);
+      setValue("catalogS3Key", "", { shouldValidate: true });
+      setValue("catalogName", "", { shouldValidate: true });
       toast.error("Please upload a CSV file");
     }
   };
@@ -355,8 +335,23 @@ export default function AgentBuilder() {
   //   setQuestionSetInputMode(checked ? "paste" : "upload");
   // };
 
-  const onSubmit = (values: AgentFormValues) => {
-    if (isAgentCreate) createAgentFn(values);
+  const onSubmit = async (values: AgentFormValues) => {
+    if (!isAgentCreate) return;
+
+    // Check validation status before submitting
+    if (nameValidation.status === "exists") {
+      toast.error("Agent with this name already exists");
+      document.getElementById("agent-name")?.focus();
+      return;
+    }
+
+    if (nameValidation.status === "checking") {
+      toast.error("Please wait for name validation to complete");
+      return;
+    }
+
+    // If name is available, proceed with creation
+    createAgentFn(values);
   };
 
   const onError = (errors: FieldErrors<AgentFormValues>) => {
@@ -450,7 +445,13 @@ export default function AgentBuilder() {
           <Button
             size="sm"
             onClick={handleSubmit(onSubmit, onError)}
-            disabled={isCreateAgentPending}
+            disabled={
+              isCreateAgentPending ||
+              nameValidation.status === "checking" ||
+              nameValidation.status === "exists" ||
+              nameValidation.status === "error" ||
+              !watch("agentName")?.trim()
+            }
           >
             {isCreateAgentPending ? (
               <div className="w-18 flex justify-center">
@@ -497,27 +498,40 @@ export default function AgentBuilder() {
                           <Label
                             htmlFor="agent-name"
                             className={
-                              errors.agentName
+                              errors.agentName ||
+                              nameValidation.status === "exists"
                                 ? "text-red-500 text-sm mt-1"
-                                : ""
+                                : nameValidation.status === "available"
+                                  ? "text-green-600 text-sm mt-1"
+                                  : ""
                             }
                           >
                             Agent Name<span className="text-red-500">*</span>
                           </Label>
-                          <Input
+                          <ValidatedInput
                             id="agent-name"
                             placeholder="e.g., SalesBot Pro"
-                            className={`mt-1.5`}
+                            className="mt-1.5"
                             value={watch("agentName")}
                             onChange={(e) =>
                               setValue("agentName", e.target.value, {
                                 shouldValidate: true,
                               })
                             }
+                            disabled={isAgentEdit}
+                            validationStatus={nameValidation.status}
+                            showValidation={!isAgentEdit}
                           />
-                          {errors.agentName && (
-                            <p className="text-sm text-red-500 mt-1">
-                              {errors.agentName.message}
+                          {(errors.agentName || nameValidation.message) && (
+                            <p
+                              className={`text-sm mt-1 ${
+                                nameValidation.status === "available"
+                                  ? "text-green-600"
+                                  : "text-red-500"
+                              }`}
+                            >
+                              {errors.agentName?.message ||
+                                nameValidation.message}
                             </p>
                           )}
                         </div>
