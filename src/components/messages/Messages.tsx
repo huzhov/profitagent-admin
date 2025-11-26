@@ -15,8 +15,7 @@ import { apiJson } from "@/lib/http";
 import { PageHeader } from "@/components/ui/page-header";
 import { Spinner } from "../ui/spinner";
 import { useBusiness } from "@/context/AppContext";
-import { Card, CardContent } from "@/components/ui/card";
-import { Info } from "lucide-react";
+import BusinessInfoCard from "@/components/common/BusinessInfoCard";
 
 export default function Messages() {
   const [conversationId, setConversationId] = useState<string>("");
@@ -122,30 +121,7 @@ export default function Messages() {
 
       <div className="flex-1 overflow-y-auto rounded-lg border bg-background p-4 space-y-8 scrollbar-thin h-[calc(100vh-16rem)]">
         {!business ? (
-          <div className="flex items-center justify-center h-full">
-            <Card className="shadow-none border-blue-200 bg-blue-50">
-              <CardContent>
-                <div className="flex gap-3">
-                  <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-blue-900">
-                      Business Setup Required
-                    </p>
-                    <p className="text-sm text-blue-700">
-                      You need to create a business in the{" "}
-                      <a
-                        href="/settings/account#business-settings"
-                        className="underline font-medium hover:text-blue-900"
-                      >
-                        Account & Integration Settings
-                      </a>{" "}
-                      before you can use Messages.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <BusinessInfoCard type="Messages" />
         ) : (
           <>
             {loading && (

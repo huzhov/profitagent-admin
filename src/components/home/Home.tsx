@@ -26,7 +26,7 @@ export default function Home() {
       const data = await getAgentList();
       return data;
     },
-    enabled: !business,
+    enabled: business !== null,
   });
 
   return (
