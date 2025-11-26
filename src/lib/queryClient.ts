@@ -1,9 +1,12 @@
 import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
 import { toast } from "sonner";
+import axios from "axios";
 
 interface HttpError extends Error {
   status?: number;
   message: string;
+  code?: string;
+  response?: unknown;
 }
 
 const publicRoutes = ["/login", "/signup"];
@@ -37,12 +40,28 @@ export const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: (failureCount: number, error: unknown): boolean => {
-        // Stop retrying on 400 (Bad Request)
-        if ((error as HttpError)?.status === 400) {
+        // Only retry on network errors (request never reached backend or no response)
+        // Do NOT retry on any HTTP status codes (including 4xx, 5xx)
+        const axiosError = axios.isAxiosError(error);
+        const httpError = error as HttpError;
+
+        // If we have a response, it means the request reached the backend
+        // In this case, DO NOT retry (including all 4xx, 5xx codes)
+        if (httpError.response) {
           return false;
         }
-        // Default retry logic
-        return failureCount < 3;
+
+        // Only retry on network errors where request never reached backend
+        // or we never got a reply (ECONNABORTED, ERR_NETWORK, etc.)
+        const isNetworkError =
+          httpError.code === "ECONNABORTED" ||
+          httpError.code === "ERR_NETWORK" ||
+          httpError.code === "ETIMEDOUT" ||
+          httpError.code === "ENOTFOUND" ||
+          (axiosError && !httpError.response);
+
+        // Retry up to 3 times only for network errors
+        return isNetworkError && failureCount < 3;
       },
     },
   },
