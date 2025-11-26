@@ -19,7 +19,7 @@ import {
   Play,
   Plus,
   TrendingUp,
-  Trophy,
+  MousePointerClick,
   Workflow,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -34,10 +34,12 @@ import { useApp } from "@/context/AppContext";
 import { useQuery } from "@tanstack/react-query";
 import { getAgentList } from "@/services/agents";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useBusiness } from "@/context/AppContext";
 
 export default function Agents() {
   const navigate = useNavigate();
   const { agents } = useApp();
+  const { business } = useBusiness();
 
   const { data, isLoading } = useQuery({
     queryKey: ["agentsList"],
@@ -45,6 +47,7 @@ export default function Agents() {
       const data = await getAgentList();
       return data;
     },
+    enabled: business !== null,
   });
 
   const totalConversations = agents.reduce(
@@ -85,7 +88,7 @@ export default function Agents() {
                 Total Agents
               </span>
             </div>
-            <p className="text-2xl font-semibold">{agents.length}</p>
+            <p className="text-2xl font-semibold">{data?.length ?? 0}</p>
           </CardContent>
         </Card>
 
@@ -106,10 +109,8 @@ export default function Agents() {
         <Card className="py-0 shadow-none rounded-xl border">
           <CardContent className="[&:last-child]:pb-6 p-4">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-green-600" />
-              <span className="text-sm text-muted-foreground">
-                Conversations
-              </span>
+              <TrendingUp className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-muted-foreground">Visits</span>
             </div>
             <p className="text-2xl font-semibold">
               {totalConversations.toLocaleString()}
@@ -120,26 +121,20 @@ export default function Agents() {
         <Card className="py-0 shadow-none rounded-xl border">
           <CardContent className="[&:last-child]:pb-6 p-4">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-orange-600" />
-              <span className="text-sm text-muted-foreground">
-                Avg. Conversion
-              </span>
+              <MessageSquare className="w-4 h-4 text-orange-600" />
+              <span className="text-sm text-muted-foreground">Engagements</span>
             </div>
-            <p className="text-2xl font-semibold">
-              {avgConversion.toFixed(0)}%
-            </p>
+            <p className="text-2xl font-semibold">{avgConversion.toFixed(0)}</p>
           </CardContent>
         </Card>
 
         <Card className="py-0 shadow-none rounded-xl border">
           <CardContent className="[&:last-child]:pb-6 p-4">
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm text-muted-foreground">
-                Avg. Improvement
-              </span>
+              <MousePointerClick className="w-4 h-4 text-yellow-600" />
+              <span className="text-sm text-muted-foreground">Clicks</span>
             </div>
-            <p className="text-2xl font-semibold">0%</p>
+            <p className="text-2xl font-semibold">0</p>
           </CardContent>
         </Card>
       </div>
@@ -207,8 +202,8 @@ export default function Agents() {
               </Card>
             ))}
           </>
-        ) : data ? (
-          data.map((agent) => (
+        ) : (
+          data?.map((agent) => (
             <Card
               key={agent.id}
               data-slot="card"
@@ -429,17 +424,13 @@ export default function Agents() {
               </CardContent>
             </Card>
           ))
-        ) : (
-          <div className="col-span-full flex items-center justify-center py-12 text-muted-foreground">
-            No agents found
-          </div>
         )}
 
         {/* Create New Agent Card - Only show when not loading */}
         {!isLoading && (
           <Card
             data-slot="card"
-            className="shadow-none py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
+            className="shadow-none h-131 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
           >
             <CardContent
               data-slot="card-content"
