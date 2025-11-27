@@ -333,13 +333,13 @@ export default function SettingsGeneral() {
                     <Skeleton className="w-25 h-5" />
                   </div>
                 </div>
-                <Separator />
+                {/* <Separator />
                 <div className="flex justify-end">
                   <Button variant="outline" size="sm" disabled>
                     <Pencil className="w-4 h-4 mr-2" />
                     Edit Business
                   </Button>
-                </div>
+                </div> */}
               </div>
             ) : business ? (
               <div className="space-y-4">
@@ -359,13 +359,13 @@ export default function SettingsGeneral() {
                     </p>
                   </div>
                 </div>
-                <Separator />
+                {/* <Separator />
                 <div className="flex justify-end">
                   <Button variant="outline" size="sm">
                     <Pencil className="w-4 h-4 mr-2" />
                     Edit Business
                   </Button>
-                </div>
+                </div> */}
               </div>
             ) : (
               <Empty>

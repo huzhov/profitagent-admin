@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Shield, BarChart3 } from "lucide-react";
+import { Shield } from "lucide-react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 
 export default function SettingsLayout({
@@ -29,14 +29,14 @@ export default function SettingsLayout({
       />
 
       <Tabs value={activeTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger
+        <TabsList className="grid w-full grid-cols-1">
+          {/* <TabsTrigger
             value="general"
             onClick={() => navigate({ to: "/settings/general" })}
           >
             <User className="w-4 h-4 mr-2" />
             General
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger
             value="account"
             onClick={() => navigate({ to: "/settings/account" })}
@@ -44,13 +44,13 @@ export default function SettingsLayout({
             <Shield className="w-4 h-4 mr-2" />
             Account & Integration
           </TabsTrigger>
-          <TabsTrigger
+          {/* <TabsTrigger
             value="reporting"
             onClick={() => navigate({ to: "/settings/reporting" })}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             Reporting
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <div className="mt-6">{children}</div>
