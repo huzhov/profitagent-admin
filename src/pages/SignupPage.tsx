@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signup } from "@/services/auth";
+import { setToken } from "@/lib/auth";
 import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { toast } from "sonner";
@@ -46,14 +47,16 @@ const SignupPage = () => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["signup"],
     mutationFn: async (values: z.infer<typeof schema>) => {
-      await signup(values);
+      return await signup(values);
     },
     retry: false,
-    onSuccess: () => {
-      toast.success("Account created successfully! Please log in.", {
+    onSuccess: (data) => {
+      // Store the token and auto-login
+      setToken(data.token);
+      toast.success("Account created successfully!", {
         duration: 3000,
       });
-      navigate({ to: "/login" });
+      navigate({ to: "/" });
     },
     onError: (error: any) => {
       const message = error?.message || "Failed to create account";

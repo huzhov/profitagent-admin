@@ -59,7 +59,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BusinessVertical } from "@/components/agent-builder/types";
 import { useBusiness, useApp } from "@/context/AppContext";
-import { createBusiness } from "@/services/business";
+import { createBusiness, checkIfBusinessExists } from "@/services/business";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -145,6 +145,23 @@ export default function SettingsGeneral() {
   };
 
   const handleCreateBusiness = async (values: BusinessFormValues) => {
+    // Check if business name already exists before creating
+    try {
+      const result = await checkIfBusinessExists(values.name);
+      if (result.exists) {
+        businessForm.setError("name", {
+          type: "manual",
+          message: "Business with this name already exists",
+        });
+        // Focus the business name field
+        document.getElementById("business-name")?.focus();
+        toast.error("Business with this name already exists");
+        return;
+      }
+    } catch (error) {
+      console.error("Error checking business name:", error);
+    }
+
     setSubmitting(true);
 
     try {

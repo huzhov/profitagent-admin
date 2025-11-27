@@ -32,3 +32,15 @@ export async function createAgent(
   const { data } = await axiosInstance.post<AgentResponse>(`/agents`, payload);
   return data;
 }
+
+export async function checkIfAgentExists(
+  name: string
+): Promise<{ exists: boolean }> {
+  const { data } = await axiosInstance.get<{ exists: boolean }>(
+    `/agents/exists`,
+    {
+      params: { name },
+    }
+  );
+  return data;
+}

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Empty, EmptyTitle, EmptyDescription, EmptyContent } from "../ui/empty";
-import { Input } from "../ui/input";
 import {
   Form,
   FormField,
@@ -24,6 +23,10 @@ import {
 } from "../ui/select";
 import { BusinessVertical } from "../agent-builder/types";
 import { apiJson } from "@/lib/http";
+import { checkIfBusinessExists } from "@/services/business";
+import { toast } from "sonner";
+import { useNameValidation } from "@/hooks/useNameValidation";
+import { ValidatedInput } from "../ui/validated-input";
 
 type BusinessDetails = {
   id: string;
@@ -49,6 +52,15 @@ export default function BusinessSettings() {
     mode: "onChange",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  // Name validation using custom hook
+  const businessName = form.watch("name");
+  const nameValidation = useNameValidation({
+    name: businessName,
+    checkExists: checkIfBusinessExists,
+    setError: form.setError,
+    fieldName: "name",
+  });
 
   useEffect(() => {
     const businessId = JSON.parse(
@@ -129,6 +141,17 @@ export default function BusinessSettings() {
             <form
               className="space-y-6 mt-4"
               onSubmit={form.handleSubmit(async (values) => {
+                // Check validation status before submitting
+                if (nameValidation.status === "exists") {
+                  toast.error("Business with this name already exists");
+                  return;
+                }
+
+                if (nameValidation.status === "checking") {
+                  toast.error("Please wait for name validation to complete");
+                  return;
+                }
+
                 setSubmitting(true);
                 try {
                   const res = await apiJson<BusinessDetails>(
@@ -157,8 +180,9 @@ export default function BusinessSettings() {
                   });
                   setModalOpen(false);
                   form.reset();
+                  toast.success("Business created successfully");
                 } catch (err) {
-                  // handle error (could show toast)
+                  toast.error("Failed to create business. Please try again.");
                 } finally {
                   setSubmitting(false);
                 }
@@ -169,15 +193,38 @@ export default function BusinessSettings() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="name">Name</FormLabel>
+                    <FormLabel
+                      htmlFor="name"
+                      className={
+                        nameValidation.status === "exists"
+                          ? "text-red-500"
+                          : nameValidation.status === "available"
+                            ? "text-green-600"
+                            : ""
+                      }
+                    >
+                      Name
+                    </FormLabel>
                     <FormControl>
-                      <Input
+                      <ValidatedInput
                         {...field}
                         id="name"
                         placeholder="Business Name"
                         className="mt-1"
+                        validationStatus={nameValidation.status}
                       />
                     </FormControl>
+                    {nameValidation.message && (
+                      <p
+                        className={`text-sm mt-1 ${
+                          nameValidation.status === "available"
+                            ? "text-green-600"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {nameValidation.message}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -242,7 +289,14 @@ export default function BusinessSettings() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={submitting || !form.formState.isValid}
+                  disabled={
+                    submitting ||
+                    !form.formState.isValid ||
+                    nameValidation.status === "checking" ||
+                    nameValidation.status === "exists" ||
+                    nameValidation.status === "error" ||
+                    !businessName?.trim()
+                  }
                 >
                   Submit
                 </Button>
