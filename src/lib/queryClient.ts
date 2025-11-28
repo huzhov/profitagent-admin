@@ -10,15 +10,15 @@ interface HttpError extends Error {
   response?: unknown;
 }
 
-const publicRoutes = ["/login", "/signup"];
-
-const isPublicRoute = publicRoutes.some((route) => {
-  return (
-    location.pathname === route || location.pathname.startsWith(`${route}/`)
-  );
-});
-
 const handleOnError = (error: HttpError) => {
+  const publicRoutes = ["/login", "/signup"];
+
+  const isPublicRoute = publicRoutes.some((route) => {
+    return (
+      location.pathname === route || location.pathname.startsWith(`${route}/`)
+    );
+  });
+
   // Redirect to login
   if (error.status === 401 && !isPublicRoute) {
     logout();
