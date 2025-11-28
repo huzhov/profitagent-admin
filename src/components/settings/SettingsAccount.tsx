@@ -391,7 +391,7 @@ export default function SettingsAccount() {
           </CardContent>
         </Card>
         {/* Information Alert when no business exists */}
-        {!business && (
+        {!business ? (
           <Card className="shadow-none border-blue-200 bg-blue-50">
             <CardContent>
               <div className="flex gap-3">
@@ -409,269 +409,268 @@ export default function SettingsAccount() {
               </div>
             </CardContent>
           </Card>
-        )}
-
-        {/* API Connections */}
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Key className="w-5 h-5" />
-              API Connections
-            </CardTitle>
-            <CardDescription>
-              View and manage your WhatsApp Business API connections
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {isWhatsAppListLoading
-                ? [1, 2, 3]?.map((i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                          <Skeleton className="w-10 h-10" />
-                        </div>
-                        <div>
-                          <Skeleton className="w-20 h-5" />
-                          <Skeleton className="w-50 h-5 mt-1" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Skeleton className="w-20 h-5 mr-1" />
-                        <Skeleton className="w-15 h-5 mr-1" />
-                        <Skeleton className="w-20 h-5 mr-2" />
-                      </div>
-                    </div>
-                  ))
-                : whatsAppListData?.map((connection, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                          <MessageSquare className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{connection.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            +{connection.displayPhoneNumber} • WABA ID:{" "}
-                            {connection.wabaId}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {connection.status === "enabled" ? (
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                            Connected
-                          </Badge>
-                        ) : (
-                          <Badge variant="destructive">
-                            <AlertCircle className="w-3 h-3 mr-1" />
-                            Error
-                          </Badge>
-                        )}
-                        <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(connection.lastSyncedAt)} ago
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleManageConnection(connection)}
+        ) : (
+          <>
+            {/* API Connections */}
+            <Card className="shadow-none">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  API Connections
+                </CardTitle>
+                <CardDescription>
+                  View and manage your WhatsApp Business API connections
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {isWhatsAppListLoading
+                    ? [1, 2, 3]?.map((i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between p-4 border rounded-lg"
                         >
-                          <SettingsIcon className="w-4 h-4 mr-2" />
-                          Manage
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                              <Skeleton className="w-10 h-10" />
+                            </div>
+                            <div>
+                              <Skeleton className="w-20 h-5" />
+                              <Skeleton className="w-50 h-5 mt-1" />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Skeleton className="w-20 h-5 mr-1" />
+                            <Skeleton className="w-15 h-5 mr-1" />
+                            <Skeleton className="w-20 h-5 mr-2" />
+                          </div>
+                        </div>
+                      ))
+                    : whatsAppListData?.map((connection, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-4 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                              <MessageSquare className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{connection.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                +{connection.displayPhoneNumber} • WABA ID:{" "}
+                                {connection.wabaId}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {connection.status === "enabled" ? (
+                              <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Connected
+                              </Badge>
+                            ) : (
+                              <Badge variant="destructive">
+                                <AlertCircle className="w-3 h-3 mr-1" />
+                                Error
+                              </Badge>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(connection.lastSyncedAt)} ago
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleManageConnection(connection)}
+                            >
+                              <SettingsIcon className="w-4 h-4 mr-2" />
+                              Manage
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                </div>
+              </CardContent>
+            </Card>
+            {/* Add New WhatsApp Business Account - Only show if business exists */}{" "}
+            <Card className="shadow-none">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-green-600" />
+                  Add New WhatsApp Business Account
+                </CardTitle>
+                <CardDescription>
+                  Connect a new WhatsApp Business account via Meta Login
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...waForm}>
+                  <form
+                    onSubmit={waForm.handleSubmit(handleAddWhatsAppAccount)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={waForm.control}
+                      name="accountName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Account Name (for identification) *
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., Main Store, Fashion Line, Electronics"
+                              autoComplete="off"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          type="button"
+                          className="w-fit bg-blue-600 hover:bg-blue-700"
+                          onClick={launchWhatsAppSignup}
+                        >
+                          <MetaIcon className="w-4 h-4 mr-2" />
+                          Login with Meta
                         </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              tabIndex={-1}
+                              className="rounded-full p-2"
+                              type="button"
+                            >
+                              <Info className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent sideOffset={4}>
+                            Follow this flow to autopopulate fields below
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
-                  ))}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Add New WhatsApp Business Account - Only show if business exists */}
-        {business && (
-          <Card className="shadow-none">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-green-600" />
-                Add New WhatsApp Business Account
-              </CardTitle>
-              <CardDescription>
-                Connect a new WhatsApp Business account via Meta Login
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...waForm}>
-                <form
-                  onSubmit={waForm.handleSubmit(handleAddWhatsAppAccount)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={waForm.control}
-                    name="accountName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Account Name (for identification) *
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., Main Store, Fashion Line, Electronics"
-                            autoComplete="off"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        className="w-fit bg-blue-600 hover:bg-blue-700"
-                        onClick={launchWhatsAppSignup}
-                      >
-                        <MetaIcon className="w-4 h-4 mr-2" />
-                        Login with Meta
-                      </Button>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            tabIndex={-1}
-                            className="rounded-full p-2"
-                            type="button"
-                          >
-                            <Info className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent sideOffset={4}>
-                          Follow this flow to autopopulate fields below
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={waForm.control}
+                        name="waBusinessPortfolioId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Business Portfolio ID *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Auto-filled by Meta"
+                                disabled={true}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={waForm.control}
+                        name="phoneNumberId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number ID *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Auto-filled by Meta"
+                                disabled={true}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={waForm.control}
+                        name="accessToken"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Access Token *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Auto-filled by Meta"
+                                disabled={true}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={waForm.control}
+                        name="wabaId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>WABA ID *</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Auto-filled by Meta"
+                                disabled={true}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     <FormField
                       control={waForm.control}
-                      name="waBusinessPortfolioId"
+                      name="pinCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Business Portfolio ID *</FormLabel>
+                          <FormLabel>Two-Step Verification PIN *</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="Auto-filled by Meta"
-                              disabled={true}
+                              maxLength={6}
+                              placeholder="Enter 6-digit PIN"
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={waForm.control}
-                      name="phoneNumberId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number ID *</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Auto-filled by Meta"
-                              disabled={true}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={waForm.control}
-                      name="accessToken"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Access Token *</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Auto-filled by Meta"
-                              disabled={true}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={waForm.control}
-                      name="wabaId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>WABA ID *</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Auto-filled by Meta"
-                              disabled={true}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={waForm.control}
-                    name="pinCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Two-Step Verification PIN *</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            maxLength={6}
-                            placeholder="Enter 6-digit PIN"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Separator />
-                  <div className="flex justify-end">
-                    <Button
-                      type="submit"
-                      disabled={
-                        !waForm.formState.isValid || isCreateWhatAppPending
-                      }
-                    >
-                      {isCreateWhatAppPending ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Plus className="w-4 h-4 mr-2" />
-                      )}
-                      Add WhatsApp Account
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                    <Separator />
+                    <div className="flex justify-end">
+                      <Button
+                        type="submit"
+                        disabled={
+                          !waForm.formState.isValid || isCreateWhatAppPending
+                        }
+                      >
+                        {isCreateWhatAppPending ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Plus className="w-4 h-4 mr-2" />
+                        )}
+                        Add WhatsApp Account
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </>
         )}
       </div>
 

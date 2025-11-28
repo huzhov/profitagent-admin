@@ -1,24 +1,7 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
-import {
-  Bot,
-  Calendar,
-  ChartColumn,
-  EllipsisVertical,
-  Eye,
-  FlaskConical,
-  Pause,
-  Play,
-  Plus,
-  Workflow,
-} from "lucide-react";
+import { Bot, ChartColumn, EllipsisVertical, Eye, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import {
