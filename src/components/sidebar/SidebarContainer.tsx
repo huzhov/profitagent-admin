@@ -2,17 +2,16 @@ import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
 import { Power } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { removeToken } from "@/lib/auth";
+import { logout } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
 import { getInitials } from "@/helper/getInitials";
 
 export default function SidebarContainer() {
   const navigate = useNavigate();
-  const { user, clearUser } = useUserStore();
+  const { user } = useUserStore();
 
   const handleLogout = () => {
-    removeToken();
-    clearUser();
+    logout();
     navigate({ to: "/login" });
   };
 
@@ -20,15 +19,6 @@ export default function SidebarContainer() {
     <aside className="w-64 bg-card border-r border-border h-screen flex flex-col">
       <SidebarHeader />
       <div className="p-4" />
-      {/* <div className="p-4">
-        <Button
-          className="w-full mb-4"
-          onClick={() => navigate({ to: "/agents/create" })}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Agent
-        </Button>
-      </div> */}
       <SidebarNavigation />
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3">
