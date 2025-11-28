@@ -103,12 +103,12 @@ export default function Agents() {
                           <Skeleton className="w-10 h-10 rounded-lg" />
                           <div className="space-y-2">
                             <Skeleton className="h-5 w-32" />
-                            <Skeleton className="h-4 w-20" />
+                            {/* <Skeleton className="h-4 w-20" /> */}
                           </div>
                         </div>
                       </div>
-                      <Skeleton className="h-4 w-full mt-2" />
-                      <Skeleton className="h-4 w-3/4" />
+                      {/* <Skeleton className="h-4 w-full mt-2" />
+                      <Skeleton className="h-4 w-3/4" /> */}
                     </CardHeader>
                     <CardContent
                       data-slot="card-content"
@@ -128,20 +128,15 @@ export default function Agents() {
                         <Skeleton className="h-4 w-24" />
                         <div className="flex gap-1">
                           <Skeleton className="h-6 w-20" />
-                          <Skeleton className="h-6 w-16" />
                         </div>
                       </div>
-                      <div className="space-y-1">
+                      {/* <div className="space-y-1">
                         <Skeleton className="h-3 w-32" />
                         <Skeleton className="h-3 w-28" />
-                      </div>
+                      </div> */}
                       <div className="space-y-2 pt-2">
                         <Skeleton className="h-9 w-full" />
-                        <div className="flex gap-2">
-                          <Skeleton className="h-9 flex-1" />
-                          <Skeleton className="h-9 flex-1" />
-                          <Skeleton className="h-9 w-9" />
-                        </div>
+                        <Skeleton className="h-9 w-full" />
                       </div>
                     </CardContent>
                   </Card>
@@ -174,7 +169,7 @@ export default function Agents() {
                               {agent.name}
                             </CardTitle>
                             <div className="flex items-center gap-1">
-                              {agents[0].workflows > 0 && (
+                              {/* {agents[0].workflows > 0 && (
                                 <>
                                   <Workflow className="w-4 h-4 text-purple-600" />
                                   <Badge
@@ -197,10 +192,10 @@ export default function Agents() {
                                     {agents[0].tests}
                                   </Badge>
                                 </>
-                              )}
+                              )} */}
                             </div>
                           </div>
-                          <Badge
+                          {/* <Badge
                             data-slot="badge"
                             className={`text-xs border-transparent ${
                               agent.status === "Active"
@@ -209,7 +204,7 @@ export default function Agents() {
                             }`}
                           >
                             {agent.status === "disabled" ? "Paused" : "Active"}
-                          </Badge>
+                          </Badge> */}
                         </div>
                       </div>
                       <DropdownMenu>
@@ -240,12 +235,12 @@ export default function Agents() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    <CardDescription
+                    {/* <CardDescription
                       data-slot="card-description"
                       className="text-muted-foreground mt-2 text-md"
                     >
                       {agents[0].description}
-                    </CardDescription>
+                    </CardDescription> */}
                   </CardHeader>
                   <CardContent
                     data-slot="card-content"
@@ -311,13 +306,13 @@ export default function Agents() {
                     </div>
 
                     {/* Metadata */}
-                    <div className="text-xs text-muted-foreground space-y-1">
+                    {/* <div className="text-xs text-muted-foreground space-y-1">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         <span>Created {agents[0].created}</span>
                       </div>
                       <p>Last active: {agents[0].lastActive}</p>
-                    </div>
+                    </div> */}
 
                     {/* Actions */}
                     <div className="space-y-2 pt-2">
@@ -333,7 +328,7 @@ export default function Agents() {
                         View Agent
                       </Button>
                       <div className="flex gap-2">
-                        <Button
+                        {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -346,17 +341,18 @@ export default function Agents() {
                         >
                           <Play className="w-3 h-3 mr-1" />
                           Preview
-                        </Button>
+                        </Button> */}
                         <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
                           className="flex-1 cursor-pointer"
+                          onClick={() => navigate({ to: `/intelligence` })}
                         >
                           <ChartColumn className="w-3 h-3 mr-1" />
                           Analytics
                         </Button>
-                        <Button
+                        {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -368,7 +364,7 @@ export default function Agents() {
                           ) : (
                             <Play className="w-3 h-3" />
                           )}
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                   </CardContent>
@@ -380,7 +376,7 @@ export default function Agents() {
             {!isLoading && (
               <Card
                 data-slot="card"
-                className="shadow-none h-131 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
+                className="shadow-none h-110 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
               >
                 <CardContent
                   data-slot="card-content"
