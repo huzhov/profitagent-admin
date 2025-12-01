@@ -6,6 +6,7 @@ export type StageUploads = {
 export type Upload = {
   url: string;
   file: File | null;
+  key?: string;
 };
 
 export type StageUploadResponse = {
