@@ -12,15 +12,18 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { getAgentCount } from "@/services/agents";
+import { useBusiness } from "@/context/AppContext";
 
 export default function SidebarNavigation() {
   const navigate = useNavigate();
   const { location } = useRouterState();
   const currentPath = location.pathname;
+  const { business } = useBusiness();
 
   const { data } = useQuery({
     queryKey: ["agentCount"],
     queryFn: async () => getAgentCount(),
+    enabled: !!business,
   });
 
   const mainSections = [
@@ -30,7 +33,7 @@ export default function SidebarNavigation() {
       title: "Agents",
       icon: Bot,
       route: "/agents",
-      badge: data?.count ?? null,
+      badge: data?.count ? data.count : null,
     },
     // {
     //   id: "workflows",
