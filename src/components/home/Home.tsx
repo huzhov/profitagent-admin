@@ -14,6 +14,7 @@ import { getAgentList } from "@/services/agents";
 import { useBusiness } from "@/context/AppContext";
 import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import { getWhatsAppList } from "@/services/integrations";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -28,6 +29,13 @@ export default function Home() {
     enabled: !!business,
   });
 
+  const { data: whatsAppList, isLoading: isWhatsAppLoading } = useQuery({
+    queryKey: ["whatsAppList"],
+    queryFn: async () => {
+      return await getWhatsAppList();
+    },
+  });
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
@@ -37,6 +45,14 @@ export default function Home() {
         buttonLabel="Create Agent"
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
+        disabled={!!whatsAppList || isWhatsAppLoading}
+        tooltip={
+          !business
+            ? "Business Setup Required"
+            : whatsAppList
+              ? "Please add WhatsApp Business Account first"
+              : ""
+        }
       />
 
       {/* Stats Grid */}
@@ -83,7 +99,7 @@ export default function Home() {
                     </div>
                   </div>
                 ))
-              ) : data ? (
+              ) : data && data.length > 0 ? (
                 data?.slice(0, 3)?.map((agent, index) => (
                   <div
                     className="flex items-center justify-between p-3 border rounded-lg"
@@ -120,7 +136,7 @@ export default function Home() {
                     </p>
                     <Button
                       data-slot="button"
-                      onClick={() => navigate({ to: "/agents/create" })}
+                      onClick={() => navigate({ to: "/agents" })}
                       className="cursor-pointer"
                     >
                       Get Started

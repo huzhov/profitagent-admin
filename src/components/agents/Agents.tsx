@@ -17,6 +17,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useBusiness } from "@/context/AppContext";
 import StatsCards from "@/components/common/StatsCards";
 import BusinessInfoCard from "@/components/common/BusinessInfoCard";
+import { getWhatsAppList } from "@/services/integrations";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -30,6 +32,13 @@ export default function Agents() {
       return data;
     },
     enabled: !!business,
+  });
+
+  const { data: whatsAppList, isLoading: isWhatsAppLoading } = useQuery({
+    queryKey: ["whatsAppList"],
+    queryFn: async () => {
+      return await getWhatsAppList();
+    },
   });
 
   // const totalConversations = agents.reduce(
@@ -58,6 +67,14 @@ export default function Agents() {
         buttonLabel="Create Agent"
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
+        disabled={!!whatsAppList || isWhatsAppLoading}
+        tooltip={
+          !business
+            ? "Business Setup Required"
+            : whatsAppList
+              ? "Please add WhatsApp Business Account first"
+              : ""
+        }
       />
       {!business ? (
         <div className="flex-1 overflow-y-auto h-[calc(100vh-16rem)]">
@@ -373,13 +390,23 @@ export default function Agents() {
                     Set up a new AI agent to handle customer interactions and
                     drive conversions
                   </p>
-                  <Button
-                    data-slot="button"
-                    onClick={() => navigate({ to: "/agents/create" })}
-                    className="cursor-pointer"
-                  >
-                    Get Started
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button
+                        data-slot="button"
+                        onClick={() => navigate({ to: "/agents/create" })}
+                        className="cursor-pointer"
+                        disabled={!!whatsAppList}
+                      >
+                        Get Started
+                      </Button>
+                    </TooltipTrigger>
+                    {whatsAppList && (
+                      <TooltipContent>
+                        Please add WhatsApp Business Account first
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 </CardContent>
               </Card>
             )}
