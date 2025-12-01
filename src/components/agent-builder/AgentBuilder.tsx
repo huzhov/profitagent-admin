@@ -39,7 +39,6 @@ import { stageUpload, uploadFile } from "@/services/upload";
 import { toast } from "sonner";
 import type { WhatsAppResponse } from "@/types/integrations";
 import type { AxiosError } from "axios";
-import { is } from "zod/v4/locales";
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
