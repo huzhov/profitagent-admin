@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, ChevronDown, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,7 @@ export default function AgentBuilder() {
     setValue,
     watch,
     setError,
+    clearErrors,
     formState: { errors },
   } = useForm<AgentFormValues>({
     resolver: resolver,
@@ -107,7 +108,36 @@ export default function AgentBuilder() {
 
   // const [isSaved, setIsSaved] = useState(false);
 
-  const progress = 0; // Calculate based on filled fields
+  // Watch all required fields for progress calculation
+  const formValues = watch([
+    "agentName",
+    "description",
+    "objective",
+    "systemPrompt",
+    "whatsappIntegrationId",
+    "catalogS3Key",
+    "catalogName",
+  ]);
+
+  // Calculate progress based on required fields completion
+  const progress = useMemo(() => {
+    const requiredFields = [
+      "agentName",
+      "description",
+      "objective",
+      "systemPrompt",
+      "whatsappIntegrationId",
+      "catalogS3Key",
+      "catalogName",
+    ];
+
+    const filledFields = requiredFields.filter((field) => {
+      const value = watch(field as keyof AgentFormValues);
+      return value && value.toString().trim().length > 0;
+    });
+
+    return Math.round((filledFields.length / requiredFields.length) * 100);
+  }, [formValues, watch]);
 
   // Creating agent function
   const { mutate: createAgentFn, isPending: isCreateAgentPending } =
@@ -153,17 +183,39 @@ export default function AgentBuilder() {
   // Upload function
   const { mutate: uploadFileFn } = useMutation({
     mutationFn: uploadFile,
+    onSuccess: (_data, variables) => {
+      // Use the key parameter directly instead of relying on stagingKey state
+      if (variables.key) {
+        setValue("catalogS3Key", variables.key, { shouldValidate: true });
+      }
+      toast.success("Product catalog uploaded successfully");
+    },
+    onError: (error: AxiosError) => {
+      // Clear state on upload failure
+      setValue("catalogS3Key", "", { shouldValidate: true });
+      setValue("catalogName", "", { shouldValidate: true });
+      setUploadedFile(null);
+
+      toast.error("Failed to upload file to S3. Please try again.");
+      console.error("S3 upload error:", error);
+    },
   });
 
   // Stage Upload function
   const { mutate: stageUploadFn } = useMutation({
     mutationFn: stageUpload,
     onSuccess: (data, variables) => {
-      setValue("catalogS3Key", data.key, { shouldValidate: true });
+      // Set catalogName (metadata)
       setValue("catalogName", variables.filename, { shouldValidate: true });
 
-      // Call Upload Function
-      uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
+      // Call Upload Function with key parameter to avoid race condition
+      uploadFileFn({ url: data.uploadUrl, file: uploadedFile, key: data.key });
+    },
+    onError: (_error: AxiosError) => {
+      toast.error("Failed to prepare file upload. Please try again.");
+      setUploadedFile(null);
+      setValue("catalogS3Key", "", { shouldValidate: true });
+      setValue("catalogName", "", { shouldValidate: true });
     },
   });
 
@@ -202,6 +254,7 @@ export default function AgentBuilder() {
     name: agentName,
     checkExists: checkIfAgentExists,
     setError,
+    clearErrors,
     fieldName: "agentName",
     enabled: isAgentCreate, // Only validate in create mode
   });
@@ -282,7 +335,7 @@ export default function AgentBuilder() {
           contentType: file.type,
         });
 
-        toast.success("CSV file validated and ready to upload");
+        // Remove premature success toast - let actual upload completion handle it
         setCsvValidationError(null);
       } catch {
         // Clear form values and uploaded file when validation fails
