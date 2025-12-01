@@ -641,8 +641,10 @@ export default function SettingsAccount() {
                           <FormControl>
                             <Input
                               {...field}
+                              className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-inner-spin-button]:m-0"
                               maxLength={6}
                               placeholder="Enter 6-digit PIN"
+                              type="number"
                             />
                           </FormControl>
                           <FormMessage />

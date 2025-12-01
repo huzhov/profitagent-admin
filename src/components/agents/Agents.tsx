@@ -67,11 +67,11 @@ export default function Agents() {
         buttonLabel="Create Agent"
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
-        disabled={!!whatsAppList || isWhatsAppLoading}
+        disabled={!whatsAppList || isWhatsAppLoading}
         tooltip={
           !business
             ? "Business Setup Required"
-            : whatsAppList
+            : !whatsAppList
               ? "Please add WhatsApp Business Account first"
               : ""
         }
@@ -396,12 +396,12 @@ export default function Agents() {
                         data-slot="button"
                         onClick={() => navigate({ to: "/agents/create" })}
                         className="cursor-pointer"
-                        disabled={!!whatsAppList}
+                        disabled={!whatsAppList}
                       >
                         Get Started
                       </Button>
                     </TooltipTrigger>
-                    {whatsAppList && (
+                    {!whatsAppList && (
                       <TooltipContent>
                         Please add WhatsApp Business Account first
                       </TooltipContent>
