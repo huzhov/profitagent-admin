@@ -39,6 +39,7 @@ import { stageUpload, uploadFile } from "@/services/upload";
 import { toast } from "sonner";
 import type { WhatsAppResponse } from "@/types/integrations";
 import type { AxiosError } from "axios";
+import { is } from "zod/v4/locales";
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ export default function AgentBuilder() {
     watch,
     setError,
     clearErrors,
+    reset,
     formState: { errors },
   } = useForm<AgentFormValues>({
     resolver: resolver,
@@ -127,7 +129,7 @@ export default function AgentBuilder() {
     setError,
     clearErrors,
     fieldName: "agentName",
-    enabled: true,
+    enabled: isAgentCreate,
   });
 
   // Calculate progress based on required fields completion
@@ -258,18 +260,22 @@ export default function AgentBuilder() {
 
   // Reset form state when navigating to create new agent
   useEffect(() => {
-    if (isAgentCreate && !agentData) {
-      // Reset form to default values
-      Object.keys(defaultAgentValues).forEach((key) => {
-        setValue(
-          key as keyof AgentFormValues,
-          defaultAgentValues[key as keyof AgentFormValues]
-        );
-      });
+    if (isAgentCreate) {
+      // Always reset form when in create mode, regardless of cached agentData
+      reset(defaultAgentValues);
 
       // Reset upload states
       setUploadedFile(null);
       setCsvValidationError(null);
+
+      // Reset channel state to default
+      setChannels({
+        whatsapp: true,
+        web: false,
+        slack: false,
+        telegram: false,
+        sms: false,
+      });
 
       // Reset collapsible states to defaults
       setOpenSections({
@@ -296,11 +302,14 @@ export default function AgentBuilder() {
         recommendations: false,
         conversationFlow: false,
       });
+
+      // Clear any form errors from previous edits
+      clearErrors();
     }
-  }, [isAgentCreate, agentData, setValue]);
+  }, [isAgentCreate, location.pathname, reset, clearErrors]);
 
   useEffect(() => {
-    if (agentData) {
+    if (agentData && isAgentEdit) {
       setValue("agentName", agentData?.name || "");
       setValue("description", agentData?.description || "");
       setValue("systemPrompt", agentData?.systemPrompt || "");
@@ -311,7 +320,7 @@ export default function AgentBuilder() {
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
     }
-  }, [agentData, setValue]);
+  }, [agentData, setValue, isAgentEdit]);
 
   const validateCSV = async (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
