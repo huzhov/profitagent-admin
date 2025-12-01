@@ -35,3 +35,7 @@ export type AgentResponse = {
   subscriptionPlans: string;
   status: string;
 };
+
+export type AgentCountResponse = {
+  count: number;
+};
