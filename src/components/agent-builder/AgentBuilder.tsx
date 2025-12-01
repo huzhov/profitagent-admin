@@ -119,6 +119,17 @@ export default function AgentBuilder() {
     "catalogName",
   ]);
 
+  // Name validation using custom hook
+  const agentName = watch("agentName");
+  const nameValidation = useNameValidation({
+    name: agentName,
+    checkExists: checkIfAgentExists,
+    setError,
+    clearErrors,
+    fieldName: "agentName",
+    enabled: true,
+  });
+
   // Calculate progress based on required fields completion
   const progress = useMemo(() => {
     const requiredFields = [
@@ -133,11 +144,22 @@ export default function AgentBuilder() {
 
     const filledFields = requiredFields.filter((field) => {
       const value = watch(field as keyof AgentFormValues);
+
+      // Special validation for agentName it must have value AND be valid
+      if (field === "agentName" && isAgentCreate) {
+        return (
+          value &&
+          value.toString().trim().length > 0 &&
+          nameValidation.status === "available"
+        );
+      }
+
+      // For other fields, just check if they have valid values
       return value && value.toString().trim().length > 0;
     });
 
     return Math.round((filledFields.length / requiredFields.length) * 100);
-  }, [formValues, watch]);
+  }, [formValues, watch, nameValidation.status, isAgentCreate]);
 
   // Creating agent function
   const { mutate: createAgentFn, isPending: isCreateAgentPending } =
@@ -234,6 +256,49 @@ export default function AgentBuilder() {
     enabled: isAgentEdit,
   });
 
+  // Reset form state when navigating to create new agent
+  useEffect(() => {
+    if (isAgentCreate && !agentData) {
+      // Reset form to default values
+      Object.keys(defaultAgentValues).forEach((key) => {
+        setValue(
+          key as keyof AgentFormValues,
+          defaultAgentValues[key as keyof AgentFormValues]
+        );
+      });
+
+      // Reset upload states
+      setUploadedFile(null);
+      setCsvValidationError(null);
+
+      // Reset collapsible states to defaults
+      setOpenSections({
+        basicInfo: true,
+        brandBusiness: true,
+        behavior: true,
+        aiConfig: true,
+        channels: true,
+        knowledge: false,
+        productCatalogue: false,
+        audience: false,
+        productInfo: false,
+        processWorkflow: false,
+        compliance: false,
+        customerEducation: false,
+        salesMarketing: false,
+        dataTools: false,
+        guardrails: false,
+        messagingControls: false,
+        hitlHandover: false,
+        whatsappComponents: false,
+        scheduling: false,
+        questionSets: false,
+        recommendations: false,
+        conversationFlow: false,
+      });
+    }
+  }, [isAgentCreate, agentData, setValue]);
+
   useEffect(() => {
     if (agentData) {
       setValue("agentName", agentData?.name || "");
@@ -247,17 +312,6 @@ export default function AgentBuilder() {
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
     }
   }, [agentData, setValue]);
-
-  // Name validation using custom hook
-  const agentName = watch("agentName");
-  const nameValidation = useNameValidation({
-    name: agentName,
-    checkExists: checkIfAgentExists,
-    setError,
-    clearErrors,
-    fieldName: "agentName",
-    enabled: isAgentCreate, // Only validate in create mode
-  });
 
   const validateCSV = async (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -503,7 +557,8 @@ export default function AgentBuilder() {
               nameValidation.status === "checking" ||
               nameValidation.status === "exists" ||
               nameValidation.status === "error" ||
-              !watch("agentName")?.trim()
+              !watch("agentName")?.trim() ||
+              progress < 100
             }
           >
             {isCreateAgentPending ? (
