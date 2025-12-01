@@ -45,11 +45,15 @@ export default function Home() {
         buttonLabel="Create Agent"
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
-        disabled={!whatsAppList || isWhatsAppLoading}
+        disabled={
+          (whatsAppList && !whatsAppList.length) ||
+          isWhatsAppLoading ||
+          !business
+        }
         tooltip={
           !business
             ? "Business Setup Required"
-            : !whatsAppList
+            : whatsAppList && !whatsAppList.length
               ? "Please add WhatsApp Business Account first"
               : ""
         }
