@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { UseFormSetError, FieldValues, Path } from "react-hook-form";
+import type {
+  UseFormSetError,
+  UseFormClearErrors,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 
 export type ValidationStatus =
   | "idle"
@@ -17,6 +22,7 @@ export interface UseNameValidationOptions<T extends FieldValues> {
   name: string;
   checkExists: (name: string) => Promise<{ exists: boolean }>;
   setError: UseFormSetError<T>;
+  clearErrors: UseFormClearErrors<T>;
   fieldName: Path<T>;
   debounceMs?: number;
   minLength?: number;
@@ -27,6 +33,7 @@ export function useNameValidation<T extends FieldValues>({
   name,
   checkExists,
   setError,
+  clearErrors,
   fieldName,
   debounceMs = 1000,
   minLength = 2,
@@ -68,7 +75,7 @@ export function useNameValidation<T extends FieldValues>({
         } else {
           setValidation({ status: "available" });
           // Clear any existing error
-          setError(fieldName, { type: "manual", message: undefined });
+          clearErrors(fieldName);
         }
       } catch (error) {
         console.error("Error checking name:", error);
@@ -78,7 +85,7 @@ export function useNameValidation<T extends FieldValues>({
         });
       }
     },
-    [checkExists, setError, fieldName, minLength]
+    [checkExists, setError, clearErrors, fieldName, minLength]
   );
 
   useEffect(() => {

@@ -59,6 +59,7 @@ export default function BusinessSettings() {
     name: businessName,
     checkExists: checkIfBusinessExists,
     setError: form.setError,
+    clearErrors: form.clearErrors,
     fieldName: "name",
   });
 

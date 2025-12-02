@@ -65,7 +65,11 @@ export default function SidebarNavigation() {
       <ul className="space-y-2">
         {mainSections.map((section) => {
           const Icon = section.icon;
-          const isActive = currentPath === section.route;
+          // Check for exact match or if current path starts with section route (for nested routes)
+          const isActive =
+            currentPath === section.route ||
+            (section.route !== "/" &&
+              currentPath.startsWith(section.route + "/"));
 
           return (
             <li key={section.id}>

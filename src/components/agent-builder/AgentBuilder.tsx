@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
 import { ArrowLeft, ChevronDown, Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { Resolver, FieldErrors } from "react-hook-form";
 import { createAgent, getAgent, checkIfAgentExists } from "@/services/agents";
 import { useNameValidation } from "@/hooks/useNameValidation";
@@ -55,8 +55,10 @@ export default function AgentBuilder() {
   const {
     handleSubmit,
     setValue,
-    watch,
+    control,
     setError,
+    clearErrors,
+    reset,
     formState: { errors },
   } = useForm<AgentFormValues>({
     resolver: resolver,
@@ -65,14 +67,9 @@ export default function AgentBuilder() {
   });
 
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [csvValidationError, setCsvValidationError] = useState<string | null>(
-    null
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Track collapsible states
-  const [openSections, setOpenSections] = useState({
+  // Computed initial states based on mode
+  const getDefaultOpenSections = () => ({
     basicInfo: true,
     brandBusiness: true,
     behavior: true,
@@ -97,7 +94,7 @@ export default function AgentBuilder() {
     conversationFlow: false,
   });
 
-  const [channels, setChannels] = useState({
+  const getDefaultChannels = () => ({
     whatsapp: true,
     web: false,
     slack: false,
@@ -105,9 +102,91 @@ export default function AgentBuilder() {
     sms: false,
   });
 
-  // const [isSaved, setIsSaved] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [csvValidationError, setCsvValidationError] = useState<string | null>(
+    null
+  );
+  const [openSections, setOpenSections] = useState(getDefaultOpenSections);
+  const [channels, setChannels] = useState(getDefaultChannels);
 
-  const progress = 0; // Calculate based on filled fields
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadKeyRef = useRef<string | null>(null);
+
+  // Watch all required fields for progress calculation using useWatch (proper hook)
+  const formValues = useWatch({
+    control,
+    name: [
+      "agentName",
+      "description",
+      "objective",
+      "systemPrompt",
+      "whatsappIntegrationId",
+      "catalogS3Key",
+      "catalogName",
+    ],
+  });
+
+  // Name validation using custom hook
+  const agentName = useWatch({ control, name: "agentName" });
+  const description = useWatch({ control, name: "description" });
+  const objective = useWatch({ control, name: "objective" });
+  const toneOfVoice = useWatch({ control, name: "toneOfVoice" });
+  const creativity = useWatch({ control, name: "creativity" });
+  const systemPrompt = useWatch({ control, name: "systemPrompt" });
+  const whatsappIntegrationId = useWatch({
+    control,
+    name: "whatsappIntegrationId",
+  });
+  const faqsBestAnswers = useWatch({ control, name: "faqsBestAnswers" });
+  const productPlans = useWatch({ control, name: "productPlans" });
+  const nameValidation = useNameValidation({
+    name: agentName,
+    checkExists: checkIfAgentExists,
+    setError,
+    clearErrors,
+    fieldName: "agentName",
+    enabled: isAgentCreate,
+  });
+
+  // Helper function to validate field values
+  const isStringifiedValueNotEmpty = (value: unknown): boolean => {
+    return !!value?.toString()?.trim().length;
+  };
+
+  // Calculate progress based on required fields completion
+  const progress = useMemo(() => {
+    // Helper function moved inside useMemo to avoid dependency issues
+    const isAgentNameValidForProgress = (value: unknown): boolean => {
+      return (
+        isStringifiedValueNotEmpty(value) &&
+        nameValidation.status === "available"
+      );
+    };
+
+    const requiredFields = [
+      "agentName",
+      "description",
+      "objective",
+      "systemPrompt",
+      "whatsappIntegrationId",
+      "catalogS3Key",
+      "catalogName",
+    ] as const;
+
+    const filledFields = requiredFields.filter((field) => {
+      const value = formValues[requiredFields.indexOf(field)];
+
+      // Special validation for agentName - it must have value AND be valid
+      if (field === "agentName" && isAgentCreate) {
+        return isAgentNameValidForProgress(value);
+      }
+
+      // For other fields, just check if they have valid values
+      return isStringifiedValueNotEmpty(value);
+    });
+
+    return Math.round((filledFields.length / requiredFields.length) * 100);
+  }, [formValues, nameValidation.status, isAgentCreate]);
 
   // Creating agent function
   const { mutate: createAgentFn, isPending: isCreateAgentPending } =
@@ -153,17 +232,57 @@ export default function AgentBuilder() {
   // Upload function
   const { mutate: uploadFileFn } = useMutation({
     mutationFn: uploadFile,
+    onSuccess: () => {
+      // Only show success and set key if we have a stored key from staging
+      const key = uploadKeyRef.current;
+      if (key) {
+        setValue("catalogS3Key", key, { shouldValidate: true });
+        toast.success("Product catalog uploaded successfully");
+        // Clear the stored key after successful use
+        uploadKeyRef.current = null;
+      } else {
+        // Handle case where upload completed but no key was stored
+        toast.error(
+          "Upload completed but no file reference received. Please try again."
+        );
+        setValue("catalogS3Key", "", { shouldValidate: true });
+        setValue("catalogName", "", { shouldValidate: true });
+        setUploadedFile(null);
+      }
+    },
+    onError: (error: AxiosError) => {
+      // Clear state on upload failure
+      setValue("catalogS3Key", "", { shouldValidate: true });
+      setValue("catalogName", "", { shouldValidate: true });
+      setUploadedFile(null);
+      // Clear the stored key on error
+      uploadKeyRef.current = null;
+
+      toast.error("Failed to upload file to S3. Please try again.");
+      console.error("S3 upload error:", error);
+    },
   });
 
   // Stage Upload function
   const { mutate: stageUploadFn } = useMutation({
     mutationFn: stageUpload,
     onSuccess: (data, variables) => {
-      setValue("catalogS3Key", data.key, { shouldValidate: true });
+      // Set catalogName (metadata)
       setValue("catalogName", variables.filename, { shouldValidate: true });
 
-      // Call Upload Function
+      // Store the key for use in upload success callback
+      uploadKeyRef.current = data.key;
+
+      // Call Upload Function without key parameter
       uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
+    },
+    onError: () => {
+      toast.error("Failed to prepare file upload. Please try again.");
+      setUploadedFile(null);
+      setValue("catalogS3Key", "", { shouldValidate: true });
+      setValue("catalogName", "", { shouldValidate: true });
+      // Clear the stored key on error
+      uploadKeyRef.current = null;
     },
   });
 
@@ -182,8 +301,22 @@ export default function AgentBuilder() {
     enabled: isAgentEdit,
   });
 
+  // Reset form state when navigating to create new agent
   useEffect(() => {
-    if (agentData) {
+    if (isAgentCreate) {
+      // Clear any form errors from previous edits first
+      clearErrors();
+
+      // Always reset form when in create mode, regardless of cached agentData
+      reset(defaultAgentValues);
+
+      // Clear ref
+      uploadKeyRef.current = null;
+    }
+  }, [isAgentCreate, location.pathname, reset, clearErrors]);
+
+  useEffect(() => {
+    if (agentData && isAgentEdit) {
       setValue("agentName", agentData?.name || "");
       setValue("description", agentData?.description || "");
       setValue("systemPrompt", agentData?.systemPrompt || "");
@@ -194,17 +327,7 @@ export default function AgentBuilder() {
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
     }
-  }, [agentData, setValue]);
-
-  // Name validation using custom hook
-  const agentName = watch("agentName");
-  const nameValidation = useNameValidation({
-    name: agentName,
-    checkExists: checkIfAgentExists,
-    setError,
-    fieldName: "agentName",
-    enabled: isAgentCreate, // Only validate in create mode
-  });
+  }, [agentData, setValue, isAgentEdit]);
 
   const validateCSV = async (file: File): Promise<boolean> => {
     return new Promise((resolve, reject) => {
@@ -282,7 +405,7 @@ export default function AgentBuilder() {
           contentType: file.type,
         });
 
-        toast.success("CSV file validated and ready to upload");
+        // Remove premature success toast - let actual upload completion handle it
         setCsvValidationError(null);
       } catch {
         // Clear form values and uploaded file when validation fails
@@ -411,7 +534,7 @@ export default function AgentBuilder() {
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <Input
-                value={watch("agentName")}
+                value={agentName}
                 onChange={(e) =>
                   setValue("agentName", e.target.value, {
                     shouldValidate: true,
@@ -450,7 +573,8 @@ export default function AgentBuilder() {
               nameValidation.status === "checking" ||
               nameValidation.status === "exists" ||
               nameValidation.status === "error" ||
-              !watch("agentName")?.trim()
+              !agentName?.trim() ||
+              progress < 100
             }
           >
             {isCreateAgentPending ? (
@@ -512,7 +636,7 @@ export default function AgentBuilder() {
                             id="agent-name"
                             placeholder="e.g., SalesBot Pro"
                             className="mt-1.5"
-                            value={watch("agentName")}
+                            value={agentName}
                             onChange={(e) =>
                               setValue("agentName", e.target.value, {
                                 shouldValidate: true,
@@ -550,7 +674,7 @@ export default function AgentBuilder() {
                             id="agent-description"
                             placeholder="Brief description of what this agent does"
                             rows={3}
-                            value={watch("description")}
+                            value={description}
                             onChange={(e) =>
                               setValue("description", e.target.value, {
                                 shouldValidate: true,
@@ -579,7 +703,7 @@ export default function AgentBuilder() {
                           <Input
                             id="agent-objective"
                             placeholder="e.g., Qualify leads and book meetings"
-                            value={watch("objective")}
+                            value={objective}
                             onChange={(e) =>
                               setValue("objective", e.target.value, {
                                 shouldValidate: true,
@@ -622,7 +746,7 @@ export default function AgentBuilder() {
                         <div>
                           <Label htmlFor="tone">Communication Tone</Label>
                           <Select
-                            value={watch("toneOfVoice")}
+                            value={toneOfVoice}
                             onValueChange={(value) =>
                               setValue("toneOfVoice", value, {
                                 shouldValidate: true,
@@ -654,14 +778,14 @@ export default function AgentBuilder() {
                         </div>
                         <div>
                           <Label htmlFor="temperature">
-                            Creativity Level: {watch("creativity")}
+                            Creativity Level: {creativity}
                           </Label>
                           <Slider
                             id="temperature"
                             min={0}
                             max={1}
                             step={0.1}
-                            value={[watch("creativity")]}
+                            value={[creativity]}
                             onValueChange={(value) =>
                               setValue("creativity", value[0])
                             }
@@ -715,7 +839,7 @@ export default function AgentBuilder() {
                             id="system-prompt"
                             placeholder="Describe the agent's role, personality, and instructions..."
                             rows={6}
-                            value={watch("systemPrompt")}
+                            value={systemPrompt}
                             onChange={(e) =>
                               setValue("systemPrompt", e.target.value, {
                                 shouldValidate: true,
@@ -808,7 +932,7 @@ export default function AgentBuilder() {
                               <span className="text-red-500">*</span>
                             </Label>
                             <Select
-                              value={watch("whatsappIntegrationId")}
+                              value={whatsappIntegrationId}
                               onValueChange={(value) =>
                                 setValue("whatsappIntegrationId", value, {
                                   shouldValidate: true,
@@ -909,7 +1033,7 @@ export default function AgentBuilder() {
                             id="context-info"
                             placeholder="Product details, pricing, FAQs, company policies, etc."
                             rows={4}
-                            value={watch("faqsBestAnswers")}
+                            value={faqsBestAnswers}
                             onChange={(e) =>
                               setValue("faqsBestAnswers", e.target.value)
                             }
@@ -958,7 +1082,7 @@ export default function AgentBuilder() {
                             id="product-catalogue"
                             placeholder="List products or subscription plans with details"
                             rows={6}
-                            value={watch("productPlans")}
+                            value={productPlans}
                             onChange={(e) =>
                               setValue("productPlans", e.target.value, {
                                 shouldValidate: true,
