@@ -25,8 +25,7 @@ export async function stageUpload(
 export async function uploadFile({
   url,
   file,
-  key: _key,
-}: Upload): Promise<void> {
+}: Pick<Upload, "url" | "file">): Promise<void> {
   const { data } = await axiosInstance.put(url, file, {
     headers: {
       "Content-Type": file?.type || "application/octet-stream",

@@ -72,6 +72,7 @@ export default function AgentBuilder() {
     null
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadKeyRef = useRef<string | null>(null);
 
   // Track collapsible states
   const [openSections, setOpenSections] = useState({
@@ -131,6 +132,17 @@ export default function AgentBuilder() {
     enabled: isAgentCreate,
   });
 
+  // Helper function to validate field values
+  const isStringifiedValueNotEmpty = (value: unknown): boolean => {
+    return !!value?.toString()?.trim().length;
+  };
+
+  const isAgentNameValidForProgress = (value: unknown): boolean => {
+    return (
+      isStringifiedValueNotEmpty(value) && nameValidation.status === "available"
+    );
+  };
+
   // Calculate progress based on required fields completion
   const progress = useMemo(() => {
     const requiredFields = [
@@ -141,26 +153,22 @@ export default function AgentBuilder() {
       "whatsappIntegrationId",
       "catalogS3Key",
       "catalogName",
-    ];
+    ] as const;
 
     const filledFields = requiredFields.filter((field) => {
-      const value = watch(field as keyof AgentFormValues);
+      const value = formValues[requiredFields.indexOf(field)];
 
-      // Special validation for agentName it must have value AND be valid
+      // Special validation for agentName - it must have value AND be valid
       if (field === "agentName" && isAgentCreate) {
-        return (
-          value &&
-          value.toString().trim().length > 0 &&
-          nameValidation.status === "available"
-        );
+        return isAgentNameValidForProgress(value);
       }
 
       // For other fields, just check if they have valid values
-      return value && value.toString().trim().length > 0;
+      return isStringifiedValueNotEmpty(value);
     });
 
     return Math.round((filledFields.length / requiredFields.length) * 100);
-  }, [formValues, watch, nameValidation.status, isAgentCreate]);
+  }, [formValues, nameValidation.status, isAgentCreate]);
 
   // Creating agent function
   const { mutate: createAgentFn, isPending: isCreateAgentPending } =
@@ -206,18 +214,31 @@ export default function AgentBuilder() {
   // Upload function
   const { mutate: uploadFileFn } = useMutation({
     mutationFn: uploadFile,
-    onSuccess: (_data, variables) => {
-      // Use the key parameter directly instead of relying on stagingKey state
-      if (variables.key) {
-        setValue("catalogS3Key", variables.key, { shouldValidate: true });
+    onSuccess: (_data) => {
+      // Only show success and set key if we have a stored key from staging
+      const key = uploadKeyRef.current;
+      if (key) {
+        setValue("catalogS3Key", key, { shouldValidate: true });
+        toast.success("Product catalog uploaded successfully");
+        // Clear the stored key after successful use
+        uploadKeyRef.current = null;
+      } else {
+        // Handle case where upload completed but no key was stored
+        toast.error(
+          "Upload completed but no file reference received. Please try again."
+        );
+        setValue("catalogS3Key", "", { shouldValidate: true });
+        setValue("catalogName", "", { shouldValidate: true });
+        setUploadedFile(null);
       }
-      toast.success("Product catalog uploaded successfully");
     },
     onError: (error: AxiosError) => {
       // Clear state on upload failure
       setValue("catalogS3Key", "", { shouldValidate: true });
       setValue("catalogName", "", { shouldValidate: true });
       setUploadedFile(null);
+      // Clear the stored key on error
+      uploadKeyRef.current = null;
 
       toast.error("Failed to upload file to S3. Please try again.");
       console.error("S3 upload error:", error);
@@ -231,14 +252,19 @@ export default function AgentBuilder() {
       // Set catalogName (metadata)
       setValue("catalogName", variables.filename, { shouldValidate: true });
 
-      // Call Upload Function with key parameter to avoid race condition
-      uploadFileFn({ url: data.uploadUrl, file: uploadedFile, key: data.key });
+      // Store the key for use in upload success callback
+      uploadKeyRef.current = data.key;
+
+      // Call Upload Function without key parameter
+      uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
     },
     onError: (_error: AxiosError) => {
       toast.error("Failed to prepare file upload. Please try again.");
       setUploadedFile(null);
       setValue("catalogS3Key", "", { shouldValidate: true });
       setValue("catalogName", "", { shouldValidate: true });
+      // Clear the stored key on error
+      uploadKeyRef.current = null;
     },
   });
 
@@ -260,12 +286,16 @@ export default function AgentBuilder() {
   // Reset form state when navigating to create new agent
   useEffect(() => {
     if (isAgentCreate) {
+      // Clear any form errors from previous edits first
+      clearErrors();
+
       // Always reset form when in create mode, regardless of cached agentData
       reset(defaultAgentValues);
 
       // Reset upload states
       setUploadedFile(null);
       setCsvValidationError(null);
+      uploadKeyRef.current = null;
 
       // Reset channel state to default
       setChannels({
@@ -301,9 +331,6 @@ export default function AgentBuilder() {
         recommendations: false,
         conversationFlow: false,
       });
-
-      // Clear any form errors from previous edits
-      clearErrors();
     }
   }, [isAgentCreate, location.pathname, reset, clearErrors]);
 
