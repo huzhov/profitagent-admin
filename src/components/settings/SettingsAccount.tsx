@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  MessageSquare,
   CheckCircle2,
   AlertCircle,
   Key,
@@ -68,7 +67,7 @@ import { toast } from "sonner";
 import { useBusiness, useApp } from "@/context/AppContext";
 import { formatDistanceToNow } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MetaIcon } from "@/components/assets";
+import { MetaIcon, WhatsAppIcon } from "@/components/assets";
 import {
   Select,
   SelectContent,
@@ -472,7 +471,7 @@ export default function SettingsAccount() {
                         >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                              <MessageSquare className="w-5 h-5 text-green-600" />
+                              <WhatsAppIcon className="w-5 h-5 text-green-600" />
                             </div>
                             <div>
                               <p className="font-medium">{connection.name}</p>
@@ -523,7 +522,7 @@ export default function SettingsAccount() {
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-green-600" />
+                  <WhatsAppIcon className="w-5 h-5" />
                   Add New WhatsApp Business Account
                 </CardTitle>
                 <CardDescription>
@@ -822,7 +821,7 @@ export default function SettingsAccount() {
               {/* Connection Info */}
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-green-600" />
+                  <WhatsAppIcon className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">{selectedConnection.name}</p>

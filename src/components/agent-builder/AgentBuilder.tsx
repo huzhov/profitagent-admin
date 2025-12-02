@@ -39,6 +39,7 @@ import { stageUpload, uploadFile } from "@/services/upload";
 import { toast } from "sonner";
 import type { WhatsAppResponse } from "@/types/integrations";
 import type { AxiosError } from "axios";
+import { WhatsAppIcon } from "../assets";
 
 export default function AgentBuilder() {
   const navigate = useNavigate();
@@ -775,7 +776,7 @@ export default function AgentBuilder() {
                             className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="text-xl">{channel.emoji}</span>
+                              <WhatsAppIcon />
                               <span className="text-gray-900">
                                 {channel.label}
                               </span>
