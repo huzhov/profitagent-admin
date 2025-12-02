@@ -121,7 +121,9 @@ export default function SettingsAccount() {
 
   const [submitting, setSubmitting] = useState(false);
   const [highlightBusiness, setHighlightBusiness] = useState(false);
+  const [highlightWhatsapp, setHighlightWhatsapp] = useState(false);
   const businessCardRef = useRef<HTMLDivElement>(null);
+  const whatsAppCardRef = useRef<HTMLDivElement>(null);
 
   const businessForm = useForm<BusinessFormValues>({
     resolver: zodResolver(businessFormSchema),
@@ -190,6 +192,23 @@ export default function SettingsAccount() {
       setHighlightBusiness(true);
       const timer = setTimeout(() => {
         setHighlightBusiness(false);
+      }, 2000); // Remove highlight after 2 seconds (2 pulses)
+
+      return () => clearTimeout(timer);
+    }
+
+    // Highlight WhatsApp section
+    if (hash === "#whatsapp-account") {
+      // Scroll to the section
+      whatsAppCardRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Trigger highlight animation
+      setHighlightWhatsapp(true);
+      const timer = setTimeout(() => {
+        setHighlightWhatsapp(false);
       }, 2000); // Remove highlight after 2 seconds (2 pulses)
 
       return () => clearTimeout(timer);
@@ -493,7 +512,15 @@ export default function SettingsAccount() {
               </CardContent>
             </Card>
             {/* Add New WhatsApp Business Account - Only show if business exists */}{" "}
-            <Card className="shadow-none">
+            <Card
+              ref={whatsAppCardRef}
+              className={`shadow-none ${
+                highlightWhatsapp
+                  ? "animate-heartbeat ring-2 ring-blue-500 ring-offset-4 bg-blue-50/50 shadow-lg shadow-blue-200/50"
+                  : ""
+              }`}
+              id="whatsapp-account"
+            >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-green-600" />

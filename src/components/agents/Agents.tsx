@@ -73,11 +73,31 @@ export default function Agents() {
           !business
         }
         tooltip={
-          !business
-            ? "Business Setup Required"
-            : whatsAppList && !whatsAppList.length
-              ? "Please add WhatsApp Business Account first"
-              : ""
+          !business ? (
+            <>
+              <p className="font-medium">Business Setup Required</p> You need to
+              create a business in the{" "}
+              <a
+                href="/settings/account#business-settings"
+                className="underline font-medium"
+              >
+                Account & Integration Settings
+              </a>
+            </>
+          ) : whatsAppList && !whatsAppList.length ? (
+            <>
+              <p className="font-medium">No WhatsApp numbers available.</p>
+              Please add one in{" "}
+              <a
+                href="/settings/account#whatsapp-account"
+                className="underline font-medium"
+              >
+                Account & Integration Settings
+              </a>
+            </>
+          ) : (
+            ""
+          )
         }
       />
       {!business ? (
@@ -395,19 +415,33 @@ export default function Agents() {
                     drive conversions
                   </p>
                   <Tooltip>
-                    <TooltipTrigger>
-                      <Button
-                        data-slot="button"
-                        onClick={() => navigate({ to: "/agents/create" })}
-                        className="cursor-pointer"
-                        disabled={whatsAppList && !whatsAppList.length}
-                      >
-                        Get Started
-                      </Button>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Button
+                          data-slot="button"
+                          onClick={() => navigate({ to: "/agents/create" })}
+                          className="cursor-pointer"
+                          disabled={
+                            (whatsAppList && !whatsAppList.length) ||
+                            isWhatsAppLoading
+                          }
+                        >
+                          Get Started
+                        </Button>
+                      </div>
                     </TooltipTrigger>
                     {whatsAppList && !whatsAppList.length && (
                       <TooltipContent>
-                        Please add WhatsApp Business Account first
+                        <p className="font-medium">
+                          No WhatsApp numbers available.
+                        </p>
+                        Please add one in{" "}
+                        <a
+                          href="/settings/account#whatsapp-account"
+                          className="underline font-medium"
+                        >
+                          Account & Integration Settings
+                        </a>
                       </TooltipContent>
                     )}
                   </Tooltip>

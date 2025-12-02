@@ -11,7 +11,7 @@ interface PageHeaderProps {
   showButton?: boolean;
   showBorder?: boolean;
   disabled?: boolean;
-  tooltip?: string;
+  tooltip?: React.ReactNode;
 }
 
 export function PageHeader({
@@ -60,15 +60,17 @@ export function PageHeader({
       </div>
       {showButton && buttonLabel && (
         <Tooltip>
-          <TooltipTrigger>
-            <Button
-              className="h-10 px-6 has-[>svg]:px-4 shadow-none cursor-pointer"
-              onClick={onButtonClick}
-              disabled={disabled}
-            >
-              {ButtonIcon && <ButtonIcon className="w-4 h-4 mr-2" />}
-              {buttonLabel}
-            </Button>
+          <TooltipTrigger asChild>
+            <div>
+              <Button
+                className="h-10 px-6 has-[>svg]:px-4 shadow-none cursor-pointer"
+                onClick={onButtonClick}
+                disabled={disabled}
+              >
+                {ButtonIcon && <ButtonIcon className="w-4 h-4 mr-2" />}
+                {buttonLabel}
+              </Button>
+            </div>
           </TooltipTrigger>
           {tooltip && <TooltipContent sideOffset={4}>{tooltip}</TooltipContent>}
         </Tooltip>

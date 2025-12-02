@@ -51,11 +51,31 @@ export default function Home() {
           !business
         }
         tooltip={
-          !business
-            ? "Business Setup Required"
-            : whatsAppList && !whatsAppList.length
-              ? "Please add WhatsApp Business Account first"
-              : ""
+          !business ? (
+            <>
+              <p className="font-medium">Business Setup Required</p> You need to
+              create a business in the{" "}
+              <a
+                href="/settings/account#business-settings"
+                className="underline font-medium"
+              >
+                Account & Integration Settings
+              </a>
+            </>
+          ) : whatsAppList && !whatsAppList.length ? (
+            <>
+              <p className="font-medium">No WhatsApp numbers available.</p>
+              Please add one in{" "}
+              <a
+                href="/settings/account#whatsapp-account"
+                className="underline font-medium"
+              >
+                Account & Integration Settings
+              </a>
+            </>
+          ) : (
+            ""
+          )
         }
       />
 
