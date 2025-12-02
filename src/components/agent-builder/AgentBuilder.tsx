@@ -25,7 +25,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { Resolver, FieldErrors } from "react-hook-form";
 import { createAgent, getAgent, checkIfAgentExists } from "@/services/agents";
 import { useNameValidation } from "@/hooks/useNameValidation";
@@ -55,7 +55,7 @@ export default function AgentBuilder() {
   const {
     handleSubmit,
     setValue,
-    watch,
+    control,
     setError,
     clearErrors,
     reset,
@@ -67,15 +67,9 @@ export default function AgentBuilder() {
   });
 
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [csvValidationError, setCsvValidationError] = useState<string | null>(
-    null
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const uploadKeyRef = useRef<string | null>(null);
 
-  // Track collapsible states
-  const [openSections, setOpenSections] = useState({
+  // Computed initial states based on mode
+  const getDefaultOpenSections = () => ({
     basicInfo: true,
     brandBusiness: true,
     behavior: true,
@@ -100,7 +94,7 @@ export default function AgentBuilder() {
     conversationFlow: false,
   });
 
-  const [channels, setChannels] = useState({
+  const getDefaultChannels = () => ({
     whatsapp: true,
     web: false,
     slack: false,
@@ -108,21 +102,43 @@ export default function AgentBuilder() {
     sms: false,
   });
 
-  // const [isSaved, setIsSaved] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [csvValidationError, setCsvValidationError] = useState<string | null>(
+    null
+  );
+  const [openSections, setOpenSections] = useState(getDefaultOpenSections);
+  const [channels, setChannels] = useState(getDefaultChannels);
 
-  // Watch all required fields for progress calculation
-  const formValues = watch([
-    "agentName",
-    "description",
-    "objective",
-    "systemPrompt",
-    "whatsappIntegrationId",
-    "catalogS3Key",
-    "catalogName",
-  ]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadKeyRef = useRef<string | null>(null);
+
+  // Watch all required fields for progress calculation using useWatch (proper hook)
+  const formValues = useWatch({
+    control,
+    name: [
+      "agentName",
+      "description",
+      "objective",
+      "systemPrompt",
+      "whatsappIntegrationId",
+      "catalogS3Key",
+      "catalogName",
+    ],
+  });
 
   // Name validation using custom hook
-  const agentName = watch("agentName");
+  const agentName = useWatch({ control, name: "agentName" });
+  const description = useWatch({ control, name: "description" });
+  const objective = useWatch({ control, name: "objective" });
+  const toneOfVoice = useWatch({ control, name: "toneOfVoice" });
+  const creativity = useWatch({ control, name: "creativity" });
+  const systemPrompt = useWatch({ control, name: "systemPrompt" });
+  const whatsappIntegrationId = useWatch({
+    control,
+    name: "whatsappIntegrationId",
+  });
+  const faqsBestAnswers = useWatch({ control, name: "faqsBestAnswers" });
+  const productPlans = useWatch({ control, name: "productPlans" });
   const nameValidation = useNameValidation({
     name: agentName,
     checkExists: checkIfAgentExists,
@@ -137,14 +153,16 @@ export default function AgentBuilder() {
     return !!value?.toString()?.trim().length;
   };
 
-  const isAgentNameValidForProgress = (value: unknown): boolean => {
-    return (
-      isStringifiedValueNotEmpty(value) && nameValidation.status === "available"
-    );
-  };
-
   // Calculate progress based on required fields completion
   const progress = useMemo(() => {
+    // Helper function moved inside useMemo to avoid dependency issues
+    const isAgentNameValidForProgress = (value: unknown): boolean => {
+      return (
+        isStringifiedValueNotEmpty(value) &&
+        nameValidation.status === "available"
+      );
+    };
+
     const requiredFields = [
       "agentName",
       "description",
@@ -214,7 +232,7 @@ export default function AgentBuilder() {
   // Upload function
   const { mutate: uploadFileFn } = useMutation({
     mutationFn: uploadFile,
-    onSuccess: (_data) => {
+    onSuccess: () => {
       // Only show success and set key if we have a stored key from staging
       const key = uploadKeyRef.current;
       if (key) {
@@ -258,7 +276,7 @@ export default function AgentBuilder() {
       // Call Upload Function without key parameter
       uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
     },
-    onError: (_error: AxiosError) => {
+    onError: () => {
       toast.error("Failed to prepare file upload. Please try again.");
       setUploadedFile(null);
       setValue("catalogS3Key", "", { shouldValidate: true });
@@ -292,45 +310,8 @@ export default function AgentBuilder() {
       // Always reset form when in create mode, regardless of cached agentData
       reset(defaultAgentValues);
 
-      // Reset upload states
-      setUploadedFile(null);
-      setCsvValidationError(null);
+      // Clear ref
       uploadKeyRef.current = null;
-
-      // Reset channel state to default
-      setChannels({
-        whatsapp: true,
-        web: false,
-        slack: false,
-        telegram: false,
-        sms: false,
-      });
-
-      // Reset collapsible states to defaults
-      setOpenSections({
-        basicInfo: true,
-        brandBusiness: true,
-        behavior: true,
-        aiConfig: true,
-        channels: true,
-        knowledge: false,
-        productCatalogue: false,
-        audience: false,
-        productInfo: false,
-        processWorkflow: false,
-        compliance: false,
-        customerEducation: false,
-        salesMarketing: false,
-        dataTools: false,
-        guardrails: false,
-        messagingControls: false,
-        hitlHandover: false,
-        whatsappComponents: false,
-        scheduling: false,
-        questionSets: false,
-        recommendations: false,
-        conversationFlow: false,
-      });
     }
   }, [isAgentCreate, location.pathname, reset, clearErrors]);
 
@@ -553,7 +534,7 @@ export default function AgentBuilder() {
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <Input
-                value={watch("agentName")}
+                value={agentName}
                 onChange={(e) =>
                   setValue("agentName", e.target.value, {
                     shouldValidate: true,
@@ -592,7 +573,7 @@ export default function AgentBuilder() {
               nameValidation.status === "checking" ||
               nameValidation.status === "exists" ||
               nameValidation.status === "error" ||
-              !watch("agentName")?.trim() ||
+              !agentName?.trim() ||
               progress < 100
             }
           >
@@ -655,7 +636,7 @@ export default function AgentBuilder() {
                             id="agent-name"
                             placeholder="e.g., SalesBot Pro"
                             className="mt-1.5"
-                            value={watch("agentName")}
+                            value={agentName}
                             onChange={(e) =>
                               setValue("agentName", e.target.value, {
                                 shouldValidate: true,
@@ -693,7 +674,7 @@ export default function AgentBuilder() {
                             id="agent-description"
                             placeholder="Brief description of what this agent does"
                             rows={3}
-                            value={watch("description")}
+                            value={description}
                             onChange={(e) =>
                               setValue("description", e.target.value, {
                                 shouldValidate: true,
@@ -722,7 +703,7 @@ export default function AgentBuilder() {
                           <Input
                             id="agent-objective"
                             placeholder="e.g., Qualify leads and book meetings"
-                            value={watch("objective")}
+                            value={objective}
                             onChange={(e) =>
                               setValue("objective", e.target.value, {
                                 shouldValidate: true,
@@ -765,7 +746,7 @@ export default function AgentBuilder() {
                         <div>
                           <Label htmlFor="tone">Communication Tone</Label>
                           <Select
-                            value={watch("toneOfVoice")}
+                            value={toneOfVoice}
                             onValueChange={(value) =>
                               setValue("toneOfVoice", value, {
                                 shouldValidate: true,
@@ -797,14 +778,14 @@ export default function AgentBuilder() {
                         </div>
                         <div>
                           <Label htmlFor="temperature">
-                            Creativity Level: {watch("creativity")}
+                            Creativity Level: {creativity}
                           </Label>
                           <Slider
                             id="temperature"
                             min={0}
                             max={1}
                             step={0.1}
-                            value={[watch("creativity")]}
+                            value={[creativity]}
                             onValueChange={(value) =>
                               setValue("creativity", value[0])
                             }
@@ -858,7 +839,7 @@ export default function AgentBuilder() {
                             id="system-prompt"
                             placeholder="Describe the agent's role, personality, and instructions..."
                             rows={6}
-                            value={watch("systemPrompt")}
+                            value={systemPrompt}
                             onChange={(e) =>
                               setValue("systemPrompt", e.target.value, {
                                 shouldValidate: true,
@@ -951,7 +932,7 @@ export default function AgentBuilder() {
                               <span className="text-red-500">*</span>
                             </Label>
                             <Select
-                              value={watch("whatsappIntegrationId")}
+                              value={whatsappIntegrationId}
                               onValueChange={(value) =>
                                 setValue("whatsappIntegrationId", value, {
                                   shouldValidate: true,
@@ -1052,7 +1033,7 @@ export default function AgentBuilder() {
                             id="context-info"
                             placeholder="Product details, pricing, FAQs, company policies, etc."
                             rows={4}
-                            value={watch("faqsBestAnswers")}
+                            value={faqsBestAnswers}
                             onChange={(e) =>
                               setValue("faqsBestAnswers", e.target.value)
                             }
@@ -1101,7 +1082,7 @@ export default function AgentBuilder() {
                             id="product-catalogue"
                             placeholder="List products or subscription plans with details"
                             rows={6}
-                            value={watch("productPlans")}
+                            value={productPlans}
                             onChange={(e) =>
                               setValue("productPlans", e.target.value, {
                                 shouldValidate: true,
