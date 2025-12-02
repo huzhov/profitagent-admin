@@ -10,21 +10,17 @@ import {
 } from "lucide-react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { getAgentCount } from "@/services/agents";
-import { useBusiness } from "@/context/AppContext";
 
-export default function SidebarNavigation() {
+interface SidebarNavigationProps {
+  agentCount?: number;
+}
+
+export default function SidebarNavigation({
+  agentCount,
+}: SidebarNavigationProps) {
   const navigate = useNavigate();
   const { location } = useRouterState();
   const currentPath = location.pathname;
-  const { business } = useBusiness();
-
-  const { data } = useQuery({
-    queryKey: ["agentCount"],
-    queryFn: async () => getAgentCount(),
-    enabled: !!business,
-  });
 
   const mainSections = [
     { id: "home", title: "Home", icon: House, route: "/" },
@@ -33,7 +29,7 @@ export default function SidebarNavigation() {
       title: "Agents",
       icon: Bot,
       route: "/agents",
-      badge: data?.count ? data.count : null,
+      badge: agentCount ? agentCount : null,
     },
     // {
     //   id: "workflows",

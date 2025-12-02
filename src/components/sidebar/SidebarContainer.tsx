@@ -5,10 +5,20 @@ import { useNavigate } from "@tanstack/react-router";
 import { logout } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
 import { getInitials } from "@/helper/getInitials";
+import { useQuery } from "@tanstack/react-query";
+import { getAgentCount } from "@/services/agents";
+import { useBusiness } from "@/context/AppContext";
 
 export default function SidebarContainer() {
   const navigate = useNavigate();
   const { user } = useUserStore();
+  const { business } = useBusiness();
+
+  const { data } = useQuery({
+    queryKey: ["agentCount"],
+    queryFn: async () => getAgentCount(),
+    enabled: !!business,
+  });
 
   const handleLogout = () => {
     logout();
@@ -19,7 +29,7 @@ export default function SidebarContainer() {
     <aside className="w-64 bg-card border-r border-border h-screen flex flex-col">
       <SidebarHeader />
       <div className="p-4" />
-      <SidebarNavigation />
+      <SidebarNavigation agentCount={data?.count} />
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
