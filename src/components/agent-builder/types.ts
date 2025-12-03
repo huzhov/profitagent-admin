@@ -20,3 +20,16 @@ export enum BusinessVertical {
   Travel = "travel",
   RealEstate = "real_estate",
 }
+
+export type Questions = {
+  id: string;
+  question: string;
+  type: string;
+  options?: string[];
+  note?: string;
+};
+
+export type JsonSchema = {
+  name: string;
+  questions: Questions[];
+};

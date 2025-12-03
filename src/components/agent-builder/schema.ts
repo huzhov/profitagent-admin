@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { JsonSchema } from "./types";
 
 export const agentBuilderSchema = z.object({
   // Profile
@@ -16,6 +17,11 @@ export const agentBuilderSchema = z.object({
 });
 
 export type AgentBuilderFormValues = z.infer<typeof agentBuilderSchema>;
+
+export const JsonDefaultSchema: JsonSchema = {
+  name: "",
+  questions: [],
+};
 
 export const defaultValues: AgentBuilderFormValues = {
   agentName: "",
@@ -103,8 +109,8 @@ export const agentSchema = z.object({
   calendlyUrl: z.string().optional(),
 
   // Question Sets
-  questionSets: z.array(z.instanceof(File)).optional(),
-  questionSetJson: z.string().optional(),
+  // questionSets: z.array(z.instanceof(File)).optional(),
+  questionSets: z.string().optional(),
 
   // Product Recommendations
   maxRecommendations: z.number().default(3),
@@ -172,8 +178,8 @@ export const defaultAgentValues: AgentFormValues = {
   schedulingProvider: "calendly",
   calendlyUrl: "",
 
-  questionSets: [],
-  questionSetJson: "",
+  // questionSets: [],
+  questionSets: "",
 
   maxRecommendations: 3,
   recommendationStrategy: "popularity",
