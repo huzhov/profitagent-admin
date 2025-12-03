@@ -66,7 +66,7 @@ export default function Home() {
       />
 
       {/* Stats Grid */}
-      <StatsCards totalAgent={data?.length ?? 0} />
+      <StatsCards />
 
       {/* Recent Agents and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
