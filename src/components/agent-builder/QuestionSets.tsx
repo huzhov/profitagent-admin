@@ -52,6 +52,13 @@ export default memo(function QuestionSets({
   const [questionOptions, setQuestionOptions] = useState(["Option 1"]);
 
   useEffect(() => {
+    // If questionSets is cleared, setSchema to default
+    if (!questionSets.length) {
+      setSchema(JsonDefaultSchema);
+      clearQuestionSetError();
+      return;
+    }
+
     try {
       const parsed = JSON.parse(questionSets);
       if (!parsed || !Array.isArray(parsed.questions)) {
@@ -172,8 +179,7 @@ export default memo(function QuestionSets({
       <div className="mb-5 text-sm ">
         <p className="text-xs text-gray-500 mt-1">
           Tip: edit the JSON the UI updates automatically. Supports types:{" "}
-          <code>text</code>, <code>email</code>, <code>options</code>,{" "}
-          <code>number</code>.
+          <code>text</code>, <code>email</code>, <code>options</code>.
         </p>
         <div className="text-xs text-red-600 mt-1">
           {error ? `JSON error: ${error}` : ""}
@@ -208,8 +214,9 @@ export default memo(function QuestionSets({
                         question.options.map((opt: string, i: number) => (
                           <div key={i} className="flex items-center gap-2">
                             <Input
-                              type="checkbox"
+                              type="radio"
                               name={question.id}
+                              disabled
                               className="w-4 h-4 my-1"
                             />
                             <Label>{opt}</Label>
@@ -227,6 +234,7 @@ export default memo(function QuestionSets({
                 <Input
                   type={question.type}
                   className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-offset-1"
+                  disabled
                 />
               )}
               {question.note ? (
@@ -240,7 +248,8 @@ export default memo(function QuestionSets({
             </Button>
             <Button
               type="button"
-              className="bg-red-600"
+              variant="outline"
+              className="text-red-600"
               onClick={() => {
                 const filtered = schema.questions.filter(
                   (x) => x.id !== question.id
@@ -295,7 +304,8 @@ export default memo(function QuestionSets({
                         onChange={(e) => updateOptionAt(i, e.target.value)}
                       />
                       <Button
-                        className="px-2 py-1 bg-red-600"
+                        className="px-2 py-1 text-red-600"
+                        variant="outline"
                         onClick={() => removeOptionRow(i)}
                         type="button"
                       >
@@ -323,7 +333,11 @@ export default memo(function QuestionSets({
               <Button className="px-3 py-2" onClick={addEditQuestionFromPanel}>
                 Save
               </Button>
-              <Button className="px-3 py-2" onClick={closePanel}>
+              <Button
+                className="px-3 py-2"
+                onClick={closePanel}
+                variant="outline"
+              >
                 Cancel
               </Button>
             </div>
