@@ -22,14 +22,15 @@ type QuestionSetsProps = {
   clearQuestionSetError: () => void;
 };
 
-const placeholder = `{
-  name: "Customer Onboarding",
-  questions: [
+const jsonPlaceholder = `Paste your JSON question set here, e.g.: 
+{
+  "name": "Customer Onboarding",
+  "questions": [
     {
-      id: "q1_name",
-      question: "What's your full name?",
-      type: "text",
-      note: "We'll use this to personalize your experience",
+      "id": "q1",
+      "question": "What's your full name?",
+      "type": "text",
+      "note": "We'll use this to personalize your experience",
     },
   ],
 }`;
@@ -46,7 +47,7 @@ export default memo(function QuestionSets({
   // UI state for adding and editing question
   const [showPanel, setShowPanel] = useState(false);
   const [questionId, setQuestionId] = useState("");
-  const [questionName, setQuestionText] = useState("New question");
+  const [questionName, setQuestionText] = useState("");
   const [questionType, setQuestionType] = useState("text");
   const [questionNote, setQuestionNote] = useState("");
   const [questionOptions, setQuestionOptions] = useState(["Option 1"]);
@@ -91,7 +92,7 @@ export default memo(function QuestionSets({
   }, [questionSets]);
 
   const openAddPanel = () => {
-    setQuestionText("New question");
+    setQuestionText("");
     setQuestionType("text");
     setQuestionOptions(["Option 1"]);
     setQuestionNote("");
@@ -154,6 +155,12 @@ export default memo(function QuestionSets({
     setShowPanel(false);
   };
 
+  const removeQuestion = (question: Questions) => {
+    const filtered = schema.questions.filter((x) => x.id !== question.id);
+    const newSchema = { ...schema, questions: filtered };
+    setQuestionSets(JSON.stringify(newSchema, null, 2));
+  };
+
   const updateOptionAt = (index: number, value: string) => {
     setQuestionOptions((prev) => prev.map((v, i) => (i === index ? value : v)));
   };
@@ -166,17 +173,16 @@ export default memo(function QuestionSets({
 
   return (
     <div>
-      <Label className={`font-semibold mb-2 ${error ? "text-red-500" : ""}`}>
-        Editable JSON
-      </Label>
-      <Textarea
-        spellCheck={false}
-        value={questionSets}
-        onChange={(e) => setQuestionSets(e.target.value)}
-        rows={6}
-        placeholder={placeholder}
-      />
-      <div className="mb-5 text-sm ">
+      <div>
+        <Label className={`${error ? "text-red-500" : ""}`}>JSON</Label>
+        <Textarea
+          spellCheck={false}
+          value={questionSets}
+          onChange={(e) => setQuestionSets(e.target.value)}
+          rows={12}
+          placeholder={jsonPlaceholder}
+          className="mt-1.5"
+        />
         <p className="text-xs text-gray-500 mt-1">
           Tip: edit the JSON the UI updates automatically. Supports types:{" "}
           <code>text</code>, <code>email</code>, <code>options</code>.
@@ -185,26 +191,26 @@ export default memo(function QuestionSets({
           {error ? `JSON error: ${error}` : ""}
         </div>
       </div>
-      <Label>Name</Label>
-      <Input
-        placeholder="e.g., Customer Inbound"
-        className="mt-1.5"
-        value={schema.name}
-        onChange={(e) => {
-          const newSchema = { ...schema, name: e.target.value };
-          setQuestionSets(JSON.stringify(newSchema, null, 2));
-        }}
-      />
-      <Label className="font-bold mt-5 mb-2">
+      <div className="mt-3">
+        <Label>Name</Label>
+        <Input
+          placeholder="e.g., Customer Inbound"
+          className="mt-1.5"
+          value={schema.name}
+          onChange={(e) => {
+            const newSchema = { ...schema, name: e.target.value };
+            setQuestionSets(JSON.stringify(newSchema, null, 2));
+          }}
+        />
+      </div>
+      <Label className="font-bold my-3">
         Questions: {schema.questions?.length ?? 0}
       </Label>
-      <div className="space-y-4">
+      <div className="space-y-1">
         {schema.questions.map((question) => (
-          <div key={question.id} className="flex items-center w-full gap-4">
+          <div key={question.id} className="flex items-center w-full gap-2">
             <div className="w-full">
-              <Label className="block font-medium mb-1">
-                {question.question}
-              </Label>
+              <Label className="block font-medium">{question.question}</Label>
               {/* Questions Type Render */}
               {question.type === "options" ? (
                 <div>
@@ -217,13 +223,13 @@ export default memo(function QuestionSets({
                               type="radio"
                               name={question.id}
                               disabled
-                              className="w-4 h-4 my-1"
+                              className="w-4 h-4 my-1.5"
                             />
                             <Label>{opt}</Label>
                           </div>
                         ))
                       ) : (
-                        <Label className="text-sm text-gray-500">
+                        <Label className="text-sm text-gray-500 mt-1.5">
                           No options provided
                         </Label>
                       )}
@@ -231,11 +237,7 @@ export default memo(function QuestionSets({
                   </div>
                 </div>
               ) : (
-                <Input
-                  type={question.type}
-                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-offset-1"
-                  disabled
-                />
+                <Input type={question.type} className="mt-1.5" disabled />
               )}
               {question.note ? (
                 <p className="text-xs text-gray-500 mt-1">{question.note}</p>
@@ -243,20 +245,19 @@ export default memo(function QuestionSets({
                 <div className="p-2.5" />
               )}
             </div>
-            <Button type="button" onClick={() => openEditPanel(question)}>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => openEditPanel(question)}
+            >
               <Pencil />
             </Button>
             <Button
               type="button"
               variant="outline"
+              size="sm"
               className="text-red-600"
-              onClick={() => {
-                const filtered = schema.questions.filter(
-                  (x) => x.id !== question.id
-                );
-                const newSchema = { ...schema, questions: filtered };
-                setQuestionSets(JSON.stringify(newSchema, null, 2));
-              }}
+              onClick={() => removeQuestion(question)}
             >
               <Trash />
             </Button>
@@ -269,13 +270,16 @@ export default memo(function QuestionSets({
           <Label className="mb-5">
             {questionId ? "Edit" : "Add New"} Question
           </Label>
-          <Label>Question Name</Label>
           <div className="mt-2 grid grid-cols-1 gap-2">
-            <Input
-              value={questionName}
-              onChange={(e) => setQuestionText(e.target.value)}
-              placeholder="e.g., What's your full name?"
-            />
+            <div>
+              <Label>Question Name</Label>
+              <Input
+                value={questionName}
+                onChange={(e) => setQuestionText(e.target.value)}
+                placeholder="e.g., What's your full name?"
+                className="mt-1.5"
+              />
+            </div>
             <div>
               <Label className="mr-2">Type:</Label>
               <Select
@@ -304,7 +308,8 @@ export default memo(function QuestionSets({
                         onChange={(e) => updateOptionAt(i, e.target.value)}
                       />
                       <Button
-                        className="px-2 py-1 text-red-600"
+                        size="sm"
+                        className="text-red-600"
                         variant="outline"
                         onClick={() => removeOptionRow(i)}
                         type="button"
@@ -314,30 +319,27 @@ export default memo(function QuestionSets({
                     </div>
                   ))}
                   <div className="flex justify-end">
-                    <Button onClick={addOptionRow} type="button">
+                    <Button size="sm" onClick={addOptionRow} type="button">
                       <Plus />
                     </Button>
                   </div>
                 </div>
               </div>
             )}
-            <Label className="font-medium">Note</Label>
-            <Input
-              className="border rounded p-2"
-              value={questionNote}
-              onChange={(e) => setQuestionNote(e.target.value)}
-              placeholder="e.g., We'll use this to personalize your experience"
-            />
-
+            <div>
+              <Label>Note</Label>
+              <Input
+                className="mt-1.5"
+                value={questionNote}
+                onChange={(e) => setQuestionNote(e.target.value)}
+                placeholder="e.g., We'll use this to personalize your experience"
+              />
+            </div>
             <div className="flex gap-2 mt-3">
-              <Button className="px-3 py-2" onClick={addEditQuestionFromPanel}>
+              <Button size="sm" onClick={addEditQuestionFromPanel}>
                 Save
               </Button>
-              <Button
-                className="px-3 py-2"
-                onClick={closePanel}
-                variant="outline"
-              >
+              <Button size="sm" onClick={closePanel} variant="outline">
                 Cancel
               </Button>
             </div>
@@ -345,7 +347,7 @@ export default memo(function QuestionSets({
         </div>
       )}
       {!showPanel && (
-        <Button onClick={openAddPanel} className="w-full mt-2">
+        <Button onClick={openAddPanel} className="w-full mt-2" size="sm">
           Add Question
         </Button>
       )}
