@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken, removeToken } from "./auth";
+import { getToken, logout } from "./auth";
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -55,7 +55,7 @@ axiosInstance.interceptors.response.use(
         // Don't redirect if already on login or signup page
         const currentPath = window.location.pathname;
         if (currentPath !== "/login" && currentPath !== "/signup") {
-          removeToken();
+          logout();
           window.location.href = "/login";
           return Promise.reject(error);
         }

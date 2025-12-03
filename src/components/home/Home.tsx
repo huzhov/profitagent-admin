@@ -14,6 +14,9 @@ import { getAgentList } from "@/services/agents";
 import { useBusiness } from "@/context/AppContext";
 import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
+import { getWhatsAppList } from "@/services/integrations";
+import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
+import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -25,8 +28,19 @@ export default function Home() {
       const data = await getAgentList();
       return data;
     },
-    enabled: business !== null,
+    enabled: !!business,
   });
+
+  const { data: whatsAppIntegrations, isLoading: isWhatsAppLoading } = useQuery(
+    {
+      queryKey: ["whatsAppList"],
+      queryFn: async () => {
+        return await getWhatsAppList();
+      },
+    }
+  );
+
+  const isNoWhatsappIntegrationsAvailable = !whatsAppIntegrations?.length;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -37,6 +51,18 @@ export default function Home() {
         buttonLabel="Create Agent"
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
+        disabled={
+          isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
+        }
+        tooltip={
+          !business ? (
+            <BusinessSetupRequiredToolTip />
+          ) : isNoWhatsappIntegrationsAvailable ? (
+            <NoWhatsAppIntegrationToolTip />
+          ) : (
+            ""
+          )
+        }
       />
 
       {/* Stats Grid */}
@@ -83,7 +109,7 @@ export default function Home() {
                     </div>
                   </div>
                 ))
-              ) : data ? (
+              ) : data && data.length > 0 ? (
                 data?.slice(0, 3)?.map((agent, index) => (
                   <div
                     className="flex items-center justify-between p-3 border rounded-lg"
@@ -120,7 +146,7 @@ export default function Home() {
                     </p>
                     <Button
                       data-slot="button"
-                      onClick={() => navigate({ to: "/agents/create" })}
+                      onClick={() => navigate({ to: "/agents" })}
                       className="cursor-pointer"
                     >
                       Get Started

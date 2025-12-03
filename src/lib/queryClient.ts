@@ -1,6 +1,7 @@
 import { QueryClient, QueryCache, MutationCache } from "@tanstack/react-query";
 import { toast } from "sonner";
 import axios from "axios";
+import { logout } from "./auth";
 
 interface HttpError extends Error {
   status?: number;
@@ -9,18 +10,18 @@ interface HttpError extends Error {
   response?: unknown;
 }
 
-const publicRoutes = ["/login", "/signup"];
-
-const isPublicRoute = publicRoutes.some((route) => {
-  return (
-    location.pathname === route || location.pathname.startsWith(`${route}/`)
-  );
-});
-
 const handleOnError = (error: HttpError) => {
+  const publicRoutes = ["/login", "/signup"];
+
+  const isPublicRoute = publicRoutes.some((route) => {
+    return (
+      location.pathname === route || location.pathname.startsWith(`${route}/`)
+    );
+  });
+
   // Redirect to login
   if (error.status === 401 && !isPublicRoute) {
-    localStorage.clear();
+    logout();
     location.replace("/login");
   }
 

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 interface PageHeaderProps {
   title: string;
@@ -9,6 +10,8 @@ interface PageHeaderProps {
   onButtonClick?: () => void;
   showButton?: boolean;
   showBorder?: boolean;
+  disabled?: boolean;
+  tooltip?: React.ReactNode;
 }
 
 export function PageHeader({
@@ -19,6 +22,8 @@ export function PageHeader({
   onButtonClick,
   showButton = true,
   showBorder = false,
+  disabled = false,
+  tooltip,
 }: PageHeaderProps) {
   if (showBorder) {
     return (
@@ -35,6 +40,7 @@ export function PageHeader({
               <Button
                 className="h-10 px-6 has-[>svg]:px-4 shadow-none cursor-pointer"
                 onClick={onButtonClick}
+                disabled={disabled}
               >
                 {ButtonIcon && <ButtonIcon className="w-4 h-4 mr-2" />}
                 {buttonLabel}
@@ -53,13 +59,21 @@ export function PageHeader({
         {description && <p className="text-muted-foreground">{description}</p>}
       </div>
       {showButton && buttonLabel && (
-        <Button
-          className="h-10 px-6 has-[>svg]:px-4 shadow-none cursor-pointer"
-          onClick={onButtonClick}
-        >
-          {ButtonIcon && <ButtonIcon className="w-4 h-4 mr-2" />}
-          {buttonLabel}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <Button
+                className="h-10 px-6 has-[>svg]:px-4 shadow-none cursor-pointer"
+                onClick={onButtonClick}
+                disabled={disabled}
+              >
+                {ButtonIcon && <ButtonIcon className="w-4 h-4 mr-2" />}
+                {buttonLabel}
+              </Button>
+            </div>
+          </TooltipTrigger>
+          {tooltip && <TooltipContent sideOffset={4}>{tooltip}</TooltipContent>}
+        </Tooltip>
       )}
     </div>
   );

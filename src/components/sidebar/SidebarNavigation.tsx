@@ -10,11 +10,15 @@ import {
 } from "lucide-react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
-import { useApp } from "@/context/AppContext";
 
-export default function SidebarNavigation() {
+interface SidebarNavigationProps {
+  agentCount?: number;
+}
+
+export default function SidebarNavigation({
+  agentCount,
+}: SidebarNavigationProps) {
   const navigate = useNavigate();
-  const { agents } = useApp();
   const { location } = useRouterState();
   const currentPath = location.pathname;
 
@@ -25,7 +29,7 @@ export default function SidebarNavigation() {
       title: "Agents",
       icon: Bot,
       route: "/agents",
-      badge: agents?.length.toString(),
+      badge: agentCount ? agentCount : null,
     },
     // {
     //   id: "workflows",

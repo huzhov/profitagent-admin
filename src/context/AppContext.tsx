@@ -30,7 +30,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       conversionRate: "0%",
       revenueGenerated: "$0",
       customerSatisfaction: "0%",
-      channels: ["WhatsApp", "Web"],
+      channels: ["WhatsApp"],
       created: "Oct 15, 2024",
       lastActive: "2 minutes ago",
       iconColor: "blue",

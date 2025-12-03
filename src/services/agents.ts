@@ -1,9 +1,18 @@
 import axiosInstance from "@/lib/axiosInstance";
 import type { AgentFormValues } from "@/components/agent-builder/schema";
-import type { AgentListResponse, AgentResponse } from "@/types/agents";
+import type {
+  AgentCountResponse,
+  AgentListResponse,
+  AgentResponse,
+} from "@/types/agents";
 
 export async function getAgentList(): Promise<AgentListResponse[]> {
   const { data } = await axiosInstance.get<AgentListResponse[]>(`/agents/list`);
+  return data;
+}
+
+export async function getAgentCount(): Promise<AgentCountResponse> {
+  const { data } = await axiosInstance.get<AgentCountResponse>(`/agents/count`);
   return data;
 }
 
