@@ -1,24 +1,7 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
-import {
-  Bot,
-  Calendar,
-  ChartColumn,
-  EllipsisVertical,
-  Eye,
-  FlaskConical,
-  Pause,
-  Play,
-  Plus,
-  Workflow,
-} from "lucide-react";
+import { Bot, ChartColumn, EllipsisVertical, Eye, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -34,6 +17,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useBusiness } from "@/context/AppContext";
 import StatsCards from "@/components/common/StatsCards";
 import BusinessInfoCard from "@/components/common/BusinessInfoCard";
+import { getWhatsAppList } from "@/services/integrations";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
+import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -46,8 +33,19 @@ export default function Agents() {
       const data = await getAgentList();
       return data;
     },
-    enabled: business !== null,
+    enabled: !!business,
   });
+
+  const { data: whatsAppIntegrations, isLoading: isWhatsAppLoading } = useQuery(
+    {
+      queryKey: ["whatsAppList"],
+      queryFn: async () => {
+        return await getWhatsAppList();
+      },
+    }
+  );
+
+  const isNoWhatsappIntegrationsAvailable = !whatsAppIntegrations?.length;
 
   // const totalConversations = agents.reduce(
   //   (sum, agent) => sum + agent.conversations,
@@ -75,6 +73,18 @@ export default function Agents() {
         buttonLabel="Create Agent"
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
+        disabled={
+          isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
+        }
+        tooltip={
+          !business ? (
+            <BusinessSetupRequiredToolTip />
+          ) : isNoWhatsappIntegrationsAvailable ? (
+            <NoWhatsAppIntegrationToolTip />
+          ) : (
+            ""
+          )
+        }
       />
       {!business ? (
         <div className="flex-1 overflow-y-auto h-[calc(100vh-16rem)]">
@@ -103,12 +113,12 @@ export default function Agents() {
                           <Skeleton className="w-10 h-10 rounded-lg" />
                           <div className="space-y-2">
                             <Skeleton className="h-5 w-32" />
-                            <Skeleton className="h-4 w-20" />
+                            {/* <Skeleton className="h-4 w-20" /> */}
                           </div>
                         </div>
                       </div>
-                      <Skeleton className="h-4 w-full mt-2" />
-                      <Skeleton className="h-4 w-3/4" />
+                      {/* <Skeleton className="h-4 w-full mt-2" />
+                      <Skeleton className="h-4 w-3/4" /> */}
                     </CardHeader>
                     <CardContent
                       data-slot="card-content"
@@ -128,20 +138,15 @@ export default function Agents() {
                         <Skeleton className="h-4 w-24" />
                         <div className="flex gap-1">
                           <Skeleton className="h-6 w-20" />
-                          <Skeleton className="h-6 w-16" />
                         </div>
                       </div>
-                      <div className="space-y-1">
+                      {/* <div className="space-y-1">
                         <Skeleton className="h-3 w-32" />
                         <Skeleton className="h-3 w-28" />
-                      </div>
+                      </div> */}
                       <div className="space-y-2 pt-2">
                         <Skeleton className="h-9 w-full" />
-                        <div className="flex gap-2">
-                          <Skeleton className="h-9 flex-1" />
-                          <Skeleton className="h-9 flex-1" />
-                          <Skeleton className="h-9 w-9" />
-                        </div>
+                        <Skeleton className="h-9 w-full" />
                       </div>
                     </CardContent>
                   </Card>
@@ -174,7 +179,7 @@ export default function Agents() {
                               {agent.name}
                             </CardTitle>
                             <div className="flex items-center gap-1">
-                              {agents[0].workflows > 0 && (
+                              {/* {agents[0].workflows > 0 && (
                                 <>
                                   <Workflow className="w-4 h-4 text-purple-600" />
                                   <Badge
@@ -197,10 +202,10 @@ export default function Agents() {
                                     {agents[0].tests}
                                   </Badge>
                                 </>
-                              )}
+                              )} */}
                             </div>
                           </div>
-                          <Badge
+                          {/* <Badge
                             data-slot="badge"
                             className={`text-xs border-transparent ${
                               agent.status === "Active"
@@ -209,7 +214,7 @@ export default function Agents() {
                             }`}
                           >
                             {agent.status === "disabled" ? "Paused" : "Active"}
-                          </Badge>
+                          </Badge> */}
                         </div>
                       </div>
                       <DropdownMenu>
@@ -240,12 +245,12 @@ export default function Agents() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    <CardDescription
+                    {/* <CardDescription
                       data-slot="card-description"
                       className="text-muted-foreground mt-2 text-md"
                     >
                       {agents[0].description}
-                    </CardDescription>
+                    </CardDescription> */}
                   </CardHeader>
                   <CardContent
                     data-slot="card-content"
@@ -311,13 +316,13 @@ export default function Agents() {
                     </div>
 
                     {/* Metadata */}
-                    <div className="text-xs text-muted-foreground space-y-1">
+                    {/* <div className="text-xs text-muted-foreground space-y-1">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         <span>Created {agents[0].created}</span>
                       </div>
                       <p>Last active: {agents[0].lastActive}</p>
-                    </div>
+                    </div> */}
 
                     {/* Actions */}
                     <div className="space-y-2 pt-2">
@@ -333,7 +338,7 @@ export default function Agents() {
                         View Agent
                       </Button>
                       <div className="flex gap-2">
-                        <Button
+                        {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -346,17 +351,18 @@ export default function Agents() {
                         >
                           <Play className="w-3 h-3 mr-1" />
                           Preview
-                        </Button>
+                        </Button> */}
                         <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
                           className="flex-1 cursor-pointer"
+                          onClick={() => navigate({ to: `/intelligence` })}
                         >
                           <ChartColumn className="w-3 h-3 mr-1" />
                           Analytics
                         </Button>
-                        <Button
+                        {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -368,7 +374,7 @@ export default function Agents() {
                           ) : (
                             <Play className="w-3 h-3" />
                           )}
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                   </CardContent>
@@ -380,7 +386,7 @@ export default function Agents() {
             {!isLoading && (
               <Card
                 data-slot="card"
-                className="shadow-none h-131 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
+                className="shadow-none h-110 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
               >
                 <CardContent
                   data-slot="card-content"
@@ -394,13 +400,28 @@ export default function Agents() {
                     Set up a new AI agent to handle customer interactions and
                     drive conversions
                   </p>
-                  <Button
-                    data-slot="button"
-                    onClick={() => navigate({ to: "/agents/create" })}
-                    className="cursor-pointer"
-                  >
-                    Get Started
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Button
+                          data-slot="button"
+                          onClick={() => navigate({ to: "/agents/create" })}
+                          className="cursor-pointer"
+                          disabled={
+                            isNoWhatsappIntegrationsAvailable ||
+                            isWhatsAppLoading
+                          }
+                        >
+                          Get Started
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    {isNoWhatsappIntegrationsAvailable && (
+                      <TooltipContent>
+                        <NoWhatsAppIntegrationToolTip />
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
                 </CardContent>
               </Card>
             )}
