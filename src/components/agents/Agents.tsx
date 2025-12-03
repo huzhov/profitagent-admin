@@ -19,6 +19,8 @@ import StatsCards from "@/components/common/StatsCards";
 import BusinessInfoCard from "@/components/common/BusinessInfoCard";
 import { getWhatsAppList } from "@/services/integrations";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
+import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -34,12 +36,16 @@ export default function Agents() {
     enabled: !!business,
   });
 
-  const { data: whatsAppList, isLoading: isWhatsAppLoading } = useQuery({
-    queryKey: ["whatsAppList"],
-    queryFn: async () => {
-      return await getWhatsAppList();
-    },
-  });
+  const { data: whatsAppIntegrations, isLoading: isWhatsAppLoading } = useQuery(
+    {
+      queryKey: ["whatsAppList"],
+      queryFn: async () => {
+        return await getWhatsAppList();
+      },
+    }
+  );
+
+  const isNoWhatsappIntegrationsAvailable = !whatsAppIntegrations?.length;
 
   // const totalConversations = agents.reduce(
   //   (sum, agent) => sum + agent.conversations,
@@ -68,33 +74,13 @@ export default function Agents() {
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
         disabled={
-          (whatsAppList && !whatsAppList.length) ||
-          isWhatsAppLoading ||
-          !business
+          isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
         }
         tooltip={
           !business ? (
-            <>
-              <p className="font-medium">Business Setup Required</p> You need to
-              create a business in the{" "}
-              <a
-                href="/settings/account#business-settings"
-                className="underline font-medium"
-              >
-                Account & Integration Settings
-              </a>
-            </>
-          ) : whatsAppList && !whatsAppList.length ? (
-            <>
-              <p className="font-medium">No WhatsApp numbers available.</p>
-              Please add one in{" "}
-              <a
-                href="/settings/account#whatsapp-account"
-                className="underline font-medium"
-              >
-                Account & Integration Settings
-              </a>
-            </>
+            <BusinessSetupRequiredToolTip />
+          ) : isNoWhatsappIntegrationsAvailable ? (
+            <NoWhatsAppIntegrationToolTip />
           ) : (
             ""
           )
@@ -422,7 +408,7 @@ export default function Agents() {
                           onClick={() => navigate({ to: "/agents/create" })}
                           className="cursor-pointer"
                           disabled={
-                            (whatsAppList && !whatsAppList.length) ||
+                            isNoWhatsappIntegrationsAvailable ||
                             isWhatsAppLoading
                           }
                         >
@@ -430,18 +416,9 @@ export default function Agents() {
                         </Button>
                       </div>
                     </TooltipTrigger>
-                    {whatsAppList && !whatsAppList.length && (
+                    {isNoWhatsappIntegrationsAvailable && (
                       <TooltipContent>
-                        <p className="font-medium">
-                          No WhatsApp numbers available.
-                        </p>
-                        Please add one in{" "}
-                        <a
-                          href="/settings/account#whatsapp-account"
-                          className="underline font-medium"
-                        >
-                          Account & Integration Settings
-                        </a>
+                        <NoWhatsAppIntegrationToolTip />
                       </TooltipContent>
                     )}
                   </Tooltip>

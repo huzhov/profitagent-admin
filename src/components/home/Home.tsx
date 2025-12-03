@@ -15,6 +15,8 @@ import { useBusiness } from "@/context/AppContext";
 import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { getWhatsAppList } from "@/services/integrations";
+import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
+import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -29,12 +31,16 @@ export default function Home() {
     enabled: !!business,
   });
 
-  const { data: whatsAppList, isLoading: isWhatsAppLoading } = useQuery({
-    queryKey: ["whatsAppList"],
-    queryFn: async () => {
-      return await getWhatsAppList();
-    },
-  });
+  const { data: whatsAppIntegrations, isLoading: isWhatsAppLoading } = useQuery(
+    {
+      queryKey: ["whatsAppList"],
+      queryFn: async () => {
+        return await getWhatsAppList();
+      },
+    }
+  );
+
+  const isNoWhatsappIntegrationsAvailable = !whatsAppIntegrations?.length;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -46,33 +52,13 @@ export default function Home() {
         buttonIcon={Plus}
         onButtonClick={() => navigate({ to: "/agents/create" })}
         disabled={
-          (whatsAppList && !whatsAppList.length) ||
-          isWhatsAppLoading ||
-          !business
+          isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
         }
         tooltip={
           !business ? (
-            <>
-              <p className="font-medium">Business Setup Required</p> You need to
-              create a business in the{" "}
-              <a
-                href="/settings/account#business-settings"
-                className="underline font-medium"
-              >
-                Account & Integration Settings
-              </a>
-            </>
-          ) : whatsAppList && !whatsAppList.length ? (
-            <>
-              <p className="font-medium">No WhatsApp numbers available.</p>
-              Please add one in{" "}
-              <a
-                href="/settings/account#whatsapp-account"
-                className="underline font-medium"
-              >
-                Account & Integration Settings
-              </a>
-            </>
+            <BusinessSetupRequiredToolTip />
+          ) : isNoWhatsappIntegrationsAvailable ? (
+            <NoWhatsAppIntegrationToolTip />
           ) : (
             ""
           )
