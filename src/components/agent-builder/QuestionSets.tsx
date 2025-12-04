@@ -72,9 +72,7 @@ export default memo(function QuestionSets({
 
     try {
       const parsed = JSON.parse(questionSets);
-      const invalidQuestionIndex = parsed.questions.findIndex(
-        (question: Question) => !isValidQuestionItem(question)
-      );
+
       // Checks if name and question exist in json
       if (!parsed || !Array.isArray(parsed.questions))
         return setQuestionSetError(
@@ -85,6 +83,9 @@ export default memo(function QuestionSets({
         return setQuestionSetError(`Schema must include a 'name' string`);
 
       // Checks question object if valid
+      const invalidQuestionIndex = parsed.questions.findIndex(
+        (question: Question) => !isValidQuestionItem(question)
+      );
       if (invalidQuestionIndex !== -1)
         return setQuestionSetError(
           `Invalid question object at index ${invalidQuestionIndex}. Expected { id, question, type, note }`
