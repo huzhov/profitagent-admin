@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash, Plus, Pencil } from "lucide-react";
-import type { Questions } from "./types";
+import type { Question } from "./types";
 import { JsonDefaultSchema } from "./schema";
 
 type QuestionSetsProps = {
@@ -70,17 +70,19 @@ export default memo(function QuestionSets({
       }
       const normalized = {
         ...parsed,
-        questions: parsed.questions.map((q: Questions, index: number) => ({
-          id: q.id || `q_${index + 1}`,
-          question: q.question || "Untitled question",
-          type: q.type || "text",
-          options: Array.isArray(q.options)
-            ? q.options
-            : q.type === "options"
-              ? ["Option 1"]
-              : undefined,
-          note: q.note || "",
-        })),
+        questions: parsed.questions.map(
+          (question: Question, index: number) => ({
+            id: question.id || `q_${index + 1}`,
+            question: question.question || "Untitled question",
+            type: question.type || "text",
+            options: Array.isArray(question.options)
+              ? question.options
+              : question.type === "options"
+                ? ["Option 1"]
+                : undefined,
+            note: question.note || "",
+          })
+        ),
       };
       setSchema(normalized);
       clearQuestionSetError();
@@ -99,7 +101,7 @@ export default memo(function QuestionSets({
     setShowPanel(true);
   };
 
-  const openEditPanel = (question: Questions) => {
+  const openEditPanel = (question: Question) => {
     setQuestionId(question.id);
     setQuestionText(question.question);
     setQuestionType(question.type);
@@ -145,8 +147,8 @@ export default memo(function QuestionSets({
       };
       const editedSchema = {
         ...schema,
-        questions: schema.questions.map((q) =>
-          q.id === questionId ? { ...editedQuestion } : q
+        questions: schema.questions.map((question) =>
+          question.id === questionId ? { ...editedQuestion } : question
         ),
       };
       setQuestionSets(JSON.stringify(editedSchema, null, 2));
@@ -155,7 +157,7 @@ export default memo(function QuestionSets({
     setShowPanel(false);
   };
 
-  const removeQuestion = (question: Questions) => {
+  const removeQuestion = (question: Question) => {
     const filtered = schema.questions.filter((x) => x.id !== question.id);
     const newSchema = { ...schema, questions: filtered };
     setQuestionSets(JSON.stringify(newSchema, null, 2));
@@ -191,6 +193,7 @@ export default memo(function QuestionSets({
           {error ? `JSON error: ${error}` : ""}
         </div>
       </div>
+      <Label className="font-bold my-3">Live Preview</Label>
       <div className="mt-3">
         <Label>Name</Label>
         <Input
@@ -203,9 +206,7 @@ export default memo(function QuestionSets({
           }}
         />
       </div>
-      <Label className="font-bold my-3">
-        Questions: {schema.questions?.length ?? 0}
-      </Label>
+      <Label className="my-3">Questions: {schema.questions?.length ?? 0}</Label>
       <div className="space-y-1">
         {schema.questions.map((question) => (
           <div key={question.id} className="flex items-center w-full gap-2">
@@ -218,14 +219,16 @@ export default memo(function QuestionSets({
                     <div className="flex-1">
                       {question.options && question.options.length ? (
                         question.options.map((opt: string, i: number) => (
-                          <div key={i} className="flex items-center gap-2">
+                          <div
+                            key={i}
+                            className="flex justify-between w-full gap-2 border rounded-full w-full mt-1.5"
+                          >
+                            <Label className="ml-2">{opt}</Label>
                             <Input
                               type="radio"
                               name={question.id}
-                              disabled
-                              className="w-4 h-4 my-1.5"
+                              className="w-4 h-4 my-1.5 mr-2"
                             />
-                            <Label>{opt}</Label>
                           </div>
                         ))
                       ) : (
@@ -237,7 +240,7 @@ export default memo(function QuestionSets({
                   </div>
                 </div>
               ) : (
-                <Input type={question.type} className="mt-1.5" disabled />
+                <Input type={question.type} className="mt-1.5" />
               )}
               {question.note ? (
                 <p className="text-xs text-gray-500 mt-1">{question.note}</p>
@@ -303,6 +306,7 @@ export default memo(function QuestionSets({
                 <div className="space-y-2 mt-1">
                   {questionOptions.map((opt, i) => (
                     <div key={i} className="flex gap-2 items-center">
+                      <div className="flex gap-2"></div>
                       <Input
                         value={opt}
                         onChange={(e) => updateOptionAt(i, e.target.value)}

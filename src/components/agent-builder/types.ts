@@ -21,7 +21,7 @@ export enum BusinessVertical {
   RealEstate = "real_estate",
 }
 
-export type Questions = {
+export type Question = {
   id: string;
   question: string;
   type: string;
@@ -31,5 +31,5 @@ export type Questions = {
 
 export type JsonSchema = {
   name: string;
-  questions: Questions[];
+  questions: Question[];
 };
