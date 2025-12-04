@@ -62,12 +62,15 @@ export default memo(function QuestionSets({
 
     try {
       const parsed = JSON.parse(questionSets);
-      if (!parsed || !Array.isArray(parsed.questions)) {
-        setQuestionSetError(
+      // Checks if name and question exist in json
+      if (!parsed || !Array.isArray(parsed.questions))
+        return setQuestionSetError(
           `Schema must be an object with a 'questions' array`
         );
-        return;
-      }
+
+      if (typeof parsed.name !== "string")
+        return setQuestionSetError(`Schema must include a 'name' string`);
+
       const normalized = {
         ...parsed,
         questions: parsed.questions.map(
@@ -85,6 +88,13 @@ export default memo(function QuestionSets({
         ),
       };
       setSchema(normalized);
+
+      // Validation for names and question
+      if (parsed.name.length < 3)
+        return setQuestionSetError(`"name" must be at least 3 characters`);
+      if (parsed.questions.length < 1)
+        return setQuestionSetError(`Schema must have at least 1 question`);
+
       clearQuestionSetError();
     } catch (error: unknown) {
       if (error instanceof Error && questionSets.length)
@@ -185,13 +195,13 @@ export default memo(function QuestionSets({
           placeholder={jsonPlaceholder}
           className="mt-1.5"
         />
+        <div className="text-sm text-red-500 mt-1">
+          {error ? `JSON error: ${error}` : ""}
+        </div>
         <p className="text-xs text-gray-500 mt-1">
           Tip: edit the JSON the UI updates automatically. Supports types:{" "}
           <code>text</code>, <code>email</code>, <code>options</code>.
         </p>
-        <div className="text-xs text-red-600 mt-1">
-          {error ? `JSON error: ${error}` : ""}
-        </div>
       </div>
       <Label className="font-bold my-3">Live Preview</Label>
       <div className="mt-3">
