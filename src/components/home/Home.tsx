@@ -17,6 +17,11 @@ import { Skeleton } from "../ui/skeleton";
 import { getWhatsAppList } from "@/services/integrations";
 import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
 import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -101,12 +106,12 @@ export default function Home() {
                       </div>
                       <div>
                         <Skeleton className="w-15 h-6" />
-                        <Skeleton className="w-25 h-4 mt-1" />
+                        <Skeleton className="w-150 h-4 mt-1" />
                       </div>
                     </div>
-                    <div className="text-right">
+                    {/* <div className="text-right">
                       <Skeleton className="w-15 h-6" />
-                    </div>
+                    </div> */}
                   </div>
                 ))
               ) : data && data.length > 0 ? (
@@ -121,8 +126,8 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="font-medium">{agent.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          0 conversations
+                        <p className="text-sm text-muted-foreground line-clamp-1 w-150">
+                          {agent.description}
                         </p>
                       </div>
                     </div>
@@ -164,14 +169,37 @@ export default function Home() {
             <CardDescription>Common tasks and shortcuts</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start cursor-pointer shadow-none"
-              onClick={() => navigate({ to: "/agents/create" })}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create New Agent
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start cursor-pointer shadow-none"
+                    disabled={
+                      isNoWhatsappIntegrationsAvailable ||
+                      isWhatsAppLoading ||
+                      !business
+                    }
+                    onClick={() => navigate({ to: "/agents/create" })}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create New Agent
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              {!business ||
+                (isNoWhatsappIntegrationsAvailable && (
+                  <TooltipContent sideOffset={4}>
+                    {!business ? (
+                      <BusinessSetupRequiredToolTip />
+                    ) : isNoWhatsappIntegrationsAvailable ? (
+                      <NoWhatsAppIntegrationToolTip />
+                    ) : (
+                      ""
+                    )}
+                  </TooltipContent>
+                ))}
+            </Tooltip>
             <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
