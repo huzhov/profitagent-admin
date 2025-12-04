@@ -36,6 +36,7 @@ export async function createAgent(
     creativity: values.creativity,
     catalogS3Key: values.catalogS3Key,
     catalogName: values.catalogName,
+    questionSets: values.questionSets || "",
   };
 
   const { data } = await axiosInstance.post<AgentResponse>(`/agents`, payload);
