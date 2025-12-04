@@ -52,6 +52,16 @@ export default memo(function QuestionSets({
   const [questionNote, setQuestionNote] = useState("");
   const [questionOptions, setQuestionOptions] = useState(["Option 1"]);
 
+  const isValidQuestionItem = (question: Question) => {
+    if (typeof question !== "object" || question === null) return false;
+    if (typeof question.id !== "string") return false;
+    if (typeof question.question !== "string") return false;
+    if (typeof question.type !== "string") return false;
+    if (typeof question.note !== "string") return false;
+
+    return true;
+  };
+
   useEffect(() => {
     // If questionSets is cleared, setSchema to default
     if (!questionSets.length) {
@@ -62,6 +72,9 @@ export default memo(function QuestionSets({
 
     try {
       const parsed = JSON.parse(questionSets);
+      const invalidQuestionIndex = parsed.questions.findIndex(
+        (question: Question) => !isValidQuestionItem(question)
+      );
       // Checks if name and question exist in json
       if (!parsed || !Array.isArray(parsed.questions))
         return setQuestionSetError(
@@ -70,6 +83,12 @@ export default memo(function QuestionSets({
 
       if (typeof parsed.name !== "string")
         return setQuestionSetError(`Schema must include a 'name' string`);
+
+      // Checks question object if valid
+      if (invalidQuestionIndex !== -1)
+        return setQuestionSetError(
+          `Invalid question object at index ${invalidQuestionIndex}. Expected { id, question, type, note }`
+        );
 
       const normalized = {
         ...parsed,
