@@ -236,7 +236,7 @@ export default memo(function QuestionSets({
         />
       </div>
       <Label className="my-3">Questions: {schema.questions?.length ?? 0}</Label>
-      <div className="space-y-1">
+      <div className="space-y-4">
         {schema.questions.map((question) => (
           <div key={question.id} className="flex items-center w-full gap-2">
             <div className="w-full">
