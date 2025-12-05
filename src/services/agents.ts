@@ -6,6 +6,22 @@ import type {
   AgentResponse,
 } from "@/types/agents";
 
+const buildAgentPayload = (values: Partial<AgentFormValues>) => ({
+  agentName: values.agentName,
+  integrationId: values.whatsappIntegrationId,
+  systemPrompt: values.systemPrompt,
+  description: values.description,
+  objective: values.objective,
+  toneOfVoice: values.toneOfVoice,
+  aiGuardrails: [],
+  faqsBestAnswers: values.faqsBestAnswers || "",
+  productPlans: values.productPlans || "",
+  creativity: values.creativity,
+  catalogS3Key: values.catalogS3Key,
+  catalogName: values.catalogName,
+  questionSets: "",
+});
+
 export async function getAgentList(): Promise<AgentListResponse[]> {
   const { data } = await axiosInstance.get<AgentListResponse[]>(`/agents/list`);
   return data;
@@ -24,21 +40,20 @@ export async function getAgent(id: string): Promise<AgentResponse> {
 export async function createAgent(
   values: AgentFormValues
 ): Promise<AgentResponse> {
-  const payload = {
-    agentName: values.agentName,
-    integrationId: values.whatsappIntegrationId,
-    systemPrompt: values.systemPrompt,
-    description: values.description,
-    objective: values.objective,
-    toneOfVoice: values.toneOfVoice,
-    faqsBestAnswers: values.faqsBestAnswers || "",
-    productPlans: values.productPlans || "",
-    creativity: values.creativity,
-    catalogS3Key: values.catalogS3Key,
-    catalogName: values.catalogName,
-  };
-
+  const payload = buildAgentPayload(values);
   const { data } = await axiosInstance.post<AgentResponse>(`/agents`, payload);
+  return data;
+}
+
+export async function updateAgent(
+  id: string,
+  values: Partial<AgentFormValues>
+): Promise<AgentResponse> {
+  const payload = buildAgentPayload(values);
+  const { data } = await axiosInstance.patch<AgentResponse>(
+    `/agents/${id}`,
+    payload
+  );
   return data;
 }
 
