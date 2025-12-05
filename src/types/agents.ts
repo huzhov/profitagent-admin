@@ -34,6 +34,8 @@ export type AgentResponse = {
   guardrails: string[];
   subscriptionPlans: string;
   status: string;
+  catalogS3Key: string;
+  catalogName: string;
 };
 
 export type AgentCountResponse = {
