@@ -1,6 +1,17 @@
+// React
 import { useState, useEffect, useRef, useMemo } from "react";
+
+// Third-party libraries
 import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
+import type { Resolver, FieldErrors } from "react-hook-form";
+import type { AxiosError } from "axios";
+import { toast } from "sonner";
 import { ArrowLeft, ChevronDown, Loader2, Upload } from "lucide-react";
+
+// UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ValidatedInput } from "@/components/ui/validated-input";
@@ -21,24 +32,33 @@ import {
 } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/ui/spinner";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
-import type { Resolver, FieldErrors } from "react-hook-form";
-import { createAgent, getAgent, checkIfAgentExists } from "@/services/agents";
+// Services
+import {
+  createAgent,
+  getAgent,
+  checkIfAgentExists,
+  updateAgent,
+} from "@/services/agents";
+import { getWhatsAppList } from "@/services/integrations";
+import { stageUpload, uploadFile } from "@/services/upload";
+
+// Hooks
 import { useNameValidation } from "@/hooks/useNameValidation";
+
+// Utils
+import { handleAgentMutationError } from "@/lib/agentErrorHandler";
+
+// Types
+import type { WhatsAppResponse } from "@/types/integrations";
+
+// Local
 import {
   agentSchema,
   defaultAgentValues,
   type AgentFormValues,
 } from "./schema";
-import { getWhatsAppList } from "@/services/integrations";
-import { stageUpload, uploadFile } from "@/services/upload";
-import { toast } from "sonner";
-import type { WhatsAppResponse } from "@/types/integrations";
-import type { AxiosError } from "axios";
 import { WhatsAppIcon } from "../assets";
 
 export default function AgentBuilder() {
@@ -109,11 +129,12 @@ export default function AgentBuilder() {
   );
   const [openSections, setOpenSections] = useState(getDefaultOpenSections);
   const [channels, setChannels] = useState(getDefaultChannels);
+  const [uploadedCatalogKey, setUploadedCatalogKey] = useState<string | null>(
+    null
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const uploadKeyRef = useRef<string | null>(null);
 
-  // Watch all required fields for progress calculation using useWatch (proper hook)
   const formValues = useWatch({
     control,
     name: [
@@ -127,7 +148,6 @@ export default function AgentBuilder() {
     ],
   });
 
-  // Name validation using custom hook
   const agentName = useWatch({ control, name: "agentName" });
   const description = useWatch({ control, name: "description" });
   const objective = useWatch({ control, name: "objective" });
@@ -149,14 +169,11 @@ export default function AgentBuilder() {
     enabled: isAgentCreate,
   });
 
-  // Helper function to validate field values
   const isStringifiedValueNotEmpty = (value: unknown): boolean => {
     return !!value?.toString()?.trim().length;
   };
 
-  // Calculate progress based on required fields completion
   const progress = useMemo(() => {
-    // Helper function moved inside useMemo to avoid dependency issues
     const isAgentNameValidForProgress = (value: unknown): boolean => {
       return (
         isStringifiedValueNotEmpty(value) &&
@@ -189,7 +206,6 @@ export default function AgentBuilder() {
     return Math.round((filledFields.length / requiredFields.length) * 100);
   }, [formValues, nameValidation.status, isAgentCreate]);
 
-  // Creating agent function
   const { mutate: createAgentFn, isPending: isCreateAgentPending } =
     useMutation({
       mutationFn: createAgent,
@@ -198,92 +214,60 @@ export default function AgentBuilder() {
         navigate({ to: `/agents/${data.id}/view` });
       },
       onError: (error: AxiosError<{ error?: string; message?: string }>) => {
-        // Handle specific error types
-        if (error.response?.status === 500) {
-          const errorData = error.response?.data;
-
-          if (errorData?.error === "PrismaClientKnownRequestError") {
-            toast.error(
-              "Database error: The selected WhatsApp integration may not be valid or accessible. Please verify your WhatsApp number selection.",
-              { duration: 3000 }
-            );
-          } else {
-            toast.error(
-              "Server error occurred while creating the agent. Please try again or contact support.",
-              { duration: 3000 }
-            );
-          }
-        } else if (error.response?.status === 400) {
-          toast.error(
-            error.response?.data?.message ||
-              "Invalid data provided. Please check all required fields.",
-            { duration: 3000 }
-          );
-        }
-
-        if (error?.message === "Agent with this name already exists (403)") {
-          setError("agentName", {
-            type: "manual",
-            message: "Agent with this name already exists",
-          });
-        }
+        handleAgentMutationError(error, setError);
       },
     });
 
-  // Upload function
+  const { mutate: updateAgentFn, isPending: isUpdateAgentPending } =
+    useMutation({
+      mutationFn: (values: AgentFormValues) => updateAgent(id, values),
+      onSuccess: (data) => {
+        toast.success("Agent has been updated successfully");
+        navigate({ to: `/agents/${data.id}/view` });
+      },
+      onError: (error: AxiosError<{ error?: string; message?: string }>) => {
+        handleAgentMutationError(error);
+      },
+    });
+
+  const resetUploadState = () => {
+    setUploadedCatalogKey(null);
+    setUploadedFile(null);
+    setValue("catalogS3Key", "", { shouldValidate: true });
+    setValue("catalogName", "", { shouldValidate: true });
+  };
+
   const { mutate: uploadFileFn } = useMutation({
     mutationFn: uploadFile,
     onSuccess: () => {
-      // Only show success and set key if we have a stored key from staging
-      const key = uploadKeyRef.current;
-      if (key) {
-        setValue("catalogS3Key", key, { shouldValidate: true });
+      if (uploadedCatalogKey) {
+        setValue("catalogS3Key", uploadedCatalogKey, { shouldValidate: true });
         toast.success("Product catalog uploaded successfully");
-        // Clear the stored key after successful use
-        uploadKeyRef.current = null;
+        setUploadedCatalogKey(null);
       } else {
-        // Handle case where upload completed but no key was stored
         toast.error(
           "Upload completed but no file reference received. Please try again."
         );
-        setValue("catalogS3Key", "", { shouldValidate: true });
-        setValue("catalogName", "", { shouldValidate: true });
-        setUploadedFile(null);
+        resetUploadState();
       }
     },
     onError: (error: AxiosError) => {
-      // Clear state on upload failure
-      setValue("catalogS3Key", "", { shouldValidate: true });
-      setValue("catalogName", "", { shouldValidate: true });
-      setUploadedFile(null);
-      // Clear the stored key on error
-      uploadKeyRef.current = null;
-
       toast.error("Failed to upload file to S3. Please try again.");
       console.error("S3 upload error:", error);
+      resetUploadState();
     },
   });
 
-  // Stage Upload function
   const { mutate: stageUploadFn } = useMutation({
     mutationFn: stageUpload,
     onSuccess: (data, variables) => {
-      // Set catalogName (metadata)
       setValue("catalogName", variables.filename, { shouldValidate: true });
-
-      // Store the key for use in upload success callback
-      uploadKeyRef.current = data.key;
-
-      // Call Upload Function without key parameter
+      setUploadedCatalogKey(data.key);
       uploadFileFn({ url: data.uploadUrl, file: uploadedFile });
     },
     onError: () => {
       toast.error("Failed to prepare file upload. Please try again.");
-      setUploadedFile(null);
-      setValue("catalogS3Key", "", { shouldValidate: true });
-      setValue("catalogName", "", { shouldValidate: true });
-      // Clear the stored key on error
-      uploadKeyRef.current = null;
+      resetUploadState();
     },
   });
 
@@ -302,17 +286,12 @@ export default function AgentBuilder() {
     enabled: isAgentEdit,
   });
 
-  // Reset form state when navigating to create new agent
   useEffect(() => {
     if (isAgentCreate) {
-      // Clear any form errors from previous edits first
       clearErrors();
-
-      // Always reset form when in create mode, regardless of cached agentData
       reset(defaultAgentValues);
 
-      // Clear ref
-      uploadKeyRef.current = null;
+      setUploadedCatalogKey(null);
     }
   }, [isAgentCreate, location.pathname, reset, clearErrors]);
 
@@ -327,6 +306,8 @@ export default function AgentBuilder() {
       setValue("toneOfVoice", agentData?.tone || "");
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
+      setValue("catalogS3Key", agentData?.catalogS3Key || "");
+      setValue("catalogName", agentData?.catalogName || "");
     }
   }, [agentData, setValue, isAgentEdit]);
 
@@ -395,21 +376,14 @@ export default function AgentBuilder() {
   const handleFileUpload = async (file: File) => {
     if (file.type === "text/csv" || file.name.endsWith(".csv")) {
       try {
-        // Validate CSV structure
         await validateCSV(file);
-
         setUploadedFile(file);
-
-        // Call Endpoint
         stageUploadFn({
           filename: file.name,
           contentType: file.type,
         });
-
-        // Remove premature success toast - let actual upload completion handle it
         setCsvValidationError(null);
       } catch {
-        // Clear form values and uploaded file when validation fails
         setUploadedFile(null);
         setValue("catalogS3Key", "", { shouldValidate: true });
         setValue("catalogName", "", { shouldValidate: true });
@@ -453,16 +427,14 @@ export default function AgentBuilder() {
     }
   };
 
-  // const handleQuestionInputMode = (checked: boolean) => {
-  //   setValue("questionSetJson", "");
-  //   setValue("questionSets", []);
-  //   setQuestionSetInputMode(checked ? "paste" : "upload");
-  // };
-
   const onSubmit = async (values: AgentFormValues) => {
+    if (isAgentEdit) {
+      updateAgentFn(values);
+      return;
+    }
+
     if (!isAgentCreate) return;
 
-    // Check validation status before submitting
     if (nameValidation.status === "exists") {
       toast.error("Agent with this name already exists");
       document.getElementById("agent-name")?.focus();
@@ -474,12 +446,10 @@ export default function AgentBuilder() {
       return;
     }
 
-    // If name is available, proceed with creation
     createAgentFn(values);
   };
 
   const onError = (errors: FieldErrors<AgentFormValues>) => {
-    // Auto-open sections with errors
     const updatedSections = { ...openSections };
     if (errors.agentName || errors.description || errors.objective) {
       updatedSections.basicInfo = true;
@@ -495,7 +465,6 @@ export default function AgentBuilder() {
     }
     setOpenSections(updatedSections);
 
-    // Show error toast
     const errorMessages: string[] = [];
     if (errors.agentName) errorMessages.push("Agent Name");
     if (errors.description) errorMessages.push("Description");
@@ -571,17 +540,21 @@ export default function AgentBuilder() {
             onClick={handleSubmit(onSubmit, onError)}
             disabled={
               isCreateAgentPending ||
-              nameValidation.status === "checking" ||
-              nameValidation.status === "exists" ||
-              nameValidation.status === "error" ||
+              isUpdateAgentPending ||
+              (isAgentCreate &&
+                (nameValidation.status === "checking" ||
+                  nameValidation.status === "exists" ||
+                  nameValidation.status === "error")) ||
               !agentName?.trim() ||
               progress < 100
             }
           >
-            {isCreateAgentPending ? (
+            {isCreateAgentPending || isUpdateAgentPending ? (
               <div className="w-18 flex justify-center">
                 <Loader2 className="animate-spin" />
               </div>
+            ) : isAgentEdit ? (
+              "Update Agent"
             ) : (
               "Save Agent"
             )}
@@ -681,7 +654,7 @@ export default function AgentBuilder() {
                                 shouldValidate: true,
                               })
                             }
-                            className="mt-1.5"
+                            className={`mt-1.5 ${errors.description ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           />
                           {errors.description && (
                             <p className="text-sm text-red-500 mt-1">
@@ -710,7 +683,7 @@ export default function AgentBuilder() {
                                 shouldValidate: true,
                               })
                             }
-                            className="mt-1.5"
+                            className={`mt-1.5 ${errors.objective ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           />
                           {errors.objective && (
                             <p className="text-sm text-red-500 mt-1">
@@ -846,7 +819,7 @@ export default function AgentBuilder() {
                                 shouldValidate: true,
                               })
                             }
-                            className="mt-1.5 font-mono text-sm"
+                            className={`mt-1.5 font-mono text-sm ${errors.systemPrompt ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           />
                           {errors.systemPrompt && (
                             <p className="text-sm text-red-500 mt-1">
@@ -949,7 +922,6 @@ export default function AgentBuilder() {
                               <SelectContent>
                                 {whatsAppList?.map(
                                   (whatsapp: WhatsAppResponse) => {
-                                    // Format phone number for better readability
                                     const formatPhoneNumber = (
                                       phone: string
                                     ) => {
