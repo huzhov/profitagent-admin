@@ -15,13 +15,8 @@ import { useBusiness } from "@/context/AppContext";
 import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { getWhatsAppList } from "@/services/integrations";
-import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
-import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip";
+import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -60,13 +55,12 @@ export default function Home() {
           isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
         }
         tooltip={
-          !business ? (
-            <BusinessSetupRequiredToolTip />
-          ) : isNoWhatsappIntegrationsAvailable ? (
-            <NoWhatsAppIntegrationToolTip />
-          ) : (
-            ""
-          )
+          <NoIntegrationInfo
+            isNoBusinessAvailable={!business}
+            isNoWhatsappIntegrationsAvailable={
+              isNoWhatsappIntegrationsAvailable
+            }
+          />
         }
       />
 
@@ -187,18 +181,12 @@ export default function Home() {
                   </Button>
                 </div>
               </TooltipTrigger>
-              {!business ||
-                (isNoWhatsappIntegrationsAvailable && (
-                  <TooltipContent sideOffset={4}>
-                    {!business ? (
-                      <BusinessSetupRequiredToolTip />
-                    ) : isNoWhatsappIntegrationsAvailable ? (
-                      <NoWhatsAppIntegrationToolTip />
-                    ) : (
-                      ""
-                    )}
-                  </TooltipContent>
-                ))}
+              <NoIntegrationInfo
+                isNoBusinessAvailable={!business}
+                isNoWhatsappIntegrationsAvailable={
+                  isNoWhatsappIntegrationsAvailable
+                }
+              />
             </Tooltip>
             <Button
               variant="outline"

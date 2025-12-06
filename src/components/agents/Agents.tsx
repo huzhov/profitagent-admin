@@ -24,9 +24,8 @@ import { useBusiness } from "@/context/AppContext";
 import StatsCards from "@/components/common/StatsCards";
 import BusinessInfoCard from "@/components/common/BusinessInfoCard";
 import { getWhatsAppList } from "@/services/integrations";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
-import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
+import { Tooltip, TooltipTrigger } from "../ui/tooltip";
+import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -83,13 +82,12 @@ export default function Agents() {
           isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
         }
         tooltip={
-          !business ? (
-            <BusinessSetupRequiredToolTip />
-          ) : isNoWhatsappIntegrationsAvailable ? (
-            <NoWhatsAppIntegrationToolTip />
-          ) : (
-            ""
-          )
+          <NoIntegrationInfo
+            isNoBusinessAvailable={!business}
+            isNoWhatsappIntegrationsAvailable={
+              isNoWhatsappIntegrationsAvailable
+            }
+          />
         }
       />
       {!business ? (
@@ -412,11 +410,11 @@ export default function Agents() {
                         </Button>
                       </div>
                     </TooltipTrigger>
-                    {isNoWhatsappIntegrationsAvailable && (
-                      <TooltipContent>
-                        <NoWhatsAppIntegrationToolTip />
-                      </TooltipContent>
-                    )}
+                    <NoIntegrationInfo
+                      isNoWhatsappIntegrationsAvailable={
+                        isNoWhatsappIntegrationsAvailable
+                      }
+                    />
                   </Tooltip>
                 </CardContent>
               </Card>
