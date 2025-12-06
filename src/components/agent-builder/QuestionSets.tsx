@@ -71,7 +71,7 @@ export default memo(function QuestionSets({
 
         // validate question object
         const invalidQuestionIndex = parsed.questions.findIndex(
-          (question: any) => {
+          (question: Question) => {
             if (typeof question !== "object" || question === null) return true;
             if (typeof question.id !== "string") return true;
             if (typeof question.question !== "string") return true;
@@ -90,17 +90,19 @@ export default memo(function QuestionSets({
 
         const normalized = {
           ...parsed,
-          questions: parsed.questions.map((question: any, index: number) => ({
-            id: question.id || `q${index + 1}`,
-            question: question.question || "Untitled question",
-            type: question.type || "text",
-            options: Array.isArray(question.options)
-              ? question.options
-              : question.type === "options"
-                ? ["Option 1"]
-                : undefined,
-            note: typeof question.note === "string" ? question.note : "",
-          })),
+          questions: parsed.questions.map(
+            (question: Question, index: number) => ({
+              id: question.id || `q${index + 1}`,
+              question: question.question || "Untitled question",
+              type: question.type || "text",
+              options: Array.isArray(question.options)
+                ? question.options
+                : question.type === "options"
+                  ? ["Option 1"]
+                  : undefined,
+              note: typeof question.note === "string" ? question.note : "",
+            })
+          ),
         };
 
         if (normalized.name.length < 3) {
@@ -224,7 +226,7 @@ export default memo(function QuestionSets({
   };
 
   const moveQuestion = (direction: string, index: number) => {
-    const newQuestionArr = [...schema?.questions]; // Create a question copy array
+    const newQuestionArr = [...(schema?.questions || [])]; // Create a question copy array
     if (direction === "Up") {
       //Swap array direction up
       [newQuestionArr[index - 1], newQuestionArr[index]] = [
