@@ -77,9 +77,9 @@ export default function AgentView() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-200">
+      <div className=" border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-8 py-6">
           {/* Top Row with Back Button and Actions */}
           <div className="flex items-center gap-4 mb-4">
@@ -184,7 +184,7 @@ export default function AgentView() {
         </div>
 
         {/* Workflows Table */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className=" rounded-lg border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">

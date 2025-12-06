@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
 import { useNavigate } from "@tanstack/react-router";
 import StatsCards from "@/components/common/StatsCards";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import { Skeleton } from "../ui/skeleton";
 import { getWhatsAppList } from "@/services/integrations";
 import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip";
 import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
+import { Badge } from "../ui/badge";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -43,27 +43,7 @@ export default function Home() {
   const isNoWhatsappIntegrationsAvailable = !whatsAppIntegrations?.length;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <PageHeader
-        title="Welcome to ProfitAgent"
-        description="Create and manage AI agents that drive sales and engagement"
-        buttonLabel="Create Agent"
-        buttonIcon={Plus}
-        onButtonClick={() => navigate({ to: "/agents/create" })}
-        disabled={
-          isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
-        }
-        tooltip={
-          <NoIntegrationInfo
-            isNoBusinessAvailable={!business}
-            isNoWhatsappIntegrationsAvailable={
-              isNoWhatsappIntegrationsAvailable
-            }
-          />
-        }
-      />
-
+    <div className="mx-auto p-6 space-y-6">
       {/* Stats Grid */}
       <StatsCards />
 
@@ -120,9 +100,23 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="font-medium">{agent.name}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-1 w-150">
+                        {/* <p className="text-sm text-muted-foreground line-clamp-1 w-150">
                           {agent.description}
-                        </p>
+                        </p> */}
+                        <div className="flex gap-1">
+                          <Badge
+                            className={`text-xs border-transparent ${
+                              agent.status === "Active"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                            }`}
+                          >
+                            {agent.status === "disabled" ? "Paused" : "Active"}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            WhatsApp
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                     {/* <div className="text-right">

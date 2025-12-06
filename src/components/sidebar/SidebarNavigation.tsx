@@ -65,7 +65,7 @@ export default function SidebarNavigation({
   ];
 
   return (
-    <nav className="flex-1 px-4">
+    <nav className="flex-1 px-4 py-4">
       <ul className="space-y-2">
         {mainSections.map((section) => {
           const Icon = section.icon;

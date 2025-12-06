@@ -1,9 +1,10 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { Agent } from "@/types/agents";
 import type { User } from "@/types/user";
 import userStore from "@/store/user-store";
 import businessStore from "@/store/business-store";
+import themeStore from "@/store/theme-store";
 
 interface AppContextType {
   agents: Agent[];
@@ -69,6 +70,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     },
   ]);
 
+  const {
+    theme: { theme },
+  } = themeStore();
+
   const toggleAgentStatus = (agentId: number) => {
     setAgents(
       agents.map((agent) =>
@@ -81,6 +86,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       )
     );
   };
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
 
   const handleCloneAgent = (agentId: number) => {
     const agent = agents.find((agent) => agent.id === agentId);
@@ -159,6 +172,7 @@ export function useApp() {
 // Re-export Zustand stores for direct access if needed
 export { default as useUserStore } from "@/store/user-store";
 export { default as useBusinessStore } from "@/store/business-store";
+export { default as useThemeStore } from "@/store/theme-store";
 
 // Convenience hook that provides business state
 export function useBusiness() {
@@ -174,5 +188,15 @@ export function useBusiness() {
     loading,
     error,
     fetchBusiness,
+  };
+}
+
+export function useTheme() {
+  const theme = themeStore((state) => state.theme);
+  const setTheme = themeStore((state) => state.setTheme);
+
+  return {
+    theme,
+    setTheme,
   };
 }
