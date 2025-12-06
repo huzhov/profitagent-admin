@@ -325,7 +325,7 @@ export default function Agents() {
                         size="sm"
                         className="w-full cursor-pointer"
                         onClick={() =>
-                          navigate({ to: `/agents/${agent.id}/view` as any })
+                          navigate({ to: `/agents/${agent.id}/view` })
                         }
                       >
                         <Eye className="w-3 h-3 mr-1" />
