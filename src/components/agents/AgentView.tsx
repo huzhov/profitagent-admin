@@ -96,7 +96,7 @@ export default function AgentView() {
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 text-blue-700">
                   <Play className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="w-full">
                   <h1 className="text-gray-900">{data?.name}</h1>
                   <p className="text-gray-600">{data?.description}</p>
                 </div>
@@ -146,22 +146,20 @@ export default function AgentView() {
           {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Conversations</p>
-              <p className="text-gray-900">
-                {agent.conversations.toLocaleString()}
-              </p>
+              <p className="text-gray-600 text-sm mb-1">Tests</p>
+              <p className="text-gray-900">0</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Conversion Rate</p>
-              <p className="text-gray-900">{agent.conversionRate}</p>
+              <p className="text-gray-600 text-sm mb-1">Visits</p>
+              <p className="text-gray-900">0</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Revenue Generated</p>
-              <p className="text-gray-900">{agent.revenueGenerated}</p>
+              <p className="text-gray-600 text-sm mb-1">Engagements</p>
+              <p className="text-gray-900">0</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Satisfaction</p>
-              <p className="text-gray-900">{agent.satisfaction}</p>
+              <p className="text-gray-600 text-sm mb-1">Clicks</p>
+              <p className="text-gray-900">0</p>
             </div>
           </div>
         </div>

@@ -39,6 +39,7 @@ import { stageUpload, uploadFile } from "@/services/upload";
 import { toast } from "sonner";
 import type { WhatsAppResponse } from "@/types/integrations";
 import type { AxiosError } from "axios";
+import QuestionSets from "./QuestionSets";
 import { WhatsAppIcon } from "../assets";
 
 export default function AgentBuilder() {
@@ -140,6 +141,11 @@ export default function AgentBuilder() {
   });
   const faqsBestAnswers = useWatch({ control, name: "faqsBestAnswers" });
   const productPlans = useWatch({ control, name: "productPlans" });
+  const questionSets = useWatch({
+    control,
+    name: "questionSets",
+  });
+
   const nameValidation = useNameValidation({
     name: agentName,
     checkExists: checkIfAgentExists,
@@ -453,12 +459,6 @@ export default function AgentBuilder() {
     }
   };
 
-  // const handleQuestionInputMode = (checked: boolean) => {
-  //   setValue("questionSetJson", "");
-  //   setValue("questionSets", []);
-  //   setQuestionSetInputMode(checked ? "paste" : "upload");
-  // };
-
   const onSubmit = async (values: AgentFormValues) => {
     if (!isAgentCreate) return;
 
@@ -512,6 +512,21 @@ export default function AgentBuilder() {
     }
   };
 
+  const setQuestionSets = (value: string) => {
+    setValue("questionSets", value);
+  };
+
+  const setQuestionSetError = (value: string) => {
+    setError("questionSets", {
+      type: "manual",
+      message: value,
+    });
+  };
+
+  const clearQuestionSetError = () => {
+    clearErrors("questionSets");
+  };
+
   if (isAgentEdit && isAgentLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -523,6 +538,7 @@ export default function AgentBuilder() {
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
+
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4 flex-1">
           <Button
@@ -574,6 +590,7 @@ export default function AgentBuilder() {
               nameValidation.status === "checking" ||
               nameValidation.status === "exists" ||
               nameValidation.status === "error" ||
+              !!errors?.questionSets ||
               !agentName?.trim() ||
               progress < 100
             }
@@ -1163,6 +1180,38 @@ export default function AgentBuilder() {
                             </p>
                           </div>
                         )}
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+                {/* Question Sets */}
+                <Collapsible
+                  open={openSections.questionSets}
+                  onOpenChange={(open) =>
+                    setOpenSections({ ...openSections, questionSets: open })
+                  }
+                >
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                    <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
+                      <div className="text-left">
+                        <h3 className="text-gray-900">Question Sets</h3>
+                        <p className="text-gray-600 text-sm">
+                          Upload structured question flows (JSON)
+                        </p>
+                      </div>
+                      <ChevronDown
+                        className={`w-5 h-5 text-gray-400 transition-transform ${openSections.questionSets ? "" : "-rotate-90"}`}
+                      />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-6 pb-6 space-y-4 border-t border-gray-100 pt-4">
+                        <QuestionSets
+                          questionSets={questionSets ?? ""}
+                          setQuestionSets={setQuestionSets}
+                          error={errors.questionSets?.message ?? ""}
+                          setQuestionSetError={setQuestionSetError}
+                          clearQuestionSetError={clearQuestionSetError}
+                        />
                       </div>
                     </CollapsibleContent>
                   </div>

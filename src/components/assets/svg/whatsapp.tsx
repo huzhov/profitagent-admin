@@ -10,7 +10,9 @@ const WhatsAppIcon: React.FC<Partial<IconProps>> = ({
   className,
 }) => {
   return (
-    <div className={className ?? "w-5 h-5"}>
+    <div
+      className={`pointer-events-none select-none ${className ?? "w-5 h-5"}`}
+    >
       <img src="/whatsapp.svg" width={width} height={height} alt="logo" />
     </div>
   );

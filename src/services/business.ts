@@ -81,3 +81,15 @@ export async function checkIfBusinessExists(
   );
   return data;
 }
+
+/**
+ * Get Business Engagement Count
+ */
+export async function getBusinessEngagements(
+  businessId: string | null
+): Promise<{ engagements: number }> {
+  const { data } = await axiosInstance.get<{ engagements: number }>(
+    `/businesses/${businessId}/engagements`
+  );
+  return data;
+}

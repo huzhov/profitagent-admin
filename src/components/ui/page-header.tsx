@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
+import { Tooltip, TooltipTrigger } from "./tooltip";
 
 interface PageHeaderProps {
   title: string;
@@ -72,7 +72,7 @@ export function PageHeader({
               </Button>
             </div>
           </TooltipTrigger>
-          {tooltip && <TooltipContent sideOffset={4}>{tooltip}</TooltipContent>}
+          {tooltip}
         </Tooltip>
       )}
     </div>
