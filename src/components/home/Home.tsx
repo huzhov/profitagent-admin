@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "@tanstack/react-router";
 import StatsCards from "@/components/common/StatsCards";
 import { useQuery } from "@tanstack/react-query";
@@ -52,10 +46,10 @@ export default function Home() {
         <Card className="lg:col-span-2 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex flex-col gap-1.5">
-              <CardTitle>Recent Agents</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-normal">Recent Agents</CardTitle>
+              {/* <CardDescription>
                 Your most recently active AI agents
-              </CardDescription>
+              </CardDescription> */}
             </div>
             <Button
               variant="outline"
@@ -79,8 +73,11 @@ export default function Home() {
                         <Skeleton className="w-5 h-5" />
                       </div>
                       <div>
-                        <Skeleton className="w-15 h-6" />
-                        <Skeleton className="w-150 h-4 mt-1" />
+                        <Skeleton className="w-40 h-6" />
+                        <div className="flex items-center gap-1 mt-1">
+                          <Skeleton className="w-15 h-4.5 mt-1" />
+                          <Skeleton className="w-15 h-4.5 mt-1" />
+                        </div>
                       </div>
                     </div>
                     {/* <div className="text-right">
@@ -104,7 +101,7 @@ export default function Home() {
                         {/* <p className="text-sm text-muted-foreground line-clamp-1 w-150">
                           {agent.description}
                         </p> */}
-                        <div className="flex gap-1">
+                        <div className="flex items-center gap-1 mt-1">
                           <Badge
                             className={`text-xs border-transparent ${
                               agent.status === "Active"
@@ -154,8 +151,8 @@ export default function Home() {
 
         <Card className="shadow-none">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and shortcuts</CardDescription>
+            <CardTitle className="font-normal">Quick Actions</CardTitle>
+            {/* <CardDescription>Common tasks and shortcuts</CardDescription> */}
           </CardHeader>
           <CardContent className="space-y-3">
             <Tooltip>

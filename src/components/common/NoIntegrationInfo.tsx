@@ -1,4 +1,5 @@
 import { TooltipContent } from "@/components/ui/tooltip";
+import { Link } from "@tanstack/react-router";
 
 type NoIntegrationInfoProps = {
   isNoWhatsappIntegrationsAvailable?: boolean;
@@ -15,12 +16,13 @@ export default function NoIntegrationInfo({
         <div>
           <p className="font-medium">Business Setup Required</p> You need to
           create a business in the{" "}
-          <a
-            href="/settings/account#business-settings"
+          <Link
+            to="/settings/account"
+            hash="business-settings"
             className="underline font-medium"
           >
             Account & Integration Settings
-          </a>
+          </Link>
         </div>
       </TooltipContent>
     );
@@ -31,12 +33,13 @@ export default function NoIntegrationInfo({
         <div>
           <p className="font-medium">No WhatsApp numbers available.</p>
           Please add one in{" "}
-          <a
-            href="/settings/account#whatsapp-account"
+          <Link
+            to="/settings/account"
+            hash="whatsapp-account"
             className="underline font-medium"
           >
             Account & Integration Settings
-          </a>
+          </Link>
         </div>
       </TooltipContent>
     );

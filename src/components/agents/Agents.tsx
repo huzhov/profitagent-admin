@@ -132,8 +132,8 @@ export default function Agents() {
                           </div>
                         </div>
                       </div>
-                      <Skeleton className="h-4 w-full mt-2" />
-                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-5 w-full mt-3" />
+                      {/* <Skeleton className="h-4 w-3/4" /> */}
                     </CardHeader>
                     <CardContent
                       data-slot="card-content"
@@ -273,7 +273,7 @@ export default function Agents() {
                     </div>
                     <CardDescription
                       data-slot="card-description"
-                      className="text-muted-foreground mt-2 text-md line-clamp-2 h-10"
+                      className="text-muted-foreground mt-2 text-md line-clamp-1 h-6"
                     >
                       {agent.description}
                     </CardDescription>
@@ -387,7 +387,7 @@ export default function Agents() {
             {!isLoading && (
               <Card
                 data-slot="card"
-                className="shadow-none h-96 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
+                className="shadow-none h-92 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
               >
                 <CardContent
                   data-slot="card-content"

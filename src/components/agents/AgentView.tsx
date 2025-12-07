@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Eye, Ellipsis, Settings, Play } from "lucide-react";
+import { ArrowLeft, Ellipsis, Settings, Play, Pause } from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { getAgent } from "@/services/agents";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -104,14 +104,14 @@ export default function AgentView() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate({ to: `/agents/${id}/preview` })}
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
-              </Button>
+              </Button> */}
               <Button
                 variant="outline"
                 size="sm"
@@ -119,6 +119,19 @@ export default function AgentView() {
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Configure
+              </Button>
+              <Button
+                data-slot="button"
+                variant="outline"
+                size="sm"
+                // onClick={() => toggleAgentStatus(agent.id)}
+                className="cursor-pointer"
+              >
+                {data.status === "Active" ? (
+                  <Pause className="w-3 h-3" />
+                ) : (
+                  <Play className="w-3 h-3" />
+                )}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -203,7 +216,7 @@ export default function AgentView() {
         </div>
         <div className="flex-1 px-6 py-6 overflow-auto">
           {/* Stats Grid */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             <div className="rounded-lg p-4 border border-gray-200">
               <p className="text-sm text-muted-foreground mb-1">Tests</p>
               <p className="text-2xl">0</p>
