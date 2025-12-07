@@ -1,23 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Eye, Ellipsis, Workflow, Plus, Play } from "lucide-react";
+import { ArrowLeft, Eye, Ellipsis, Settings, Play } from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { getAgent } from "@/services/agents";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Label } from "../ui/label";
 
 export default function AgentView() {
   const navigate = useNavigate();
@@ -32,57 +25,57 @@ export default function AgentView() {
   });
 
   // Mock data - replace with actual data fetching
-  const agent = {
-    id: id,
-    name: "SalesBot Pro",
-    description: "Advanced sales agent for lead qualification and conversion",
-    status: "Active",
-    conversations: 1247,
-    conversionRate: "28.5%",
-    revenueGenerated: "$15,420",
-    satisfaction: "94%",
-  };
+  // const agent = {
+  //   id: id,
+  //   name: "SalesBot Pro",
+  //   description: "Advanced sales agent for lead qualification and conversion",
+  //   status: "Active",
+  //   conversations: 1247,
+  //   conversionRate: "28.5%",
+  //   revenueGenerated: "$15,420",
+  //   satisfaction: "94%",
+  // };
 
-  const workflows = [
-    {
-      id: 1,
-      name: "Lead Qualification Flow",
-      description: "Qualifies leads based on budget and needs",
-      status: "Active",
-      steps: 8,
-      executions: 342,
-      successRate: "87.5%",
-      lastUpdated: "2 hours ago",
-    },
-    {
-      id: 2,
-      name: "Product Recommendation",
-      description: "Recommends products based on customer preferences",
-      status: "Active",
-      steps: 6,
-      executions: 256,
-      successRate: "92.3%",
-      lastUpdated: "1 day ago",
-    },
-    {
-      id: 3,
-      name: "Objection Handling",
-      description: "Handles common sales objections",
-      status: "Draft",
-      steps: 5,
-      executions: 0,
-      successRate: "-",
-      lastUpdated: "3 days ago",
-    },
-  ];
+  // const workflows = [
+  //   {
+  //     id: 1,
+  //     name: "Lead Qualification Flow",
+  //     description: "Qualifies leads based on budget and needs",
+  //     status: "Active",
+  //     steps: 8,
+  //     executions: 342,
+  //     successRate: "87.5%",
+  //     lastUpdated: "2 hours ago",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Product Recommendation",
+  //     description: "Recommends products based on customer preferences",
+  //     status: "Active",
+  //     steps: 6,
+  //     executions: 256,
+  //     successRate: "92.3%",
+  //     lastUpdated: "1 day ago",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Objection Handling",
+  //     description: "Handles common sales objections",
+  //     status: "Draft",
+  //     steps: 5,
+  //     executions: 0,
+  //     successRate: "-",
+  //     lastUpdated: "3 days ago",
+  //   },
+  // ];
 
   return (
-    <div className="min-h-screen">
+    <div className="h-[calc(100vh-145px)]">
       {/* Header Section */}
       <div className=" border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+        <div className="px-6 py-4">
           {/* Top Row with Back Button and Actions */}
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
@@ -96,21 +89,36 @@ export default function AgentView() {
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 text-blue-700">
                   <Play className="w-6 h-6" />
                 </div>
-                <div className="w-full">
+                <div className="flex items-center gap-3">
                   <h1 className="text-gray-900">{data?.name}</h1>
-                  <p className="text-gray-600">{data?.description}</p>
+                  <Badge
+                    className={
+                      data.status === "disabled"
+                        ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                        : "bg-green-100 text-green-700 border-green-200"
+                    }
+                  >
+                    {data.status === "disabled" ? "Paused" : "Active"}
+                  </Badge>
                 </div>
               </div>
             </div>
-
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate({ to: `/agents/${id}/preview` as any })}
+                onClick={() => navigate({ to: `/agents/${id}/preview` })}
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate({ to: `/agents/${id}/edit` })}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Configure
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -119,11 +127,6 @@ export default function AgentView() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => navigate({ to: `/agents/${id}/edit` })}
-                  >
-                    Edit Agent
-                  </DropdownMenuItem>
                   <DropdownMenuItem>Duplicate</DropdownMenuItem>
                   <DropdownMenuItem>Export</DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive">
@@ -131,42 +134,98 @@ export default function AgentView() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Badge
-                className={
-                  agent.status === "Active"
-                    ? "bg-green-100 text-green-700 border-green-200"
-                    : "bg-gray-100 text-gray-700 border-gray-200"
-                }
-              >
-                {agent.status}
-              </Badge>
             </div>
           </div>
-
+        </div>
+      </div>
+      <div className="flex-1 flex overflow-hidden h-full">
+        <div className="w-64 xl:w-80 flex-shrink-0 border-r border-border px-6 py-6 overflow-auto ">
+          <div className="space-y-6">
+            <div>
+              <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
+                Description
+              </Label>
+              <p className="text-sm text-gray-900">{data?.description}</p>
+            </div>
+            <div>
+              <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
+                Objective
+              </Label>
+              <p className="text-sm text-gray-900">{data?.objective}</p>
+            </div>
+            <div>
+              <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
+                Tone of Voice
+              </Label>
+              <p className="text-sm text-gray-900">{data?.tone}</p>
+            </div>
+            <div>
+              <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
+                Language
+              </Label>
+              <p className="text-sm text-gray-900">English</p>
+            </div>
+            <div>
+              <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
+                Active Channels
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                <Badge
+                  data-slot="badge"
+                  className="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap bg-blue-50 text-blue-700 border-blue-200"
+                >
+                  WhatsApp
+                </Badge>
+              </div>
+            </div>
+            <div>
+              <Label
+                data-slot="label"
+                className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block"
+              >
+                System Prompt
+              </Label>
+              <p className="text-sm text-gray-900 line-clamp-3">
+                {data?.systemPrompt}
+              </p>
+            </div>
+            <div className="pt-2">
+              <Button
+                className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium h-8 rounded-md w-full"
+                variant="outline"
+                onClick={() => navigate({ to: `/agents/${id}/edit` })}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Edit Configuration
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 px-6 py-6 overflow-auto">
           {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Tests</p>
-              <p className="text-gray-900">0</p>
+            <div className="rounded-lg p-4 border border-gray-200">
+              <p className="text-sm text-muted-foreground mb-1">Tests</p>
+              <p className="text-2xl">0</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Visits</p>
-              <p className="text-gray-900">0</p>
+            <div className="rounded-lg p-4 border border-gray-200">
+              <p className="text-sm text-muted-foreground mb-1">Visits</p>
+              <p className="text-2xl">0</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Engagements</p>
-              <p className="text-gray-900">0</p>
+            <div className="rounded-lg p-4 border border-gray-200">
+              <p className="text-sm text-muted-foreground mb-1">Engagements</p>
+              <p className="text-2xl">0</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-gray-600 text-sm mb-1">Clicks</p>
-              <p className="text-gray-900">0</p>
+            <div className="rounded-lg p-4 border border-gray-200">
+              <p className="text-sm text-muted-foreground mb-1">Clicks</p>
+              <p className="text-2xl">0</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Workflows Section */}
-      <div className="max-w-7xl mx-auto px-8 py-8">
+      {/* <div className="max-w-7xl mx-auto px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-gray-900 flex items-center gap-2">
@@ -181,10 +240,10 @@ export default function AgentView() {
             <Plus className="w-4 h-4" />
             New Workflow
           </Button>
-        </div>
+        </div> */}
 
-        {/* Workflows Table */}
-        <div className=" rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      {/* Workflows Table */}
+      {/* <div className=" rounded-lg border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
@@ -272,8 +331,8 @@ export default function AgentView() {
               ))}
             </TableBody>
           </Table>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
     </div>
   );
 }
