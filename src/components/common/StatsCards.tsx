@@ -73,8 +73,8 @@ export default function StatsCards({ type }: { type: string }) {
       {statsData.map((stats) => {
         const Icon = stats.icon;
         return (
-          <Card className="py-0 shadow-none rounded-xl border">
-            <CardContent className="[&:last-child]:pb-6 p-4" key={stats.id}>
+          <Card className="py-0 shadow-none rounded-xl border" key={stats.id}>
+            <CardContent className="[&:last-child]:pb-6 p-4">
               {type === "Home" ? (
                 <div className="flex items-center justify-between">
                   <div>
