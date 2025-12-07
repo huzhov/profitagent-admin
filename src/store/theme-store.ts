@@ -1,24 +1,24 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface Theme {
-  theme: string;
+export interface Mode {
+  mode: string;
 }
 
 export interface ThemeStore {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  mode: string;
+  setMode: (mode: Mode) => void;
 }
 
-const theme: Theme = {
-  theme: "light",
+const mode: Mode = {
+  mode: "light",
 };
 
 const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      theme: theme,
-      setTheme: (theme: Theme) => set({ theme }),
+      mode: mode?.mode,
+      setMode: (mode: Mode) => set({ mode: mode?.mode }),
     }),
     { name: "theme" }
   )

@@ -70,9 +70,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     },
   ]);
 
-  const {
-    theme: { theme },
-  } = themeStore();
+  const { mode } = themeStore();
 
   const toggleAgentStatus = (agentId: number) => {
     setAgents(
@@ -88,12 +86,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    if (theme === "dark") {
+    if (mode === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [theme]);
+  }, [mode]);
 
   const handleCloneAgent = (agentId: number) => {
     const agent = agents.find((agent) => agent.id === agentId);
@@ -192,11 +190,11 @@ export function useBusiness() {
 }
 
 export function useTheme() {
-  const theme = themeStore((state) => state.theme);
-  const setTheme = themeStore((state) => state.setTheme);
+  const mode = themeStore((state) => state.mode);
+  const setMode = themeStore((state) => state.setMode);
 
   return {
-    theme,
-    setTheme,
+    mode,
+    setMode,
   };
 }

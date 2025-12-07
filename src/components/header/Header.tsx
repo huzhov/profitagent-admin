@@ -7,10 +7,7 @@ import { Button } from "../ui/button";
 
 export default function Header() {
   const { user } = useUserStore();
-  const {
-    theme: { theme },
-    setTheme,
-  } = useTheme();
+  const { mode, setMode } = useTheme();
 
   return (
     <div className="h-16 bg-card border-b border-border px-6 flex items-center justify-between">
@@ -22,13 +19,11 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-4">
         <Button
-          onClick={() =>
-            setTheme({ theme: theme !== "dark" ? "dark" : "light" })
-          }
+          onClick={() => setMode({ mode: mode !== "dark" ? "dark" : "light" })}
           variant="ghost"
           className="inline-flex items-center justify-center px-2.5 w-9 h-9 p-0"
         >
-          {theme !== "dark" ? (
+          {mode !== "dark" ? (
             <Sun className="w-5 h-5" />
           ) : (
             <Moon className="w-5 h-5" />
