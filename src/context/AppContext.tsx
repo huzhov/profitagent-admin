@@ -72,6 +72,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const { mode } = themeStore();
 
+  useEffect(() => {
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [mode]);
+
   const toggleAgentStatus = (agentId: number) => {
     setAgents(
       agents.map((agent) =>
@@ -84,14 +92,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       )
     );
   };
-
-  useEffect(() => {
-    if (mode === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [mode]);
 
   const handleCloneAgent = (agentId: number) => {
     const agent = agents.find((agent) => agent.id === agentId);

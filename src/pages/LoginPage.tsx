@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
@@ -59,6 +59,11 @@ const LoginPage = () => {
       });
     },
   });
+
+  // Remove dark mode
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
 
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 

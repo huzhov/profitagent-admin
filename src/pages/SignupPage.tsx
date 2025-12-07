@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -66,6 +66,11 @@ const SignupPage = () => {
       });
     },
   });
+
+  // Remove dark mode
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
 
   const togglePasswordVisibility = () =>
     setIsPasswordVisible((prevState) => !prevState);

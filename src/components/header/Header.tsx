@@ -19,7 +19,7 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-4">
         <Button
-          onClick={() => setMode({ mode: mode !== "dark" ? "dark" : "light" })}
+          onClick={() => setMode({ mode: mode === "dark" ? "light" : "dark" })}
           variant="ghost"
           className="inline-flex items-center justify-center px-2.5 w-9 h-9 p-0"
         >
