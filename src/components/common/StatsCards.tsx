@@ -11,7 +11,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 
-export default function StatsCards() {
+export default function StatsCards({ type }: { type: string }) {
   const { business } = useBusiness();
 
   const [{ data: agentCountData }, { data: businessEngagementsData }] =
@@ -30,59 +30,76 @@ export default function StatsCards() {
       ],
     });
 
+  const statsData = [
+    {
+      id: "totalAgents",
+      title: "Total Agents",
+      icon: Bot,
+      count: agentCountData?.count ?? 0,
+      color: "blue-600",
+    },
+    {
+      id: "activeTest",
+      title: "Active Test",
+      icon: FlaskConical,
+      count: 0,
+      color: "purple-600",
+    },
+    {
+      id: "visits",
+      title: "Visits",
+      icon: TrendingUp,
+      count: 0,
+      color: "green-600",
+    },
+    {
+      id: "engagements",
+      title: "Engagements",
+      icon: MessageSquare,
+      count: businessEngagementsData?.engagements ?? 0,
+      color: "orange-600",
+    },
+    {
+      id: "clicks",
+      title: "Clicks",
+      icon: MousePointerClick,
+      count: 0,
+      color: "yellow-600",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      <Card className="py-0 shadow-none rounded-xl border">
-        <CardContent className="[&:last-child]:pb-6 p-4">
-          <div className="flex items-center gap-2">
-            <Bot className="w-4 h-4 text-blue-600" />
-            <span className="text-sm text-muted-foreground">Total Agents</span>
-          </div>
-          <p className="text-2xl font-semibold">{agentCountData?.count ?? 0}</p>
-        </CardContent>
-      </Card>
-
-      <Card className="py-0 shadow-none rounded-xl border">
-        <CardContent className="[&:last-child]:pb-6 p-4">
-          <div className="flex items-center gap-2">
-            <FlaskConical className="w-4 h-4 text-purple-600" />
-            <span className="text-sm text-muted-foreground">Active Tests</span>
-          </div>
-          <p className="text-2xl font-semibold">0</p>
-        </CardContent>
-      </Card>
-
-      <Card className="py-0 shadow-none rounded-xl border">
-        <CardContent className="[&:last-child]:pb-6 p-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-green-600" />
-            <span className="text-sm text-muted-foreground">Visits</span>
-          </div>
-          <p className="text-2xl font-semibold">0</p>
-        </CardContent>
-      </Card>
-
-      <Card className="py-0 shadow-none rounded-xl border">
-        <CardContent className="[&:last-child]:pb-6 p-4">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-orange-600" />
-            <span className="text-sm text-muted-foreground">Engagements</span>
-          </div>
-          <p className="text-2xl font-semibold">
-            {businessEngagementsData?.engagements ?? 0}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="py-0 shadow-none rounded-xl border">
-        <CardContent className="[&:last-child]:pb-6 p-4">
-          <div className="flex items-center gap-2">
-            <MousePointerClick className="w-4 h-4 text-yellow-600" />
-            <span className="text-sm text-muted-foreground">Clicks</span>
-          </div>
-          <p className="text-2xl font-semibold">0</p>
-        </CardContent>
-      </Card>
+      {statsData.map((stats) => {
+        const Icon = stats.icon;
+        return (
+          <Card className="py-0 shadow-none rounded-xl border">
+            <CardContent className="[&:last-child]:pb-6 p-4" key={stats.id}>
+              {type === "Home" ? (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      {stats.title}
+                    </p>
+                    <p className="text-2xl font-semibold">{stats.count}</p>
+                  </div>
+                  <Icon className={`w-8 h-8 text-${stats.color}`} />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Icon className={`w-4 h-4 text-${stats.color}`} />
+                    <span className="text-sm text-muted-foreground">
+                      {stats.title}
+                    </span>
+                  </div>
+                  <p className="text-2xl font-semibold">{stats.count}</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

@@ -45,7 +45,7 @@ export default function Home() {
   return (
     <div className="mx-auto p-6 space-y-6">
       {/* Stats Grid */}
-      <StatsCards />
+      <StatsCards type="Home" />
 
       {/* Recent Agents and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -91,8 +91,9 @@ export default function Home() {
               ) : data && data.length > 0 ? (
                 data?.slice(0, 3)?.map((agent, index) => (
                   <div
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
                     key={index}
+                    onClick={() => navigate({ to: `/agents/${agent.id}/view` })}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">

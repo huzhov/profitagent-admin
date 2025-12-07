@@ -17,7 +17,7 @@ export default function AgentView() {
   const { id } = useParams({ from: "/_authenticated/agents/$id/view" });
 
   const { data } = useSuspenseQuery({
-    queryKey: ["agents"],
+    queryKey: ["agents", id],
     queryFn: async () => {
       const data = await getAgent(id);
       return data;
@@ -92,11 +92,11 @@ export default function AgentView() {
                 <div className="flex items-center gap-3">
                   <h1 className="text-gray-900">{data?.name}</h1>
                   <Badge
-                    className={
-                      data.status === "disabled"
-                        ? "bg-yellow-100 text-yellow-700 border-yellow-200"
-                        : "bg-green-100 text-green-700 border-green-200"
-                    }
+                    className={`text-xs border-transparent ${
+                      data.status === "Active"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                    }`}
                   >
                     {data.status === "disabled" ? "Paused" : "Active"}
                   </Badge>
