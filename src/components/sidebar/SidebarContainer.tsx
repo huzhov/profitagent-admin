@@ -1,17 +1,14 @@
-import SidebarHeader from "./SidebarHeader";
+// import SidebarHeader from "./SidebarHeader";
 import SidebarNavigation from "./SidebarNavigation";
 import { Power } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
 import { logout } from "@/lib/auth";
-import useUserStore from "@/store/user-store";
-import { getInitials } from "@/helper/getInitials";
 import { useQuery } from "@tanstack/react-query";
 import { getAgentCount } from "@/services/agents";
 import { useBusiness } from "@/context/AppContext";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function SidebarContainer() {
   const navigate = useNavigate();
-  const { user } = useUserStore();
   const { business } = useBusiness();
 
   const { data } = useQuery({
@@ -26,22 +23,10 @@ export default function SidebarContainer() {
   };
 
   return (
-    <aside className="w-64 bg-card border-r border-border h-screen flex flex-col">
-      <SidebarHeader />
-      <div className="p-4" />
+    <aside className="w-64 bg-card border-r border-border h-full flex flex-col">
+      {/* <SidebarHeader /> */}
+      <div className="p-2" />
       <SidebarNavigation agentCount={data?.count} />
-      <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-            <span className="text-sm">{getInitials(user?.name)}</span>
-          </div>
-          <div className="flex-1">
-            <p className="text-sm">{user.name}</p>
-            <p className="text-xs text-muted-foreground">Premium Plan</p>
-          </div>
-        </div>
-      </div>
-
       {/* Log Out */}
       <div className="p-2 border-t border-border text-muted-foreground hover:text-foreground hover:bg-accent/50">
         <button

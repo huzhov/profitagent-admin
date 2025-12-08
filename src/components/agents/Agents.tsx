@@ -7,7 +7,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
-import { Bot, ChartColumn, EllipsisVertical, Eye, Plus } from "lucide-react";
+import {
+  Bot,
+  // ChartColumn,
+  EllipsisVertical,
+  Eye,
+  Plus,
+  // Play,
+  // Pause,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -70,7 +78,7 @@ export default function Agents() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="mx-auto p-6 space-y-6">
       {/* Header */}
       <PageHeader
         title="My Agents"
@@ -97,7 +105,7 @@ export default function Agents() {
       ) : (
         <>
           {/* Stats Grid */}
-          <StatsCards />
+          <StatsCards type="Agents" />
           {/* Agents Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
@@ -117,12 +125,15 @@ export default function Agents() {
                           <Skeleton className="w-10 h-10 rounded-lg" />
                           <div className="space-y-2">
                             <Skeleton className="h-5 w-32" />
-                            {/* <Skeleton className="h-4 w-20" /> */}
+                            <div className="flex gap-1">
+                              <Skeleton className="h-4.5 w-15" />
+                              <Skeleton className="h-4.5 w-15" />
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <Skeleton className="h-4 w-full mt-2" />
-                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-5 w-full mt-3" />
+                      {/* <Skeleton className="h-4 w-3/4" /> */}
                     </CardHeader>
                     <CardContent
                       data-slot="card-content"
@@ -138,19 +149,15 @@ export default function Agents() {
                           <Skeleton className="h-16 rounded-lg" />
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-24" />
-                        <div className="flex gap-1">
-                          <Skeleton className="h-5.5 w-20" />
-                        </div>
-                      </div>
+
                       {/* <div className="space-y-1">
                         <Skeleton className="h-3 w-32" />
                         <Skeleton className="h-3 w-28" />
                       </div> */}
-                      <div className="space-y-2 pt-2">
-                        <Skeleton className="h-9 w-full" />
-                        <Skeleton className="h-9 w-full" />
+                      <div className="flex gap-2 space-y-2 pt-2">
+                        <Skeleton className="h-7 w-full" />
+                        <Skeleton className="h-7 w-full" />
+                        <Skeleton className="h-7 w-20" />
                       </div>
                     </CardContent>
                   </Card>
@@ -170,7 +177,7 @@ export default function Agents() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIconColorClass(agents[0].iconColor)}`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center dark:bg-blue-900/20 ${getIconColorClass(agents[0].iconColor)}`}
                         >
                           <Bot className="w-5 h-5" />
                         </div>
@@ -209,16 +216,31 @@ export default function Agents() {
                               )} */}
                             </div>
                           </div>
-                          {/* <Badge
-                            data-slot="badge"
-                            className={`text-xs border-transparent ${
-                              agent.status === "Active"
-                                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
-                            }`}
-                          >
-                            {agent.status === "disabled" ? "Paused" : "Active"}
-                          </Badge> */}
+                          <div className="flex gap-1">
+                            {/* <Badge
+                              data-slot="badge"
+                              className={`text-xs border-transparent ${
+                                agent.status === "Active"
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                                  : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                              }`}
+                            >
+                              {agent.status === "disabled"
+                                ? "Paused"
+                                : "Active"}
+                            </Badge> */}
+                            {/* Active Channels */}
+                            {agents[0].channels.map((channel, index) => (
+                              <Badge
+                                key={index}
+                                data-slot="badge"
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                {channel}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
                       </div>
                       <DropdownMenu>
@@ -235,7 +257,7 @@ export default function Agents() {
                           >
                             Edit Agent
                           </DropdownMenuItem>
-                          <DropdownMenuItem
+                          {/* <DropdownMenuItem
                           // onClick={() => handleCloneAgent(agent.id)}
                           >
                             Duplicate
@@ -245,13 +267,13 @@ export default function Agents() {
                             // onClick={() => handleDeleteAgent(agent.id)}
                           >
                             Delete
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                     <CardDescription
                       data-slot="card-description"
-                      className="text-muted-foreground mt-2 text-md line-clamp-2 h-12"
+                      className="text-muted-foreground mt-2 text-md line-clamp-1 h-6"
                     >
                       {agent.description}
                     </CardDescription>
@@ -290,25 +312,6 @@ export default function Agents() {
                       </div>
                     </div>
 
-                    {/* Active Channels */}
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Active Channels
-                      </p>
-                      <div className="flex gap-1">
-                        {agents[0].channels.map((channel, index) => (
-                          <Badge
-                            key={index}
-                            data-slot="badge"
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {channel}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Metadata */}
                     {/* <div className="text-xs text-muted-foreground space-y-1">
                       <div className="flex items-center gap-1">
@@ -319,10 +322,12 @@ export default function Agents() {
                     </div> */}
 
                     {/* Actions */}
-                    <div className="space-y-2 pt-2">
+
+                    <div className="flex gap-2 space-y-2 pt-2">
                       <Button
                         data-slot="button"
                         size="sm"
+                        variant="outline"
                         className="w-full cursor-pointer"
                         onClick={() =>
                           navigate({ to: `/agents/${agent.id}/view` })
@@ -331,8 +336,9 @@ export default function Agents() {
                         <Eye className="w-3 h-3 mr-1" />
                         View Agent
                       </Button>
-                      <div className="flex gap-2">
-                        {/* <Button
+                      {/* <div className="w-full"></div>
+                      <div className="w-full"> */}
+                      {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -346,30 +352,30 @@ export default function Agents() {
                           <Play className="w-3 h-3 mr-1" />
                           Preview
                         </Button> */}
-                        <Button
+                      {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
-                          className="flex-1 cursor-pointer"
+                          className="w-full cursor-pointer"
                           onClick={() => navigate({ to: `/intelligence` })}
                         >
                           <ChartColumn className="w-3 h-3 mr-1" />
                           Analytics
-                        </Button>
-                        {/* <Button
-                          data-slot="button"
-                          variant="outline"
-                          size="sm"
-                          // onClick={() => toggleAgentStatus(agent.id)}
-                          className="cursor-pointer"
-                        >
-                          {agent.status === "Active" ? (
-                            <Pause className="w-3 h-3" />
-                          ) : (
-                            <Play className="w-3 h-3" />
-                          )}
                         </Button> */}
-                      </div>
+                      {/* </div> */}
+                      {/* <Button
+                        data-slot="button"
+                        variant="outline"
+                        size="sm"
+                        // onClick={() => toggleAgentStatus(agent.id)}
+                        className="cursor-pointer"
+                      >
+                        {agent.status === "Active" ? (
+                          <Pause className="w-3 h-3" />
+                        ) : (
+                          <Play className="w-3 h-3" />
+                        )}
+                      </Button> */}
                     </div>
                   </CardContent>
                 </Card>
@@ -380,7 +386,7 @@ export default function Agents() {
             {!isLoading && (
               <Card
                 data-slot="card"
-                className="shadow-none h-121 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
+                className="shadow-none h-92 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
               >
                 <CardContent
                   data-slot="card-content"

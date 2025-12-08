@@ -564,7 +564,7 @@ export default function SettingsAccount() {
                       <div className="flex items-center space-x-2">
                         <Button
                           type="button"
-                          className="w-fit bg-blue-600 hover:bg-blue-700"
+                          className="w-fit text-white bg-blue-600 hover:bg-blue-700"
                           onClick={launchWhatsAppSignup}
                         >
                           <MetaIcon className="w-4 h-4 mr-2" />

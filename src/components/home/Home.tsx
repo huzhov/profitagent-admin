@@ -1,12 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "@tanstack/react-router";
 import StatsCards from "@/components/common/StatsCards";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +10,7 @@ import { Skeleton } from "../ui/skeleton";
 import { getWhatsAppList } from "@/services/integrations";
 import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip";
 import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
+import { Badge } from "../ui/badge";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -43,39 +37,19 @@ export default function Home() {
   const isNoWhatsappIntegrationsAvailable = !whatsAppIntegrations?.length;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <PageHeader
-        title="Welcome to ProfitAgent"
-        description="Create and manage AI agents that drive sales and engagement"
-        buttonLabel="Create Agent"
-        buttonIcon={Plus}
-        onButtonClick={() => navigate({ to: "/agents/create" })}
-        disabled={
-          isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
-        }
-        tooltip={
-          <NoIntegrationInfo
-            isNoBusinessAvailable={!business}
-            isNoWhatsappIntegrationsAvailable={
-              isNoWhatsappIntegrationsAvailable
-            }
-          />
-        }
-      />
-
+    <div className="mx-auto p-6 space-y-6">
       {/* Stats Grid */}
-      <StatsCards />
+      <StatsCards type="Home" />
 
       {/* Recent Agents and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 shadow-none">
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex flex-col gap-1.5">
-              <CardTitle>Recent Agents</CardTitle>
-              <CardDescription>
+              <CardTitle className="font-normal">Recent Agents</CardTitle>
+              {/* <CardDescription>
                 Your most recently active AI agents
-              </CardDescription>
+              </CardDescription> */}
             </div>
             <Button
               variant="outline"
@@ -99,8 +73,11 @@ export default function Home() {
                         <Skeleton className="w-5 h-5" />
                       </div>
                       <div>
-                        <Skeleton className="w-15 h-6" />
-                        <Skeleton className="w-150 h-4 mt-1" />
+                        <Skeleton className="w-40 h-6" />
+                        <div className="flex items-center gap-1 mt-1">
+                          <Skeleton className="w-15 h-4.5 mt-1" />
+                          <Skeleton className="w-15 h-4.5 mt-1" />
+                        </div>
                       </div>
                     </div>
                     {/* <div className="text-right">
@@ -111,8 +88,9 @@ export default function Home() {
               ) : data && data.length > 0 ? (
                 data?.slice(0, 3)?.map((agent, index) => (
                   <div
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
                     key={index}
+                    onClick={() => navigate({ to: `/agents/${agent.id}/view` })}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
@@ -120,9 +98,23 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="font-medium">{agent.name}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-1 w-150">
+                        {/* <p className="text-sm text-muted-foreground line-clamp-1 w-150">
                           {agent.description}
-                        </p>
+                        </p> */}
+                        <div className="flex items-center gap-1 mt-1">
+                          {/* <Badge
+                            className={`text-xs border-transparent ${
+                              agent.status === "Active"
+                                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                                : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                            }`}
+                          >
+                            {agent.status === "disabled" ? "Paused" : "Active"}
+                          </Badge> */}
+                          <Badge variant="outline" className="text-xs">
+                            WhatsApp
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                     {/* <div className="text-right">
@@ -159,8 +151,8 @@ export default function Home() {
 
         <Card className="shadow-none">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and shortcuts</CardDescription>
+            <CardTitle className="font-normal">Quick Actions</CardTitle>
+            {/* <CardDescription>Common tasks and shortcuts</CardDescription> */}
           </CardHeader>
           <CardContent className="space-y-3">
             <Tooltip>
@@ -196,14 +188,14 @@ export default function Home() {
               <MessageSquare className="w-4 h-4 mr-2" />
               View Messages
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
               onClick={() => navigate({ to: "/intelligence" })}
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               Analytics Dashboard
-            </Button>
+            </Button> */}
             {/* <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
