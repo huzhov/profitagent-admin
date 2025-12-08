@@ -1,13 +1,10 @@
 import useUserStore from "@/store/user-store";
-import { Sun, Moon } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { getInitials } from "@/helper/getInitials";
-import { useTheme } from "@/context/AppContext";
-import { Button } from "../ui/button";
+import DarkModeToggle from "../common/DarkModeToggle";
 
 export default function Header() {
   const { user } = useUserStore();
-  const { mode, setMode } = useTheme();
 
   return (
     <div className="h-16 bg-card border-b border-border px-6 flex items-center justify-between">
@@ -18,18 +15,7 @@ export default function Header() {
         <h1 className="text-lg font-semibold">ProfitAgent</h1>
       </div>
       <div className="flex items-center gap-4">
-        <Button
-          onClick={() => setMode({ mode: mode === "dark" ? "light" : "dark" })}
-          variant="ghost"
-          className="inline-flex items-center justify-center px-2.5 w-9 h-9 p-0"
-        >
-          {mode !== "dark" ? (
-            <Sun className="w-5 h-5" />
-          ) : (
-            <Moon className="w-5 h-5" />
-          )}
-        </Button>
-
+        <DarkModeToggle />
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
             <span className="text-sm">{getInitials(user?.name)}</span>

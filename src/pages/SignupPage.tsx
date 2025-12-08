@@ -19,6 +19,7 @@ import { setToken } from "@/lib/auth";
 import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { toast } from "sonner";
+import DarkModeToggle from "@/components/common/DarkModeToggle";
 
 const schema = z
   .object({
@@ -67,11 +68,6 @@ const SignupPage = () => {
     },
   });
 
-  // Remove dark mode
-  useEffect(() => {
-    document.documentElement.classList.remove("dark");
-  }, []);
-
   const togglePasswordVisibility = () =>
     setIsPasswordVisible((prevState) => !prevState);
   const toggleConfirmPasswordVisibility = () =>
@@ -79,10 +75,13 @@ const SignupPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="absolute top-4 right-4">
+        <DarkModeToggle />
+      </div>
       <div className="w-full max-w-sm border rounded-lg p-6 shadow-sm bg-card">
         <div className="flex items-center justify-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <LogoIcon className="w-5 h-5 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden bg-black">
+            <LogoIcon className="w-full h-full object-contain p-1" />
           </div>
           <div>
             <h1 className="text-lg font-semibold">ProfitAgent</h1>

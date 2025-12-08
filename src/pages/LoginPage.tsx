@@ -21,6 +21,7 @@ import { setToken } from "@/lib/auth";
 import useUserStore from "@/store/user-store";
 import { toast } from "sonner";
 import { useBusiness } from "@/context/AppContext";
+import DarkModeToggle from "@/components/common/DarkModeToggle";
 
 const schema = z.object({
   email: z.email("Enter a valid email"),
@@ -60,19 +61,17 @@ const LoginPage = () => {
     },
   });
 
-  // Remove dark mode
-  useEffect(() => {
-    document.documentElement.classList.remove("dark");
-  }, []);
-
   const toggleVisibility = () => setIsVisible((prevState) => !prevState);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="absolute top-4 right-4">
+        <DarkModeToggle />
+      </div>
       <div className="w-full max-w-sm border rounded-lg p-6 shadow-sm bg-card">
         <div className="flex items-center justify-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <LogoIcon className="w-6 h-6 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden bg-black">
+            <LogoIcon className="w-full h-full object-contain p-1" />
           </div>
           <div>
             <h1 className="text-lg font-semibold">ProfitAgent</h1>

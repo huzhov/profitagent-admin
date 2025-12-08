@@ -73,11 +73,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const { mode } = themeStore();
 
   useEffect(() => {
-    if (mode === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", mode === "dark");
   }, [mode]);
 
   const toggleAgentStatus = (agentId: number) => {
@@ -170,7 +166,6 @@ export function useApp() {
 // Re-export Zustand stores for direct access if needed
 export { default as useUserStore } from "@/store/user-store";
 export { default as useBusinessStore } from "@/store/business-store";
-export { default as useThemeStore } from "@/store/theme-store";
 
 // Convenience hook that provides business state
 export function useBusiness() {
@@ -186,15 +181,5 @@ export function useBusiness() {
     loading,
     error,
     fetchBusiness,
-  };
-}
-
-export function useTheme() {
-  const mode = themeStore((state) => state.mode);
-  const setMode = themeStore((state) => state.setMode);
-
-  return {
-    mode,
-    setMode,
   };
 }

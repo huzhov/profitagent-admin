@@ -621,6 +621,10 @@ export default function AgentBuilder() {
     }, 100);
   };
 
+  const handleBackButton = () => {
+    canGoBack ? router.history.back() : navigate({ to: "/agents" });
+  };
+
   const setQuestionSets = (value: string) => {
     setValue("questionSets", value);
   };
@@ -655,13 +659,7 @@ export default function AgentBuilder() {
 
       <div className="bg-background border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4 flex-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() =>
-              canGoBack ? router.history.back() : navigate({ to: "/agents" })
-            }
-          >
+          <Button variant="ghost" size="sm" onClick={() => handleBackButton()}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="flex-1">
@@ -694,9 +692,7 @@ export default function AgentBuilder() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() =>
-              canGoBack ? router.history.back() : navigate({ to: "/agents" })
-            }
+            onClick={() => handleBackButton()}
           >
             Cancel
           </Button>
@@ -729,7 +725,7 @@ export default function AgentBuilder() {
         <div className="flex-shrink-0 flex flex-col max-w-3xl mx-auto py-8 pl-6">
           <div className="bg-background rounded-lg border border-gray-200 p-3">
             <div className="space-y-1">
-              {navigationSection?.map((section) => {
+              {navigationSection.map((section) => {
                 const Icon = section.icon;
                 return (
                   <Button
