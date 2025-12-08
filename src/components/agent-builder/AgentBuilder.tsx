@@ -579,50 +579,46 @@ export default function AgentBuilder() {
   };
 
   const handleScrollTo = (name: string) => {
-    switch (name) {
-      case "basicInfo":
-        setOpenSections({ ...openSections, basicInfo: true });
-        return basicInfoRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      case "behavior":
-        setOpenSections({ ...openSections, behavior: true });
-        return behavior.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      case "aiConfig":
-        setOpenSections({ ...openSections, aiConfig: true });
-        return aiConfig.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      case "channels":
-        setOpenSections({ ...openSections, channels: true });
-        return channelsRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      case "knowledge":
-        setOpenSections({ ...openSections, knowledge: true });
-        return knowledgeRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      case "productCatalogue":
-        setOpenSections({ ...openSections, productCatalogue: true });
-        return productCatalogueRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      case "questionSets":
-        setOpenSections({ ...openSections, questionSets: true });
-        return questionSetsRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-    }
+    setOpenSections({ ...openSections, [name]: true });
+    setTimeout(() => {
+      switch (name) {
+        case "basicInfo":
+          return basicInfoRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        case "behavior":
+          return behavior.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        case "aiConfig":
+          return aiConfig.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        case "channels":
+          return channelsRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        case "knowledge":
+          return knowledgeRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        case "productCatalogue":
+          return productCatalogueRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        case "questionSets":
+          return questionSetsRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+      }
+    }, 100);
   };
 
   const setQuestionSets = (value: string) => {
