@@ -8,9 +8,8 @@ import { useBusiness } from "@/context/AppContext";
 import { useNavigate } from "@tanstack/react-router";
 
 export default function SidebarContainer() {
-  const { business } = useBusiness();
-
   const navigate = useNavigate();
+  const { business } = useBusiness();
 
   const { data } = useQuery({
     queryKey: ["agentCount"],

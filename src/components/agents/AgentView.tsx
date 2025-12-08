@@ -93,7 +93,7 @@ export default function AgentView() {
 
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 text-blue-700">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/20 text-blue-700">
                   <Play className="w-6 h-6" />
                 </div>
                 <div className="flex items-center gap-3">
@@ -200,7 +200,7 @@ export default function AgentView() {
               <div className="flex flex-wrap gap-2">
                 <Badge
                   data-slot="badge"
-                  className="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap bg-blue-50 text-blue-700 border-blue-200"
+                  className="inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 border-blue-200"
                 >
                   WhatsApp
                 </Badge>

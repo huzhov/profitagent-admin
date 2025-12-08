@@ -177,7 +177,7 @@ export default function Agents() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIconColorClass(agents[0].iconColor)}`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center dark:bg-blue-900/20 ${getIconColorClass(agents[0].iconColor)}`}
                         >
                           <Bot className="w-5 h-5" />
                         </div>
