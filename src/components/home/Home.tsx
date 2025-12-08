@@ -15,8 +15,8 @@ import { useBusiness } from "@/context/AppContext";
 import { Plus, Bot, MessageSquare, TrendingUp, Zap } from "lucide-react";
 import { Skeleton } from "../ui/skeleton";
 import { getWhatsAppList } from "@/services/integrations";
-import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
-import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
+import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip";
+import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -55,18 +55,17 @@ export default function Home() {
           isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
         }
         tooltip={
-          !business ? (
-            <BusinessSetupRequiredToolTip />
-          ) : isNoWhatsappIntegrationsAvailable ? (
-            <NoWhatsAppIntegrationToolTip />
-          ) : (
-            ""
-          )
+          <NoIntegrationInfo
+            isNoBusinessAvailable={!business}
+            isNoWhatsappIntegrationsAvailable={
+              isNoWhatsappIntegrationsAvailable
+            }
+          />
         }
       />
 
       {/* Stats Grid */}
-      <StatsCards totalAgent={data?.length ?? 0} />
+      <StatsCards />
 
       {/* Recent Agents and Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -101,12 +100,12 @@ export default function Home() {
                       </div>
                       <div>
                         <Skeleton className="w-15 h-6" />
-                        <Skeleton className="w-25 h-4 mt-1" />
+                        <Skeleton className="w-150 h-4 mt-1" />
                       </div>
                     </div>
-                    <div className="text-right">
+                    {/* <div className="text-right">
                       <Skeleton className="w-15 h-6" />
-                    </div>
+                    </div> */}
                   </div>
                 ))
               ) : data && data.length > 0 ? (
@@ -121,8 +120,8 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="font-medium">{agent.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          0 conversations
+                        <p className="text-sm text-muted-foreground line-clamp-1 w-150">
+                          {agent.description}
                         </p>
                       </div>
                     </div>
@@ -164,14 +163,31 @@ export default function Home() {
             <CardDescription>Common tasks and shortcuts</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button
-              variant="outline"
-              className="w-full justify-start cursor-pointer shadow-none"
-              onClick={() => navigate({ to: "/agents/create" })}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create New Agent
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start cursor-pointer shadow-none"
+                    disabled={
+                      isNoWhatsappIntegrationsAvailable ||
+                      isWhatsAppLoading ||
+                      !business
+                    }
+                    onClick={() => navigate({ to: "/agents/create" })}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create New Agent
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <NoIntegrationInfo
+                isNoBusinessAvailable={!business}
+                isNoWhatsappIntegrationsAvailable={
+                  isNoWhatsappIntegrationsAvailable
+                }
+              />
+            </Tooltip>
             <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"

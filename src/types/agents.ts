@@ -19,6 +19,7 @@ export type AgentListResponse = {
   id: string;
   name: string;
   status: string;
+  description: string;
 };
 
 export type AgentResponse = {

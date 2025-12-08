@@ -19,7 +19,7 @@ const buildAgentPayload = (values: Partial<AgentFormValues>) => ({
   creativity: values.creativity,
   catalogS3Key: values.catalogS3Key,
   catalogName: values.catalogName,
-  questionSets: "",
+  questionSets: values.questionSets || "",
 });
 
 export async function getAgentList(): Promise<AgentListResponse[]> {

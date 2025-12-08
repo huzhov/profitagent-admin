@@ -1,4 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { Bot, ChartColumn, EllipsisVertical, Eye, Plus } from "lucide-react";
@@ -18,9 +24,8 @@ import { useBusiness } from "@/context/AppContext";
 import StatsCards from "@/components/common/StatsCards";
 import BusinessInfoCard from "@/components/common/BusinessInfoCard";
 import { getWhatsAppList } from "@/services/integrations";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import NoWhatsAppIntegrationToolTip from "@/components/common/NoWhatsAppIntegrationToolTip";
-import BusinessSetupRequiredToolTip from "@/components/common/BusinessSetupRequiredToolTip";
+import { Tooltip, TooltipTrigger } from "../ui/tooltip";
+import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -77,13 +82,12 @@ export default function Agents() {
           isNoWhatsappIntegrationsAvailable || isWhatsAppLoading || !business
         }
         tooltip={
-          !business ? (
-            <BusinessSetupRequiredToolTip />
-          ) : isNoWhatsappIntegrationsAvailable ? (
-            <NoWhatsAppIntegrationToolTip />
-          ) : (
-            ""
-          )
+          <NoIntegrationInfo
+            isNoBusinessAvailable={!business}
+            isNoWhatsappIntegrationsAvailable={
+              isNoWhatsappIntegrationsAvailable
+            }
+          />
         }
       />
       {!business ? (
@@ -93,7 +97,7 @@ export default function Agents() {
       ) : (
         <>
           {/* Stats Grid */}
-          <StatsCards totalAgent={data?.length ?? 0} />
+          <StatsCards />
           {/* Agents Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (
@@ -117,8 +121,8 @@ export default function Agents() {
                           </div>
                         </div>
                       </div>
-                      {/* <Skeleton className="h-4 w-full mt-2" />
-                      <Skeleton className="h-4 w-3/4" /> */}
+                      <Skeleton className="h-4 w-full mt-2" />
+                      <Skeleton className="h-4 w-3/4" />
                     </CardHeader>
                     <CardContent
                       data-slot="card-content"
@@ -137,7 +141,7 @@ export default function Agents() {
                       <div className="space-y-2">
                         <Skeleton className="h-4 w-24" />
                         <div className="flex gap-1">
-                          <Skeleton className="h-6 w-20" />
+                          <Skeleton className="h-5.5 w-20" />
                         </div>
                       </div>
                       {/* <div className="space-y-1">
@@ -245,12 +249,12 @@ export default function Agents() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    {/* <CardDescription
+                    <CardDescription
                       data-slot="card-description"
-                      className="text-muted-foreground mt-2 text-md"
+                      className="text-muted-foreground mt-2 text-md line-clamp-2 h-12"
                     >
-                      {agents[0].description}
-                    </CardDescription> */}
+                      {agent.description}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent
                     data-slot="card-content"
@@ -260,38 +264,28 @@ export default function Agents() {
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center p-2 bg-accent/50 rounded-lg">
-                          <p className="text-sm text-muted-foreground">
-                            Conversations
-                          </p>
-                          <p className="font-semibold">
-                            {agents[0].conversations.toLocaleString()}
-                          </p>
+                          <p className="text-sm text-muted-foreground">Tests</p>
+                          <p className="font-semibold">0</p>
                         </div>
                         <div className="text-center p-2 bg-accent/50 rounded-lg">
                           <p className="text-sm text-muted-foreground">
-                            Conversion
+                            Visits
                           </p>
-                          <p className="font-semibold">
-                            {agents[0].conversionRate}
-                          </p>
+                          <p className="font-semibold">0</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center p-2 bg-accent/50 rounded-lg">
                           <p className="text-sm text-muted-foreground">
-                            Revenue Generated
+                            Engagements
                           </p>
-                          <p className="font-semibold">
-                            {agents[0].revenueGenerated}
-                          </p>
+                          <p className="font-semibold">0</p>
                         </div>
                         <div className="text-center p-2 bg-accent/50 rounded-lg">
                           <p className="text-sm text-muted-foreground">
-                            Customer Satisfaction
+                            Clicks
                           </p>
-                          <p className="font-semibold">
-                            {agents[0].customerSatisfaction}
-                          </p>
+                          <p className="font-semibold">0</p>
                         </div>
                       </div>
                     </div>
@@ -331,7 +325,7 @@ export default function Agents() {
                         size="sm"
                         className="w-full cursor-pointer"
                         onClick={() =>
-                          navigate({ to: `/agents/${agent.id}/view` as any })
+                          navigate({ to: `/agents/${agent.id}/view` })
                         }
                       >
                         <Eye className="w-3 h-3 mr-1" />
@@ -386,7 +380,7 @@ export default function Agents() {
             {!isLoading && (
               <Card
                 data-slot="card"
-                className="shadow-none h-110 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
+                className="shadow-none h-121 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"
               >
                 <CardContent
                   data-slot="card-content"
@@ -416,11 +410,11 @@ export default function Agents() {
                         </Button>
                       </div>
                     </TooltipTrigger>
-                    {isNoWhatsappIntegrationsAvailable && (
-                      <TooltipContent>
-                        <NoWhatsAppIntegrationToolTip />
-                      </TooltipContent>
-                    )}
+                    <NoIntegrationInfo
+                      isNoWhatsappIntegrationsAvailable={
+                        isNoWhatsappIntegrationsAvailable
+                      }
+                    />
                   </Tooltip>
                 </CardContent>
               </Card>

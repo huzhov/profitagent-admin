@@ -1,4 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { getAgentCount } from "@/services/agents";
+import { getBusinessEngagements } from "@/services/business";
+import { useQueries } from "@tanstack/react-query";
+import { useBusiness } from "@/context/AppContext";
 import {
   Bot,
   FlaskConical,
@@ -7,7 +11,25 @@ import {
   MousePointerClick,
 } from "lucide-react";
 
-export default function StatsCards({ totalAgent }: { totalAgent: number }) {
+export default function StatsCards() {
+  const { business } = useBusiness();
+
+  const [{ data: agentCountData }, { data: businessEngagementsData }] =
+    useQueries({
+      queries: [
+        {
+          queryKey: ["agentCount"],
+          queryFn: async () => getAgentCount(),
+          enabled: !!business,
+        },
+        {
+          queryKey: ["businessEngagements"],
+          queryFn: async () => getBusinessEngagements(business?.id || null),
+          enabled: !!business,
+        },
+      ],
+    });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
       <Card className="py-0 shadow-none rounded-xl border">
@@ -16,7 +38,7 @@ export default function StatsCards({ totalAgent }: { totalAgent: number }) {
             <Bot className="w-4 h-4 text-blue-600" />
             <span className="text-sm text-muted-foreground">Total Agents</span>
           </div>
-          <p className="text-2xl font-semibold">{totalAgent}</p>
+          <p className="text-2xl font-semibold">{agentCountData?.count ?? 0}</p>
         </CardContent>
       </Card>
 
@@ -46,7 +68,9 @@ export default function StatsCards({ totalAgent }: { totalAgent: number }) {
             <MessageSquare className="w-4 h-4 text-orange-600" />
             <span className="text-sm text-muted-foreground">Engagements</span>
           </div>
-          <p className="text-2xl font-semibold">0</p>
+          <p className="text-2xl font-semibold">
+            {businessEngagementsData?.engagements ?? 0}
+          </p>
         </CardContent>
       </Card>
 
