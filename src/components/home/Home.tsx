@@ -102,7 +102,7 @@ export default function Home() {
                           {agent.description}
                         </p> */}
                         <div className="flex items-center gap-1 mt-1">
-                          <Badge
+                          {/* <Badge
                             className={`text-xs border-transparent ${
                               agent.status === "Active"
                                 ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
@@ -110,7 +110,7 @@ export default function Home() {
                             }`}
                           >
                             {agent.status === "disabled" ? "Paused" : "Active"}
-                          </Badge>
+                          </Badge> */}
                           <Badge variant="outline" className="text-xs">
                             WhatsApp
                           </Badge>
@@ -188,14 +188,14 @@ export default function Home() {
               <MessageSquare className="w-4 h-4 mr-2" />
               View Messages
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"
               onClick={() => navigate({ to: "/intelligence" })}
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               Analytics Dashboard
-            </Button>
+            </Button> */}
             {/* <Button
               variant="outline"
               className="w-full justify-start cursor-pointer shadow-none"

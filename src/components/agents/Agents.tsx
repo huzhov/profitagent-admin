@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import {
   Bot,
-  ChartColumn,
+  // ChartColumn,
   EllipsisVertical,
   Eye,
   Plus,
-  Play,
-  Pause,
+  // Play,
+  // Pause,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
@@ -217,7 +217,7 @@ export default function Agents() {
                             </div>
                           </div>
                           <div className="flex gap-1">
-                            <Badge
+                            {/* <Badge
                               data-slot="badge"
                               className={`text-xs border-transparent ${
                                 agent.status === "Active"
@@ -228,7 +228,7 @@ export default function Agents() {
                               {agent.status === "disabled"
                                 ? "Paused"
                                 : "Active"}
-                            </Badge>
+                            </Badge> */}
                             {/* Active Channels */}
                             {agents[0].channels.map((channel, index) => (
                               <Badge
@@ -257,7 +257,7 @@ export default function Agents() {
                           >
                             Edit Agent
                           </DropdownMenuItem>
-                          <DropdownMenuItem
+                          {/* <DropdownMenuItem
                           // onClick={() => handleCloneAgent(agent.id)}
                           >
                             Duplicate
@@ -267,7 +267,7 @@ export default function Agents() {
                             // onClick={() => handleDeleteAgent(agent.id)}
                           >
                             Delete
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -324,22 +324,21 @@ export default function Agents() {
                     {/* Actions */}
 
                     <div className="flex gap-2 space-y-2 pt-2">
-                      <div className="w-full">
-                        <Button
-                          data-slot="button"
-                          size="sm"
-                          variant="outline"
-                          className="w-full cursor-pointer"
-                          onClick={() =>
-                            navigate({ to: `/agents/${agent.id}/view` })
-                          }
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          View Agent
-                        </Button>
-                      </div>
-                      <div className="w-full">
-                        {/* <Button
+                      <Button
+                        data-slot="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full cursor-pointer"
+                        onClick={() =>
+                          navigate({ to: `/agents/${agent.id}/view` })
+                        }
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View Agent
+                      </Button>
+                      {/* <div className="w-full"></div>
+                      <div className="w-full"> */}
+                      {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -353,7 +352,7 @@ export default function Agents() {
                           <Play className="w-3 h-3 mr-1" />
                           Preview
                         </Button> */}
-                        <Button
+                      {/* <Button
                           data-slot="button"
                           variant="outline"
                           size="sm"
@@ -362,9 +361,9 @@ export default function Agents() {
                         >
                           <ChartColumn className="w-3 h-3 mr-1" />
                           Analytics
-                        </Button>
-                      </div>
-                      <Button
+                        </Button> */}
+                      {/* </div> */}
+                      {/* <Button
                         data-slot="button"
                         variant="outline"
                         size="sm"
@@ -376,7 +375,7 @@ export default function Agents() {
                         ) : (
                           <Play className="w-3 h-3" />
                         )}
-                      </Button>
+                      </Button> */}
                     </div>
                   </CardContent>
                 </Card>

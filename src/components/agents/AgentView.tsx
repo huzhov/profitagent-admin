@@ -1,12 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Ellipsis, Settings, Play, Pause } from "lucide-react";
+  ArrowLeft,
+  // Pause,
+  //Ellipsis,
+  Play,
+  Settings,
+  //Pause
+} from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { getAgent } from "@/services/agents";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -91,7 +98,7 @@ export default function AgentView() {
                 </div>
                 <div className="flex items-center gap-3">
                   <h1 className="text-gray-900">{data?.name}</h1>
-                  <Badge
+                  {/* <Badge
                     className={`text-xs border-transparent ${
                       data.status === "Active"
                         ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
@@ -99,7 +106,7 @@ export default function AgentView() {
                     }`}
                   >
                     {data.status === "disabled" ? "Paused" : "Active"}
-                  </Badge>
+                  </Badge> */}
                 </div>
               </div>
             </div>
@@ -111,8 +118,8 @@ export default function AgentView() {
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
-              </Button> */}
-              <Button
+              </Button> 
+               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate({ to: `/agents/${id}/edit` })}
@@ -120,7 +127,7 @@ export default function AgentView() {
                 <Settings className="w-4 h-4 mr-2" />
                 Configure
               </Button>
-              <Button
+             <Button
                 data-slot="button"
                 variant="outline"
                 size="sm"
@@ -146,7 +153,15 @@ export default function AgentView() {
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate({ to: `/agents/${id}/edit` })}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Configure
+              </Button>
             </div>
           </div>
         </div>

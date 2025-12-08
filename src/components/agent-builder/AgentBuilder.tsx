@@ -1,6 +1,24 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate, useParams, useLocation } from "@tanstack/react-router";
-import { ArrowLeft, ChevronDown, Loader2, Upload } from "lucide-react";
+import {
+  useNavigate,
+  useParams,
+  useLocation,
+  useRouter,
+  useCanGoBack,
+} from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  Book,
+  BookOpen,
+  ChevronDown,
+  FileQuestionMark,
+  Info,
+  Loader2,
+  MessageSquare,
+  Monitor,
+  Upload,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ValidatedInput } from "@/components/ui/validated-input";
@@ -42,13 +60,61 @@ import type { AxiosError } from "axios";
 import QuestionSets from "./QuestionSets";
 import { WhatsAppIcon } from "../assets";
 
+const navigationSection = [
+  {
+    id: "basicInfo",
+    title: "Basic Information",
+    icon: Info,
+  },
+  {
+    id: "behavior",
+    title: "Agent Behavior",
+    icon: MessageSquare,
+  },
+  {
+    id: "aiConfig",
+    title: "AI Configuration",
+    icon: Zap,
+  },
+  {
+    id: "channels",
+    title: "Channels",
+    icon: Monitor,
+  },
+  {
+    id: "knowledge",
+    title: "Knowledge & Context",
+    icon: BookOpen,
+  },
+  {
+    id: "productCatalogue",
+    title: "Product Catalogue",
+    icon: Book,
+  },
+  {
+    id: "questionSets",
+    title: "Question Sets",
+    icon: FileQuestionMark,
+  },
+];
+
 export default function AgentBuilder() {
   const navigate = useNavigate();
   const location = useLocation();
+  const canGoBack = useCanGoBack();
+  const router = useRouter();
   const isAgentCreate = location.pathname.includes("/create");
   const isAgentEdit = location.pathname.includes("/edit");
   const params = useParams({ strict: false });
   const id = params.id || "";
+
+  const basicInfoRef = useRef<HTMLDivElement>(null);
+  const behavior = useRef<HTMLDivElement>(null);
+  const aiConfig = useRef<HTMLDivElement>(null);
+  const channelsRef = useRef<HTMLDivElement>(null);
+  const knowledgeRef = useRef<HTMLDivElement>(null);
+  const productCatalogueRef = useRef<HTMLDivElement>(null);
+  const questionSetsRef = useRef<HTMLDivElement>(null);
 
   const resolver = zodResolver(
     agentSchema
@@ -512,6 +578,53 @@ export default function AgentBuilder() {
     }
   };
 
+  const handleScrollTo = (name: string) => {
+    switch (name) {
+      case "basicInfo":
+        setOpenSections({ ...openSections, basicInfo: true });
+        return basicInfoRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      case "behavior":
+        setOpenSections({ ...openSections, behavior: true });
+        return behavior.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      case "aiConfig":
+        setOpenSections({ ...openSections, aiConfig: true });
+        return aiConfig.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      case "channels":
+        setOpenSections({ ...openSections, channels: true });
+        return channelsRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      case "knowledge":
+        setOpenSections({ ...openSections, knowledge: true });
+        return knowledgeRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      case "productCatalogue":
+        setOpenSections({ ...openSections, productCatalogue: true });
+        return productCatalogueRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      case "questionSets":
+        setOpenSections({ ...openSections, questionSets: true });
+        return questionSetsRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+    }
+  };
+
   const setQuestionSets = (value: string) => {
     setValue("questionSets", value);
   };
@@ -529,22 +642,29 @@ export default function AgentBuilder() {
 
   if (isAgentEdit && isAgentLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-[calc(100vh-64px)]">
         <Spinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-[calc(100vh-64px)] flex flex-col bg-gray-50">
       {/* Header */}
+      <style>{`
+        .highlight {
+          background: yellow !important;
+        }
+      `}</style>
 
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+      <div className="bg-background border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4 flex-1">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate({ to: "/agents" })}
+            onClick={() =>
+              canGoBack ? router.history.back() : navigate({ to: "/agents" })
+            }
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
@@ -578,7 +698,9 @@ export default function AgentBuilder() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate({ to: "/agents" })}
+            onClick={() =>
+              canGoBack ? router.history.back() : navigate({ to: "/agents" })
+            }
           >
             Cancel
           </Button>
@@ -607,20 +729,43 @@ export default function AgentBuilder() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden ">
+        <div className="flex-shrink-0 flex flex-col max-w-3xl mx-auto py-8 pl-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-3">
+            <div className="space-y-1">
+              {navigationSection?.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <Button
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors`}
+                    variant="ghost"
+                    key={section.id}
+                    onClick={() => handleScrollTo(section.id)}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="flex-1 text-sm whitespace-nowrap">
+                      {section.title}
+                    </span>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
         {/* Form Section */}
         <div className="flex-1 overflow-auto">
           <ScrollArea className="h-full">
-            <div className="max-w-3xl mx-auto py-8 px-6">
+            <div className="max-w-3xl mx-auto py-8">
               <div className="space-y-4">
                 {/* Basic Information */}
                 <Collapsible
                   open={openSections.basicInfo}
+                  ref={basicInfoRef}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, basicInfo: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div className="bg-background rounded-lg border border-gray-200 shadow-sm">
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
@@ -742,12 +887,13 @@ export default function AgentBuilder() {
 
                 {/* Agent Behavior */}
                 <Collapsible
+                  ref={behavior}
                   open={openSections.behavior}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, behavior: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div className="bg-background rounded-lg border border-gray-200 shadow-sm">
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Agent Behavior</h3>
@@ -821,12 +967,13 @@ export default function AgentBuilder() {
 
                 {/* AI Configuration */}
                 <Collapsible
+                  ref={aiConfig}
                   open={openSections.aiConfig}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, aiConfig: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div className="bg-background rounded-lg border border-gray-200 shadow-sm">
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900 flex items-center gap-2">
@@ -881,13 +1028,14 @@ export default function AgentBuilder() {
 
                 {/* Channels */}
                 <Collapsible
+                  ref={channelsRef}
                   open={openSections.channels}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, channels: open })
                   }
                 >
                   <div
-                    className={`bg-white rounded-lg border shadow-sm ${errors.whatsappIntegrationId ? "border-red-500" : "border-gray-200"}`}
+                    className={`bg-background rounded-lg border shadow-sm ${errors.whatsappIntegrationId ? "border-red-500" : "border-gray-200"}`}
                   >
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
@@ -1024,12 +1172,13 @@ export default function AgentBuilder() {
 
                 {/* Knowledge & Context */}
                 <Collapsible
+                  ref={knowledgeRef}
                   open={openSections.knowledge}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, knowledge: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div className="bg-background rounded-lg border border-gray-200 shadow-sm">
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Knowledge & Context</h3>
@@ -1068,13 +1217,14 @@ export default function AgentBuilder() {
 
                 {/* Product Catalogue */}
                 <Collapsible
+                  ref={productCatalogueRef}
                   open={openSections.productCatalogue}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, productCatalogue: open })
                   }
                 >
                   <div
-                    className={`bg-white rounded-lg border shadow-sm ${errors.catalogS3Key || errors.catalogName ? "border-red-500" : "border-gray-200"}`}
+                    className={`bg-background rounded-lg border shadow-sm ${errors.catalogS3Key || errors.catalogName ? "border-red-500" : "border-gray-200"}`}
                   >
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
@@ -1186,12 +1336,13 @@ export default function AgentBuilder() {
                 </Collapsible>
                 {/* Question Sets */}
                 <Collapsible
+                  ref={questionSetsRef}
                   open={openSections.questionSets}
                   onOpenChange={(open) =>
                     setOpenSections({ ...openSections, questionSets: open })
                   }
                 >
-                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+                  <div className="bg-background rounded-lg border border-gray-200 shadow-sm">
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
                         <h3 className="text-gray-900">Question Sets</h3>
