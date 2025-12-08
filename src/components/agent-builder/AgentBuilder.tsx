@@ -731,13 +731,13 @@ export default function AgentBuilder() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden ">
         <div className="flex-shrink-0 flex flex-col max-w-3xl mx-auto py-8 pl-6">
-          <div className="bg-white rounded-lg border border-gray-200 p-3">
+          <div className="bg-background rounded-lg border border-gray-200 p-3">
             <div className="space-y-1">
               {navigationSection?.map((section) => {
                 const Icon = section.icon;
                 return (
                   <Button
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors`}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors text-gray-700`}
                     variant="ghost"
                     key={section.id}
                     onClick={() => handleScrollTo(section.id)}
