@@ -201,10 +201,6 @@ export default function AgentBuilder() {
   const [uploadedCatalogKey, setUploadedCatalogKey] = useState<string | null>(
     null
   );
-  const [existingCatalog, setExistingCatalog] = useState<{
-    key: string;
-    name: string;
-  } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -364,12 +360,29 @@ export default function AgentBuilder() {
     enabled: isAgentEdit,
   });
 
+  // Derive existing catalog from agent data
+  const existingCatalog = useMemo(() => {
+    if (agentData && isAgentEdit) {
+      const catalogKey =
+        agentData?.catalogS3Key || agentData?.catalog?.id || "";
+      const catalogName =
+        agentData?.catalogName || agentData?.catalog?.name || "";
+
+      if (catalogKey && catalogName) {
+        return { key: catalogKey, name: catalogName };
+      }
+    }
+    return null;
+  }, [agentData, isAgentEdit]);
+
+  // Reset form when switching to create mode
   useEffect(() => {
     if (isAgentCreate) {
+      // Reset upload key before form reset to avoid stale state
+      const resetUploadKey = () => setUploadedCatalogKey(null);
+      resetUploadKey();
       clearErrors();
       reset(defaultAgentValues);
-
-      setUploadedCatalogKey(null);
     }
   }, [isAgentCreate, location.pathname, reset, clearErrors]);
 
@@ -393,11 +406,6 @@ export default function AgentBuilder() {
 
       setValue("catalogS3Key", catalogKey);
       setValue("catalogName", catalogName);
-
-      // Set existing catalog state for display
-      if (catalogKey && catalogName) {
-        setExistingCatalog({ key: catalogKey, name: catalogName });
-      }
 
       // Handle questionSets - convert object to JSON string
       if (agentData?.questionSets) {
@@ -586,46 +594,57 @@ export default function AgentBuilder() {
     setTimeout(() => {
       switch (name) {
         case "basicInfo":
-          return basicInfoRef.current?.scrollIntoView({
+          basicInfoRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
         case "behavior":
-          return behavior.current?.scrollIntoView({
+          behavior.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
         case "aiConfig":
-          return aiConfig.current?.scrollIntoView({
+          aiConfig.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
         case "channels":
-          return channelsRef.current?.scrollIntoView({
+          channelsRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
         case "knowledge":
-          return knowledgeRef.current?.scrollIntoView({
+          knowledgeRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
         case "productCatalogue":
-          return productCatalogueRef.current?.scrollIntoView({
+          productCatalogueRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
         case "questionSets":
-          return questionSetsRef.current?.scrollIntoView({
+          questionSetsRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
+          break;
       }
     }, 100);
   };
 
   const handleBackButton = () => {
-    canGoBack ? router.history.back() : navigate({ to: "/agents" });
+    if (canGoBack) {
+      router.history.back();
+    } else {
+      navigate({ to: "/agents" });
+    }
   };
 
   const setQuestionSets = (value: string) => {
@@ -644,7 +663,6 @@ export default function AgentBuilder() {
   };
 
   const handleRemoveCatalog = () => {
-    setExistingCatalog(null);
     setValue("catalogS3Key", "", { shouldValidate: true });
     setValue("catalogName", "", { shouldValidate: true });
     setUploadedFile(null);
