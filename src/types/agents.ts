@@ -32,11 +32,27 @@ export type AgentResponse = {
   creativity: number;
   tone: string;
   faq: string;
-  guardrails: string[];
+  guardrails: string[] | null;
   subscriptionPlans: string;
+  followupFrequency: number | null;
   status: string;
-  catalogS3Key: string;
-  catalogName: string;
+  catalogS3Key?: string;
+  catalogName?: string;
+  questionSets?: {
+    name: string;
+    questions: Array<{
+      id: string;
+      question: string;
+      type: string;
+      options?: string[];
+      note?: string;
+    }>;
+  };
+  businessId: string;
+  catalog?: {
+    id: string;
+    name: string;
+  };
 };
 
 export type AgentCountResponse = {

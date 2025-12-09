@@ -27,6 +27,8 @@ import {
   Monitor,
   Upload,
   Zap,
+  X,
+  FileText,
 } from "lucide-react";
 
 // UI Components
@@ -199,6 +201,10 @@ export default function AgentBuilder() {
   const [uploadedCatalogKey, setUploadedCatalogKey] = useState<string | null>(
     null
   );
+  const [existingCatalog, setExistingCatalog] = useState<{
+    key: string;
+    name: string;
+  } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -378,8 +384,30 @@ export default function AgentBuilder() {
       setValue("toneOfVoice", agentData?.tone || "");
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
-      setValue("catalogS3Key", agentData?.catalogS3Key || "");
-      setValue("catalogName", agentData?.catalogName || "");
+
+      // Handle catalog - prioritize direct fields, fallback to catalog object
+      const catalogKey =
+        agentData?.catalogS3Key || agentData?.catalog?.id || "";
+      const catalogName =
+        agentData?.catalogName || agentData?.catalog?.name || "";
+
+      setValue("catalogS3Key", catalogKey);
+      setValue("catalogName", catalogName);
+
+      // Set existing catalog state for display
+      if (catalogKey && catalogName) {
+        setExistingCatalog({ key: catalogKey, name: catalogName });
+      }
+
+      // Handle questionSets - convert object to JSON string
+      if (agentData?.questionSets) {
+        setValue(
+          "questionSets",
+          JSON.stringify(agentData.questionSets, null, 2)
+        );
+      } else {
+        setValue("questionSets", "");
+      }
     }
   }, [agentData, setValue, isAgentEdit]);
 
@@ -613,6 +641,14 @@ export default function AgentBuilder() {
 
   const clearQuestionSetError = () => {
     clearErrors("questionSets");
+  };
+
+  const handleRemoveCatalog = () => {
+    setExistingCatalog(null);
+    setValue("catalogS3Key", "", { shouldValidate: true });
+    setValue("catalogName", "", { shouldValidate: true });
+    setUploadedFile(null);
+    toast.success("Catalog removed. Please upload a new one.");
   };
 
   if (isAgentEdit && isAgentLoading) {
@@ -1230,7 +1266,7 @@ export default function AgentBuilder() {
                           />
                         </div>
 
-                        {/* Drag and Drop Upload Zone */}
+                        {/* Existing Catalog Display or Upload Zone */}
                         <div>
                           <Label
                             className={
@@ -1240,51 +1276,81 @@ export default function AgentBuilder() {
                             Upload Product Catalog (CSV)
                             <span className="text-red-500">*</span>
                           </Label>
-                          <div
-                            onDrop={handleDrop}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 mt-1.5 ${
-                              isDragging
-                                ? "border-blue-500 bg-blue-50"
-                                : errors.catalogS3Key || csvValidationError
-                                  ? "border-red-500 bg-red-50"
-                                  : "border-gray-300"
-                            }`}
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            <input
-                              ref={fileInputRef}
-                              id="csv-upload"
-                              type="file"
-                              accept=".csv"
-                              onChange={handleProductCatalogueFileInputChange}
-                              className="hidden"
-                            />
-                            <div className="flex flex-col items-center gap-2">
-                              <Upload
-                                className={`w-8 h-8 ${
-                                  isDragging
-                                    ? "text-blue-500"
-                                    : errors.catalogS3Key || csvValidationError
-                                      ? "text-red-500"
-                                      : "text-gray-400"
-                                }`}
-                              />
-                              <div>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {uploadedFile
-                                    ? uploadedFile.name
-                                    : "Upload CSV Product Catalogue"}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {uploadedFile
-                                    ? "Click to upload a different file"
-                                    : "Drag and drop your CSV file here, or click to browse"}
-                                </p>
+
+                          {existingCatalog ? (
+                            <div className="mt-1.5 border border-gray-300 rounded-lg p-4 bg-gray-50">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <FileText className="w-5 h-5 text-blue-600" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                      {existingCatalog.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-0.5">
+                                      Current catalog
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={handleRemoveCatalog}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
                               </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div
+                              onDrop={handleDrop}
+                              onDragOver={handleDragOver}
+                              onDragLeave={handleDragLeave}
+                              className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer hover:bg-gray-50 mt-1.5 ${
+                                isDragging
+                                  ? "border-blue-500 bg-blue-50"
+                                  : errors.catalogS3Key || csvValidationError
+                                    ? "border-red-500 bg-red-50"
+                                    : "border-gray-300"
+                              }`}
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              <input
+                                ref={fileInputRef}
+                                id="csv-upload"
+                                type="file"
+                                accept=".csv"
+                                onChange={handleProductCatalogueFileInputChange}
+                                className="hidden"
+                              />
+                              <div className="flex flex-col items-center gap-2">
+                                <Upload
+                                  className={`w-8 h-8 ${
+                                    isDragging
+                                      ? "text-blue-500"
+                                      : errors.catalogS3Key ||
+                                          csvValidationError
+                                        ? "text-red-500"
+                                        : "text-gray-400"
+                                  }`}
+                                />
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {uploadedFile
+                                      ? uploadedFile.name
+                                      : "Upload CSV Product Catalogue"}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {uploadedFile
+                                      ? "Click to upload a different file"
+                                      : "Drag and drop your CSV file here, or click to browse"}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
                           {(errors.catalogS3Key || errors.catalogName) && (
                             <p className="text-sm text-red-500 mt-1">
                               {errors.catalogS3Key?.message ||
