@@ -1,9 +1,10 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { Agent } from "@/types/agents";
 import type { User } from "@/types/user";
 import userStore from "@/store/user-store";
 import businessStore from "@/store/business-store";
+import themeStore from "@/store/theme-store";
 
 interface AppContextType {
   agents: Agent[];
@@ -68,6 +69,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       iconColor: "purple",
     },
   ]);
+
+  const { mode } = themeStore();
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", mode === "dark");
+  }, [mode]);
 
   const toggleAgentStatus = (agentId: number) => {
     setAgents(

@@ -4,7 +4,7 @@ import {
   // Workflow,
   // FlaskConical,
   // ChartColumn,
-  Zap,
+  // Zap,
   MessageSquare,
   Settings,
 } from "lucide-react";
@@ -49,12 +49,12 @@ export default function SidebarNavigation({
     //   icon: ChartColumn,
     //   route: "/templates",
     // },
-    {
-      id: "intelligence",
-      title: "Intelligence",
-      icon: Zap,
-      route: "/intelligence",
-    },
+    // {
+    //   id: "intelligence",
+    //   title: "Intelligence",
+    //   icon: Zap,
+    //   route: "/intelligence",
+    // },
     {
       id: "messages",
       title: "Messages",
@@ -65,7 +65,7 @@ export default function SidebarNavigation({
   ];
 
   return (
-    <nav className="flex-1 px-4">
+    <nav className="flex-1 px-4 py-4">
       <ul className="space-y-2">
         {mainSections.map((section) => {
           const Icon = section.icon;
