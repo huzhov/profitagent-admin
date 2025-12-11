@@ -379,8 +379,7 @@ export default function AgentBuilder() {
   useEffect(() => {
     if (isAgentCreate) {
       // Reset upload key before form reset to avoid stale state
-      const resetUploadKey = () => setUploadedCatalogKey(null);
-      resetUploadKey();
+      setUploadedCatalogKey(null);
       clearErrors();
       reset(defaultAgentValues);
     }
