@@ -102,15 +102,15 @@ export default function Home() {
                           {agent.description}
                         </p> */}
                         <div className="flex items-center gap-1 mt-1">
-                          {/* <Badge
+                          <Badge
                             className={`text-xs border-transparent ${
-                              agent.status === "Active"
+                              agent.status === "enabled"
                                 ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                                 : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                             }`}
                           >
-                            {agent.status === "disabled" ? "Paused" : "Active"}
-                          </Badge> */}
+                            {agent.status === "enabled" ? "Active" : "Paused"}
+                          </Badge>
                           <Badge variant="outline" className="text-xs">
                             WhatsApp
                           </Badge>

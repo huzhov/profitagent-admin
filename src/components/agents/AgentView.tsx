@@ -95,12 +95,12 @@ export default function AgentView() {
                   <h1 className="text-gray-900">{agentData.name}</h1>
                   <Badge
                     className={`text-xs border-transparent ${
-                      agentData.status === "Active"
+                      agentData.status === "enabled"
                         ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                         : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                     }`}
                   >
-                    {agentData.status === "disabled" ? "Paused" : "Active"}
+                    {agentData.status === "enabled" ? "Active" : "Paused"}
                   </Badge>
                 </div>
               </div>

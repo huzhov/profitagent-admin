@@ -39,7 +39,7 @@ export default function AgentToggleButton({
     >
       {isRefetching || isPendingToggleAgentStatus ? (
         <Loader2 className="w-3 h-3 animate-spin" />
-      ) : agent.status === "Active" ? (
+      ) : agent.status === "enabled" ? (
         <Pause className="w-3 h-3" />
       ) : (
         <Play className="w-3 h-3" />

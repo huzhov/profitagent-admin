@@ -219,14 +219,12 @@ export default function Agents() {
                             <Badge
                               data-slot="badge"
                               className={`text-xs border-transparent ${
-                                agent.status === "Active"
+                                agent.status === "enabled"
                                   ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                                   : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                               }`}
                             >
-                              {agent.status === "disabled"
-                                ? "Paused"
-                                : "Active"}
+                              {agent.status === "enabled" ? "Active" : "Paused"}
                             </Badge>
                             {/* Active Channels */}
                             {agents[0].channels.map((channel, index) => (
