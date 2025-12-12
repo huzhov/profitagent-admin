@@ -127,10 +127,6 @@ export default function Outbound() {
     form.setValue("phones", parsePhoneNumber);
   }, [parsePhoneNumber]);
 
-  const handleQuestionInputMode = (checked: boolean) => {
-    setBulkInputMode(checked);
-  };
-
   const handleOnChangePhone = (e: any) => {
     setPhoneText(e.target.value);
   };
@@ -230,9 +226,7 @@ export default function Outbound() {
                     </span>
                     <Switch
                       checked={bulkInputMode}
-                      onCheckedChange={(checked) =>
-                        handleQuestionInputMode(checked)
-                      }
+                      onCheckedChange={(checked) => setBulkInputMode(checked)}
                     />
                     <span
                       className={`text-sm ${bulkInputMode ? "text-gray-900 font-medium" : "text-gray-500"}`}
