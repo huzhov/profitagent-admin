@@ -35,7 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -62,6 +62,7 @@ export default function Outbound() {
   const [phoneText, setPhoneText] = useState("");
   const [status, setStatus] = useState("");
   const [bulkInputMode, setBulkInputMode] = useState(false);
+  const [parseError, setParseError] = useState<string>("");
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -80,55 +81,44 @@ export default function Outbound() {
 
   const defaultCountry: string | undefined = undefined;
 
-  const { parsePhoneNumber, parseError } = useMemo<{
-    parsePhoneNumber: string[];
-    parseError: string;
-  }>(() => {
-    const parseSchema = (phoneText: string) => {
-      try {
-        if (!phoneText || !phoneText.trim()) {
-          return { parsePhoneNumber: [], parseError: "" };
-        }
+  const handleOnChangePhone = (value: string) => {
+    setPhoneText(value);
+    // reset phones value in form
+    const resetPhoneValues = () =>
+      form.setValue("phones", [], {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
 
-        // split lines, trim each, filter out blank lines
-        const parsePhoneNumber = phoneText
-          .split(/\r?\n/)
-          .map((ln) => ln.trim())
-          .filter((ln) => ln.length > 0);
+    // if empty or whitespace, clear parseError
+    if (!value || !value.trim()) {
+      resetPhoneValues();
+      return setParseError("");
+    }
 
-        parsePhoneNumber.forEach((number, index) => {
-          const valid = isValidPhoneNumber(number, defaultCountry);
+    const lines = value
+      .split(/\r?\n/)
+      .map((ln) => ln.trim())
+      .filter((ln) => ln.length > 0);
 
-          if (!valid) {
-            throw new Error(
-              `Invalid phone number at line ${index + 1}: "${number}"`
-            );
-          }
-        });
+    if (lines.length > 100) {
+      resetPhoneValues();
+      return setParseError(`Only up to 100 phone numbers are allowed.`);
+    }
 
-        if (parsePhoneNumber.length > 100)
-          throw new Error("100 phone numbers are only allowed");
+    // check each number
+    const invalidLine = lines.findIndex(
+      (num) => !isValidPhoneNumber(num, defaultCountry)
+    );
+    if (invalidLine !== -1) {
+      resetPhoneValues();
+      return setParseError(
+        `Invalid phone number at line ${invalidLine + 1}: "${lines[invalidLine]}"`
+      );
+    }
 
-        return { parsePhoneNumber, parseError: "" };
-      } catch (err: unknown) {
-        if (err instanceof Error)
-          return { parsePhoneNumber: [], parseError: err.message };
-        return {
-          parsePhoneNumber: [],
-          parseError: "Unknown number parse error",
-        };
-      }
-    };
-
-    return parseSchema(phoneText);
-  }, [phoneText]);
-
-  useEffect(() => {
-    form.setValue("phones", parsePhoneNumber);
-  }, [parsePhoneNumber]);
-
-  const handleOnChangePhone = (e: any) => {
-    setPhoneText(e.target.value);
+    form.setValue("phones", lines, { shouldValidate: true, shouldDirty: true });
+    setParseError("");
   };
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -243,7 +233,7 @@ export default function Outbound() {
                       </Label>
                       <Textarea
                         value={phoneText}
-                        onChange={handleOnChangePhone}
+                        onChange={(e) => handleOnChangePhone(e.target.value)}
                       />
                       <div className="text-sm text-red-500 mt-1">
                         {parseError ? parseError : ""}
