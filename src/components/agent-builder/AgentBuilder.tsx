@@ -394,7 +394,7 @@ export default function AgentBuilder() {
       setValue("objective", agentData?.objective || "");
       setValue("faqsBestAnswers", agentData?.faq || "");
       setValue("creativity", agentData?.creativity || 0);
-      setValue("followupFrequency", agentData?.followupFrequency || 0);
+      setValue("followupFrequency", agentData?.followupFrequency || 12);
       setValue("toneOfVoice", agentData?.tone || "");
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
@@ -963,6 +963,28 @@ export default function AgentBuilder() {
                           </Select>
                         </div>
                         <div>
+                          <Label htmlFor="max-followups">
+                            Follow Up Frequency
+                          </Label>
+                          <Select
+                            value={followupFrequency.toString()}
+                            onValueChange={(value) =>
+                              setValue("followupFrequency", Number(value))
+                            }
+                          >
+                            <SelectTrigger className={`mt-1.5 w-full`}>
+                              <SelectValue placeholder="Select Follow Up Frequency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">After 1 hour</SelectItem>
+                              <SelectItem value="12">After 12 hours</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-gray-500">
+                            Time to wait before sending a follow-up message
+                          </p>
+                        </div>
+                        <div>
                           <Label htmlFor="temperature">
                             Creativity Level: {creativity}
                           </Label>
@@ -982,27 +1004,6 @@ export default function AgentBuilder() {
                             <span>Creative</span>
                           </div>
                         </div>
-                        <Label htmlFor="max-followups">
-                          Follow Up Frequency: {followupFrequency}
-                        </Label>
-                        <Slider
-                          id="max-followups"
-                          min={0}
-                          max={50}
-                          step={1}
-                          value={[followupFrequency]}
-                          onValueChange={(value) =>
-                            setValue("followupFrequency", value[0])
-                          }
-                          className="mt-2"
-                        />
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
-                          <span>None</span>
-                          <span>50 attempts</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Maximum follow-up attempts before stopping
-                        </p>
                       </div>
                     </CollapsibleContent>
                   </div>
