@@ -222,6 +222,7 @@ export default function AgentBuilder() {
   const objective = useWatch({ control, name: "objective" });
   const toneOfVoice = useWatch({ control, name: "toneOfVoice" });
   const creativity = useWatch({ control, name: "creativity" });
+  const followupFrequency = useWatch({ control, name: "followupFrequency" });
   const systemPrompt = useWatch({ control, name: "systemPrompt" });
   const whatsappIntegrationId = useWatch({
     control,
@@ -393,6 +394,7 @@ export default function AgentBuilder() {
       setValue("objective", agentData?.objective || "");
       setValue("faqsBestAnswers", agentData?.faq || "");
       setValue("creativity", agentData?.creativity || 0);
+      setValue("followupFrequency", agentData?.followupFrequency || 0);
       setValue("toneOfVoice", agentData?.tone || "");
       setValue("productPlans", agentData?.subscriptionPlans || "");
       setValue("whatsappIntegrationId", agentData?.wabaAccountId || "");
@@ -687,7 +689,7 @@ export default function AgentBuilder() {
 
       <div className="bg-background border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4 flex-1">
-          <Button variant="ghost" size="sm" onClick={() => handleBackButton()}>
+          <Button variant="ghost" size="sm" onClick={handleBackButton}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="flex-1">
@@ -717,11 +719,7 @@ export default function AgentBuilder() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleBackButton()}
-          >
+          <Button variant="outline" size="sm" onClick={handleBackButton}>
             Cancel
           </Button>
           <Button
@@ -920,7 +918,7 @@ export default function AgentBuilder() {
                   <div className="bg-background rounded-lg border border-gray-200 shadow-sm">
                     <CollapsibleTrigger className="w-full px-6 py-4 flex items-center justify-between transition-colors hover:bg-gray-50 rounded-lg">
                       <div className="text-left">
-                        <h3 className="text-gray-900">Agent Behavior</h3>
+                        <h3 className="text-gray-900">Agent Behaviour</h3>
                         <p className="text-gray-600 text-sm">
                           Communication style and personality
                         </p>
@@ -984,6 +982,27 @@ export default function AgentBuilder() {
                             <span>Creative</span>
                           </div>
                         </div>
+                        <Label htmlFor="max-followups">
+                          Follow Up Frequency: {followupFrequency}
+                        </Label>
+                        <Slider
+                          id="max-followups"
+                          min={0}
+                          max={50}
+                          step={1}
+                          value={[followupFrequency]}
+                          onValueChange={(value) =>
+                            setValue("followupFrequency", value[0])
+                          }
+                          className="mt-2"
+                        />
+                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                          <span>None</span>
+                          <span>50 attempts</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Maximum follow-up attempts before stopping
+                        </p>
                       </div>
                     </CollapsibleContent>
                   </div>
