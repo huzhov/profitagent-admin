@@ -51,7 +51,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createBusiness } from "@/services/business";
+import { checkIfBusinessExists, createBusiness } from "@/services/business";
 import {
   createWhatsAppIntegration,
   exchangeWhatsAppToken,
@@ -118,7 +118,6 @@ export default function SettingsAccount() {
   } = useBusiness();
   const { user, setUser } = useApp();
 
-  const [submitting, setSubmitting] = useState(false);
   const [highlightBusiness, setHighlightBusiness] = useState(false);
   const [highlightWhatsapp, setHighlightWhatsapp] = useState(false);
   const businessCardRef = useRef<HTMLDivElement>(null);
@@ -220,9 +219,7 @@ export default function SettingsAccount() {
     refetch,
   } = useQuery({
     queryKey: ["whatsAppList"],
-    queryFn: async () => {
-      return await listWhatsAppIntegrations();
-    },
+    queryFn: listWhatsAppIntegrations,
   });
 
   const { mutate: createWhatsAppFn, isPending: isCreateWhatsAppPending } =
@@ -240,6 +237,45 @@ export default function SettingsAccount() {
     mutationFn: exchangeWhatsAppToken,
     onSuccess: (data) => {
       waForm.setValue("accessToken", data);
+    },
+  });
+
+  const { mutate: createBusinessFn, isPending: isCreateBusinessPending } =
+    useMutation({
+      mutationFn: createBusiness,
+      onSuccess: (data) => {
+        businessForm.reset();
+
+        // Update business in Zustand store
+        setBusiness(data);
+
+        // Update user with businessId
+        if (user && data.id) {
+          const updatedUser = { ...user, businessId: data.id };
+          setUser(updatedUser);
+        }
+
+        toast.success("Business created successfully!");
+        setIsBusinessModalOpen(false);
+        businessForm.reset();
+      },
+    });
+
+  const { mutate: checkIfBusinessExistsFn } = useMutation({
+    mutationFn: async ({ name }: BusinessFormValues) =>
+      checkIfBusinessExists(name),
+    onSuccess: (data, variables) => {
+      if (data.exists) {
+        businessForm.setError("name", {
+          type: "manual",
+          message: "Business with this name already exists",
+        });
+        // Focus the business name field
+        document.getElementById("business-name")?.focus();
+        toast.error("Business with this name already exists");
+        return;
+      }
+      createBusinessFn(variables);
     },
   });
 
@@ -286,39 +322,15 @@ export default function SettingsAccount() {
     );
   };
 
+  const handleCreateBusiness = async (values: BusinessFormValues) => {
+    // Handle business submission
+    checkIfBusinessExistsFn(values);
+  };
+
   const handleAddWhatsAppAccount = async (values: WaAccountFormValues) => {
     console.log("Add WhatsApp Account:", values);
     // Handle form submission
     createWhatsAppFn(values);
-  };
-
-  const handleCreateBusiness = async (values: BusinessFormValues) => {
-    setSubmitting(true);
-
-    try {
-      // Create business via API
-      const newBusiness = await createBusiness({
-        name: values.name,
-        vertical: values.vertical,
-      });
-
-      // Update business in Zustand store
-      setBusiness(newBusiness);
-
-      // Update user with businessId
-      if (user && newBusiness.id) {
-        const updatedUser = { ...user, businessId: newBusiness.id };
-        setUser(updatedUser);
-      }
-
-      toast.success("Business created successfully!");
-      setIsBusinessModalOpen(false);
-      businessForm.reset();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create business");
-    } finally {
-      setSubmitting(false);
-    }
   };
 
   return (
@@ -801,7 +813,9 @@ export default function SettingsAccount() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={submitting || !businessForm.formState.isValid}
+                  disabled={
+                    isCreateBusinessPending || !businessForm.formState.isValid
+                  }
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Create Business

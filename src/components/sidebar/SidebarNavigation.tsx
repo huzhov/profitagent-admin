@@ -7,6 +7,7 @@ import {
   // Zap,
   MessageSquare,
   Settings,
+  PhoneOutgoing,
 } from "lucide-react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Badge } from "../ui/badge";
@@ -55,6 +56,12 @@ export default function SidebarNavigation({
     //   icon: Zap,
     //   route: "/intelligence",
     // },
+    {
+      id: "outbound",
+      title: "Outbound",
+      icon: PhoneOutgoing,
+      route: "/outbound",
+    },
     {
       id: "messages",
       title: "Messages",

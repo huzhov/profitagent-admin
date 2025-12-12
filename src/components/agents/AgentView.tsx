@@ -6,29 +6,24 @@ import { Badge } from "@/components/ui/badge";
 //   DropdownMenuItem,
 //   DropdownMenuTrigger,
 // } from "@/components/ui/dropdown-menu";
-import {
-  ArrowLeft,
-  // Pause,
-  //Ellipsis,
-  Play,
-  Settings,
-  //Pause
-} from "lucide-react";
+import { ArrowLeft, Bot, Settings } from "lucide-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { getAgent } from "@/services/agents";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Label } from "../ui/label";
+import AgentToggleButton from "./AgentToggleButton";
 
 export default function AgentView() {
   const navigate = useNavigate();
   const { id } = useParams({ from: "/_authenticated/agents/$id/view" });
 
-  const { data } = useSuspenseQuery({
+  const {
+    data: agentData,
+    refetch: refetchAgent,
+    isRefetching: isAgentDataRefetching,
+  } = useSuspenseQuery({
     queryKey: ["agents", id],
-    queryFn: async () => {
-      const data = await getAgent(id);
-      return data;
-    },
+    queryFn: async () => getAgent(id),
   });
 
   // Mock data - replace with actual data fetching
@@ -94,19 +89,19 @@ export default function AgentView() {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/20 text-blue-700">
-                  <Play className="w-6 h-6" />
+                  <Bot className="w-6 h-6" />
                 </div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-gray-900">{data?.name}</h1>
-                  {/* <Badge
+                  <h1 className="text-gray-900">{agentData.name}</h1>
+                  <Badge
                     className={`text-xs border-transparent ${
-                      data.status === "Active"
+                      agentData.status === "Active"
                         ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                         : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                     }`}
                   >
-                    {data.status === "disabled" ? "Paused" : "Active"}
-                  </Badge> */}
+                    {agentData.status === "disabled" ? "Paused" : "Active"}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -127,19 +122,6 @@ export default function AgentView() {
                 <Settings className="w-4 h-4 mr-2" />
                 Configure
               </Button>
-             <Button
-                data-slot="button"
-                variant="outline"
-                size="sm"
-                // onClick={() => toggleAgentStatus(agent.id)}
-                className="cursor-pointer"
-              >
-                {data.status === "Active" ? (
-                  <Pause className="w-3 h-3" />
-                ) : (
-                  <Play className="w-3 h-3" />
-                )}
-              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -154,6 +136,11 @@ export default function AgentView() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu> */}
+              <AgentToggleButton
+                refetch={refetchAgent}
+                isRefetching={isAgentDataRefetching}
+                agent={agentData}
+              />
               <Button
                 variant="outline"
                 size="sm"
@@ -173,19 +160,19 @@ export default function AgentView() {
               <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
                 Description
               </Label>
-              <p className="text-sm text-gray-900">{data?.description}</p>
+              <p className="text-sm text-gray-900">{agentData.description}</p>
             </div>
             <div>
               <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
                 Objective
               </Label>
-              <p className="text-sm text-gray-900">{data?.objective}</p>
+              <p className="text-sm text-gray-900">{agentData.objective}</p>
             </div>
             <div>
               <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
                 Tone of Voice
               </Label>
-              <p className="text-sm text-gray-900">{data?.tone}</p>
+              <p className="text-sm text-gray-900">{agentData.tone}</p>
             </div>
             <div>
               <Label className="items-center gap-2 text-sm leading-none font-medium select-none text-muted-foreground mb-2 block">
@@ -214,7 +201,7 @@ export default function AgentView() {
                 System Prompt
               </Label>
               <p className="text-sm text-gray-900 line-clamp-3">
-                {data?.systemPrompt}
+                {agentData.systemPrompt}
               </p>
             </div>
             <div className="pt-2">

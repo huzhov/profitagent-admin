@@ -57,6 +57,11 @@ export async function updateAgent(
   return data;
 }
 
+export async function toggleAgentStatus(id: string): Promise<void> {
+  const { data } = await axiosInstance.patch<void>(`/agents/${id}/toggle`);
+  return data;
+}
+
 export async function checkIfAgentExists(
   name: string
 ): Promise<{ exists: boolean }> {

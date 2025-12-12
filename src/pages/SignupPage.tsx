@@ -20,6 +20,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { LogoIcon } from "@/components/assets/index";
 import { toast } from "sonner";
 import DarkModeToggle from "@/components/common/DarkModeToggle";
+import useUserStore from "@/store/user-store";
 
 const schema = z
   .object({
@@ -40,6 +41,7 @@ const SignupPage = () => {
     defaultValues: { email: "", name: "", password: "", confirmPassword: "" },
     mode: "onSubmit",
   });
+  const { setUser } = useUserStore();
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -47,13 +49,12 @@ const SignupPage = () => {
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["signup"],
-    mutationFn: async (values: z.infer<typeof schema>) => {
-      return await signup(values);
-    },
+    mutationFn: signup,
     retry: false,
     onSuccess: (data) => {
       // Store the token and auto-login
       setToken(data.token);
+      setUser(data.user);
       toast.success("Account created successfully!", {
         duration: 3000,
       });
