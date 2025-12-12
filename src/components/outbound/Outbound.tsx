@@ -107,7 +107,7 @@ export default function Outbound() {
         });
 
         if (parsePhoneNumber.length > 100)
-          throw new Error("100 number is only allowed");
+          throw new Error("100 phone numbers are only allowed");
 
         return { parsePhoneNumber, parseError: "" };
       } catch (err: unknown) {
