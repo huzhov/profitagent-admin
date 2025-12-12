@@ -160,7 +160,7 @@ export const defaultAgentValues: AgentFormValues = {
   brandVoiceRules: "",
 
   followUpDelay: 24,
-  followupFrequency: 23,
+  followupFrequency: 12,
   maxFollowUps: 3,
   quietHoursStart: "22:00",
   quietHoursEnd: "08:00",
