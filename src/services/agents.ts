@@ -17,6 +17,7 @@ const buildAgentPayload = (values: Partial<AgentFormValues>) => ({
   faqsBestAnswers: values.faqsBestAnswers || "",
   productPlans: values.productPlans || "",
   creativity: values.creativity,
+  followupFrequency: values.followupFrequency,
   catalogS3Key: values.catalogS3Key,
   catalogName: values.catalogName,
   questionSets: values.questionSets || "",

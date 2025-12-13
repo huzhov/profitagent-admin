@@ -85,6 +85,7 @@ export const agentSchema = z.object({
 
   // Messaging Controls
   followUpDelay: z.number().default(24),
+  followupFrequency: z.number().default(12),
   maxFollowUps: z.number().default(3),
   quietHoursStart: z.string().default("22:00"),
   quietHoursEnd: z.string().default("08:00"),
@@ -159,6 +160,7 @@ export const defaultAgentValues: AgentFormValues = {
   brandVoiceRules: "",
 
   followUpDelay: 24,
+  followupFrequency: 12,
   maxFollowUps: 3,
   quietHoursStart: "22:00",
   quietHoursEnd: "08:00",
