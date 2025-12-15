@@ -45,7 +45,6 @@ import { toast } from "sonner";
 // import { Switch } from "../ui/switch";
 import { listTemplates, sendTemplate } from "@/services/templates";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { SendTemplate } from "@/types/templates";
 import { Tooltip, TooltipTrigger } from "../ui/tooltip";
 
 const schema = z.object({
@@ -57,10 +56,6 @@ const schema = z.object({
 
 export default function Outbound() {
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
-  const [sendValues, setSendValues] = useState<SendTemplate>({
-    templateId: "",
-    to: "",
-  });
   // const [phoneText, setPhoneText] = useState("");
   const [status, setStatus] = useState("");
   // const [bulkInputMode, setBulkInputMode] = useState(false);
@@ -94,6 +89,8 @@ export default function Outbound() {
     },
     mode: "onTouched",
   });
+
+  const formValues = form.getValues();
 
   /*
    * Future feature for multiple phone numbers send
@@ -146,14 +143,13 @@ export default function Outbound() {
   //   setParseError("");
   // };
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    setSendValues(data);
+  const onSubmit = () => {
     setIsBusinessModalOpen(true);
   };
 
   const handleOnSend = () => {
     setIsBusinessModalOpen(false);
-    sendTemplateFn(sendValues);
+    sendTemplateFn(formValues);
   };
 
   return (
@@ -216,7 +212,7 @@ export default function Outbound() {
                           </FormControl>
                           <SelectContent>
                             {listTemplateData?.map((data) => (
-                              <SelectItem value={data.id}>
+                              <SelectItem value={data.id} key={data.id}>
                                 {data.name}
                               </SelectItem>
                             ))}
