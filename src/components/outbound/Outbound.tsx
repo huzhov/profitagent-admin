@@ -9,7 +9,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Send, Phone, Trash } from "lucide-react";
+import { Send, Phone, Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -38,98 +38,122 @@ import {
 import { useState } from "react";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { toast } from "sonner";
-import { Switch } from "../ui/switch";
-import { Textarea } from "../ui/textarea";
+// import { Switch } from "../ui/switch";
+import { listTemplates, sendTemplate } from "@/services/templates";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import type { SendTemplate } from "@/types/templates";
+import { Tooltip, TooltipTrigger } from "../ui/tooltip";
 
-const FormSchema = z.object({
-  templateName: z.string().min(1, "Template name is required"),
-  phones: z
-    .array(
-      z.string().refine((v) => isValidPhoneNumber(v), {
-        message: "Invalid phone number",
-      })
-    )
-    .min(1, { message: "Must have at least one phone number." }),
+const schema = z.object({
+  templateId: z.string().min(1, "Template name is required"),
+  to: z.string().refine((v) => isValidPhoneNumber(v), {
+    message: "Invalid phone number",
+  }),
 });
 
 export default function Outbound() {
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
-  const [values, setValues] = useState<z.infer<typeof FormSchema>>();
-  const [phoneText, setPhoneText] = useState("");
+  const [sendValues, setSendValues] = useState<SendTemplate>({
+    templateId: "",
+    to: "",
+  });
+  // const [phoneText, setPhoneText] = useState("");
   const [status, setStatus] = useState("");
-  const [bulkInputMode, setBulkInputMode] = useState(false);
-  const [parseError, setParseError] = useState<string>("");
+  // const [bulkInputMode, setBulkInputMode] = useState(false);
+  // const [parseError, setParseError] = useState<string>("");
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  // const defaultCountry: string | undefined = undefined;
+
+  const { data: listTemplateData, isLoading: isListTemplateLoading } = useQuery(
+    {
+      queryFn: listTemplates,
+      queryKey: ["listTemplates"],
+    }
+  );
+
+  const { mutate: sendTemplateFn, isPending: isSendTemplatePending } =
+    useMutation({
+      mutationFn: sendTemplate,
+      onSuccess: (data) => {
+        if (data.success) {
+          setStatus(data.success);
+          toast.success("Successfully sent!");
+        }
+      },
+    });
+
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
-      templateName: "",
-      phones: [""],
+      templateId: "",
+      to: "",
     },
+    mode: "onTouched",
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "phones" as never,
-  });
+  /*
+   * Future feature for multiple phone numbers send
+   */
 
-  const phones = useWatch({ control: form.control, name: "phones" });
+  // const { fields, append, remove } = useFieldArray({
+  //   control: form.control,
+  //   name: "phones" as never,
+  // });
 
-  const defaultCountry: string | undefined = undefined;
+  // const phones = useWatch({ control: form.control, name: "to" });
+  //
+  // const handleOnChangePhone = (value: string) => {
+  //   setPhoneText(value);
+  //   // reset phones value in form
+  //   const resetPhoneValues = () =>
+  //     form.setValue("to", [], {
+  //       shouldValidate: true,
+  //       shouldDirty: true,
+  //     });
 
-  const handleOnChangePhone = (value: string) => {
-    setPhoneText(value);
-    // reset phones value in form
-    const resetPhoneValues = () =>
-      form.setValue("phones", [], {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+  //   // if empty or whitespace, clear parseError
+  //   if (!value || !value.trim()) {
+  //     resetPhoneValues();
+  //     return setParseError("");
+  //   }
 
-    // if empty or whitespace, clear parseError
-    if (!value || !value.trim()) {
-      resetPhoneValues();
-      return setParseError("");
-    }
+  //   const lines = value
+  //     .split(/\r?\n/)
+  //     .map((ln) => ln.trim())
+  //     .filter((ln) => ln.length > 0);
 
-    const lines = value
-      .split(/\r?\n/)
-      .map((ln) => ln.trim())
-      .filter((ln) => ln.length > 0);
+  //   if (lines.length > 100) {
+  //     resetPhoneValues();
+  //     return setParseError(`Only up to 100 phone numbers are allowed.`);
+  //   }
 
-    if (lines.length > 100) {
-      resetPhoneValues();
-      return setParseError(`Only up to 100 phone numbers are allowed.`);
-    }
+  //   // check each number
+  //   const invalidLine = lines.findIndex(
+  //     (num) => !isValidPhoneNumber(num, defaultCountry)
+  //   );
+  //   if (invalidLine !== -1) {
+  //     resetPhoneValues();
+  //     return setParseError(
+  //       `Invalid phone number at line ${invalidLine + 1}: "${lines[invalidLine]}"`
+  //     );
+  //   }
 
-    // check each number
-    const invalidLine = lines.findIndex(
-      (num) => !isValidPhoneNumber(num, defaultCountry)
-    );
-    if (invalidLine !== -1) {
-      resetPhoneValues();
-      return setParseError(
-        `Invalid phone number at line ${invalidLine + 1}: "${lines[invalidLine]}"`
-      );
-    }
+  //   form.setValue("to", lines, { shouldValidate: true, shouldDirty: true });
+  //   setParseError("");
+  // };
 
-    form.setValue("phones", lines, { shouldValidate: true, shouldDirty: true });
-    setParseError("");
-  };
-
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    setValues(data);
+  const onSubmit = (data: z.infer<typeof schema>) => {
+    setSendValues(data);
     setIsBusinessModalOpen(true);
   };
 
-  const onSend = () => {
+  const handleOnSend = () => {
     setIsBusinessModalOpen(false);
-    toast.success("Successfully sent!");
-    setStatus("Delivered");
+    sendTemplateFn(sendValues);
   };
 
   return (
@@ -139,7 +163,6 @@ export default function Outbound() {
         description="Sending outbound marketing messages"
         showButton={false}
       />
-
       <Card className="shadow-none">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -165,7 +188,7 @@ export default function Outbound() {
                 <div>
                   <FormField
                     control={form.control}
-                    name="templateName"
+                    name="templateId"
                     render={({ field }) => (
                       <FormItem className="flex flex-col items-start">
                         <FormLabel className="text-left">
@@ -174,22 +197,29 @@ export default function Outbound() {
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
+                          disabled={
+                            isListTemplateLoading || !listTemplateData?.length
+                          }
                         >
                           <FormControl>
                             <SelectTrigger className="mt-1.5 w-full">
-                              <SelectValue placeholder="Select Template" />
+                              <SelectValue
+                                placeholder={
+                                  isListTemplateLoading
+                                    ? "Loading..."
+                                    : listTemplateData?.length
+                                      ? "Select Template"
+                                      : "No Template Available"
+                                }
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="text">
-                              Template Example 1
-                            </SelectItem>
-                            <SelectItem value="email">
-                              Template Example 2
-                            </SelectItem>
-                            <SelectItem value="options">
-                              Template Example 3
-                            </SelectItem>
+                            {listTemplateData?.map((data) => (
+                              <SelectItem value={data.id}>
+                                {data.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -197,7 +227,34 @@ export default function Outbound() {
                     )}
                   />
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name={`to`}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>
+                          Phone Number <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl className="w-full">
+                          <PhoneInput
+                            disabled={
+                              isListTemplateLoading || !listTemplateData?.length
+                            }
+                            {...field}
+                            defaultCountry="GB"
+                            placeholder="Enter phone number"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                {/*
+                 * Future feature for multiple send phone numbers
+                 */}
+                {/* <div className="flex items-center justify-between p-3 rounded-lg border border-gray-200">
                   <div>
                     <Label className="text-sm font-medium">
                       {bulkInputMode ? "Bulk" : "Input"}
@@ -226,6 +283,8 @@ export default function Outbound() {
                   </div>
                 </div>
                 <div className="space-y-3">
+              
+                  
                   {bulkInputMode ? (
                     <>
                       <Label>
@@ -252,7 +311,7 @@ export default function Outbound() {
                         >
                           <FormField
                             control={form.control}
-                            name={`phones.${index}`}
+                            name={`to.${index}`}
                             render={({ field }) => (
                               <FormItem className="w-full">
                                 <FormLabel>
@@ -286,9 +345,9 @@ export default function Outbound() {
                         </div>
                       ))}
                     </>
-                  )}
+                  )} 
                 </div>
-                {!bulkInputMode && phones.length <= 100 && (
+               {!bulkInputMode && phones.length <= 100 && (
                   <Button
                     type="button"
                     size="sm"
@@ -297,28 +356,53 @@ export default function Outbound() {
                   >
                     Add Phone Number
                   </Button>
-                )}
-
+                )} */}
                 <Separator />
                 <div className="flex justify-between">
                   <div className="flex gap-1">
                     {status && (
                       <>
                         <Label className="font-bold">Status:</Label>
-                        <Label className="text-green-600">{status}</Label>
+                        <Label
+                          className={status ? "text-green-600" : "text-red-600"}
+                        >
+                          {status ? "Sent" : "Failed"}
+                        </Label>
                       </>
                     )}
                   </div>
-                  <Button size="sm" type="submit">
-                    <Send className="w-4 h-4 mr-2" />
-                    Send
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <Button
+                          size="sm"
+                          type="submit"
+                          disabled={
+                            !form.formState.isValid || isSendTemplatePending
+                          }
+                        >
+                          {isSendTemplatePending ? (
+                            <div className="w-14.5 flex justify-center">
+                              <Loader2 className="animate-spin" />
+                            </div>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" />
+                              Send
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                  </Tooltip>
                 </div>
               </div>
             </form>
           </Form>
         </CardContent>
       </Card>
+
+      {/* Send Confirmation Modal */}
       <Dialog open={isBusinessModalOpen}>
         <DialogContent className="max-w-md w-full [&>button]:hidden">
           <DialogHeader>
@@ -337,7 +421,11 @@ export default function Outbound() {
             >
               Cancel
             </Button>
-            <Button size="sm" onClick={onSend}>
+            <Button
+              size="sm"
+              onClick={handleOnSend}
+              disabled={isSendTemplatePending}
+            >
               <Send className="w-4 h-4 mr-2" />
               Send
             </Button>
