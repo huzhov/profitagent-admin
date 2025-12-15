@@ -28,11 +28,11 @@ import { getAgentList } from "@/services/agents";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBusiness } from "@/context/AppContext";
 import StatsCards from "@/components/common/StatsCards";
-import BusinessInfoCard from "@/components/common/BusinessInfoCard";
+import BusinessSetupInfoCard from "@/components/common/BusinessSetupInfoCard";
 import { getWhatsAppList } from "@/services/integrations";
 import { Tooltip, TooltipTrigger } from "../ui/tooltip";
 import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
-import AgentToggleButton from "./AgentToggleButton";
+// import AgentToggleButton from "./AgentToggleButton";
 
 export default function Agents() {
   const navigate = useNavigate();
@@ -42,8 +42,8 @@ export default function Agents() {
   const {
     data: agentList,
     isLoading: isAgentListLoading,
-    isRefetching: isAgentListRefetching,
-    refetch: refetchAgentList,
+    // isRefetching: isAgentListRefetching,
+    // refetch: refetchAgentList,
   } = useQuery({
     queryKey: ["agentsList"],
     queryFn: getAgentList,
@@ -99,7 +99,7 @@ export default function Agents() {
       />
       {!business ? (
         <div className="flex-1 overflow-y-auto h-[calc(100vh-16rem)]">
-          <BusinessInfoCard type="Agents" />
+          <BusinessSetupInfoCard page="Agents" />
         </div>
       ) : (
         <>
@@ -363,11 +363,11 @@ export default function Agents() {
                         </Button> */}
                       {/* </div> */}
 
-                      <AgentToggleButton
+                      {/* <AgentToggleButton
                         refetch={refetchAgentList}
                         isRefetching={isAgentListRefetching}
                         agent={agent}
-                      />
+                      /> */}
                     </div>
                   </CardContent>
                 </Card>

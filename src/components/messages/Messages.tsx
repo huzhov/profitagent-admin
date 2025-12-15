@@ -15,7 +15,7 @@ import { apiJson } from "@/lib/http";
 import { PageHeader } from "@/components/ui/page-header";
 import { Spinner } from "../ui/spinner";
 import { useBusiness } from "@/context/AppContext";
-import BusinessInfoCard from "@/components/common/BusinessInfoCard";
+import BusinessSetupInfoCard from "@/components/common/BusinessSetupInfoCard";
 
 export default function Messages() {
   const [conversationId, setConversationId] = useState<string>("");
@@ -121,7 +121,7 @@ export default function Messages() {
 
       <div className="flex-1 overflow-y-auto rounded-lg border bg-background p-4 space-y-8 scrollbar-thin h-[calc(100vh-16rem)]">
         {!business ? (
-          <BusinessInfoCard type="Messages" />
+          <BusinessSetupInfoCard page="Messages" />
         ) : (
           <>
             {loading && (

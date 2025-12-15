@@ -11,7 +11,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { getAgent } from "@/services/agents";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Label } from "../ui/label";
-import AgentToggleButton from "./AgentToggleButton";
+// import AgentToggleButton from "./AgentToggleButton";
 
 export default function AgentView() {
   const navigate = useNavigate();
@@ -19,8 +19,8 @@ export default function AgentView() {
 
   const {
     data: agentData,
-    refetch: refetchAgent,
-    isRefetching: isAgentDataRefetching,
+    // refetch: refetchAgent,
+    // isRefetching: isAgentDataRefetching,
   } = useSuspenseQuery({
     queryKey: ["agents", id],
     queryFn: async () => getAgent(id),
@@ -136,11 +136,11 @@ export default function AgentView() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu> */}
-              <AgentToggleButton
+              {/* <AgentToggleButton
                 refetch={refetchAgent}
                 isRefetching={isAgentDataRefetching}
                 agent={agentData}
-              />
+              /> */}
               <Button
                 variant="outline"
                 size="sm"
