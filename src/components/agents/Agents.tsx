@@ -216,7 +216,7 @@ export default function Agents() {
                             </div>
                           </div>
                           <div className="flex gap-1">
-                            <Badge
+                            {/* <Badge
                               data-slot="badge"
                               className={`text-xs border-transparent ${
                                 agent.status === "enabled"
@@ -225,7 +225,7 @@ export default function Agents() {
                               }`}
                             >
                               {agent.status === "enabled" ? "Active" : "Paused"}
-                            </Badge>
+                            </Badge> */}
                             {/* Active Channels */}
                             {agents[0].channels.map((channel, index) => (
                               <Badge
