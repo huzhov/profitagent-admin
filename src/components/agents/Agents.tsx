@@ -13,8 +13,6 @@ import {
   EllipsisVertical,
   Eye,
   Plus,
-  // Play,
-  // Pause,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "@tanstack/react-router";
@@ -30,31 +28,32 @@ import { getAgentList } from "@/services/agents";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBusiness } from "@/context/AppContext";
 import StatsCards from "@/components/common/StatsCards";
-import BusinessInfoCard from "@/components/common/BusinessInfoCard";
+import BusinessSetupInfoCard from "@/components/common/BusinessSetupInfoCard";
 import { getWhatsAppList } from "@/services/integrations";
 import { Tooltip, TooltipTrigger } from "../ui/tooltip";
 import NoIntegrationInfo from "@/components/common/NoIntegrationInfo";
+// import AgentToggleButton from "./AgentToggleButton";
 
 export default function Agents() {
   const navigate = useNavigate();
   const { agents } = useApp();
   const { business } = useBusiness();
 
-  const { data, isLoading } = useQuery({
+  const {
+    data: agentList,
+    isLoading: isAgentListLoading,
+    // isRefetching: isAgentListRefetching,
+    // refetch: refetchAgentList,
+  } = useQuery({
     queryKey: ["agentsList"],
-    queryFn: async () => {
-      const data = await getAgentList();
-      return data;
-    },
+    queryFn: getAgentList,
     enabled: !!business,
   });
 
   const { data: whatsAppIntegrations, isLoading: isWhatsAppLoading } = useQuery(
     {
       queryKey: ["whatsAppList"],
-      queryFn: async () => {
-        return await getWhatsAppList();
-      },
+      queryFn: getWhatsAppList,
     }
   );
 
@@ -100,7 +99,7 @@ export default function Agents() {
       />
       {!business ? (
         <div className="flex-1 overflow-y-auto h-[calc(100vh-16rem)]">
-          <BusinessInfoCard type="Agents" />
+          <BusinessSetupInfoCard page="Agents" />
         </div>
       ) : (
         <>
@@ -108,7 +107,7 @@ export default function Agents() {
           <StatsCards type="Agents" />
           {/* Agents Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {isLoading ? (
+            {isAgentListLoading ? (
               <>
                 {[1, 2, 3].map((i) => (
                   <Card
@@ -164,7 +163,7 @@ export default function Agents() {
                 ))}
               </>
             ) : (
-              data?.map((agent) => (
+              agentList?.map((agent) => (
                 <Card
                   key={agent.id}
                   data-slot="card"
@@ -220,14 +219,12 @@ export default function Agents() {
                             {/* <Badge
                               data-slot="badge"
                               className={`text-xs border-transparent ${
-                                agent.status === "Active"
+                                agent.status === "enabled"
                                   ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                                   : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                               }`}
                             >
-                              {agent.status === "disabled"
-                                ? "Paused"
-                                : "Active"}
+                              {agent.status === "enabled" ? "Active" : "Paused"}
                             </Badge> */}
                             {/* Active Channels */}
                             {agents[0].channels.map((channel, index) => (
@@ -324,18 +321,20 @@ export default function Agents() {
                     {/* Actions */}
 
                     <div className="flex gap-2 space-y-2 pt-2">
-                      <Button
-                        data-slot="button"
-                        size="sm"
-                        variant="outline"
-                        className="w-full cursor-pointer"
-                        onClick={() =>
-                          navigate({ to: `/agents/${agent.id}/view` })
-                        }
-                      >
-                        <Eye className="w-3 h-3 mr-1" />
-                        View Agent
-                      </Button>
+                      <div className="w-full">
+                        <Button
+                          data-slot="button"
+                          size="sm"
+                          variant="outline"
+                          className="w-full cursor-pointer"
+                          onClick={() =>
+                            navigate({ to: `/agents/${agent.id}/view` })
+                          }
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          View Agent
+                        </Button>
+                      </div>
                       {/* <div className="w-full"></div>
                       <div className="w-full"> */}
                       {/* <Button
@@ -363,19 +362,12 @@ export default function Agents() {
                           Analytics
                         </Button> */}
                       {/* </div> */}
-                      {/* <Button
-                        data-slot="button"
-                        variant="outline"
-                        size="sm"
-                        // onClick={() => toggleAgentStatus(agent.id)}
-                        className="cursor-pointer"
-                      >
-                        {agent.status === "Active" ? (
-                          <Pause className="w-3 h-3" />
-                        ) : (
-                          <Play className="w-3 h-3" />
-                        )}
-                      </Button> */}
+
+                      {/* <AgentToggleButton
+                        refetch={refetchAgentList}
+                        isRefetching={isAgentListRefetching}
+                        agent={agent}
+                      /> */}
                     </div>
                   </CardContent>
                 </Card>
@@ -383,7 +375,7 @@ export default function Agents() {
             )}
 
             {/* Create New Agent Card - Only show when not loading */}
-            {!isLoading && (
+            {!isAgentListLoading && (
               <Card
                 data-slot="card"
                 className="shadow-none h-92 py-0 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border-dashed border-2 hover:border-primary transition-colors cursor-pointer"

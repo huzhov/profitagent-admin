@@ -1,5 +1,7 @@
 import type { User } from "@/types/user";
 import { queryClient } from "./queryClient";
+import useUserStore from "@/store/user-store";
+import useBusinessStore from "@/store/business-store";
 
 export type LoginResponse = {
   token: string;
@@ -24,6 +26,8 @@ export function removeToken() {
 }
 
 export function logout() {
-  localStorage.clear();
+  removeToken();
+  useUserStore.persist.clearStorage();
+  useBusinessStore.persist.clearStorage();
   queryClient.removeQueries();
 }

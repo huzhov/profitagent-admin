@@ -19,6 +19,7 @@ import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReportingRouteImport } from './routes/_authenticated/reporting'
 import { Route as AuthenticatedPrivacyPolicyRouteImport } from './routes/_authenticated/privacy-policy'
+import { Route as AuthenticatedOutboundRouteImport } from './routes/_authenticated/outbound'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedIntelligenceRouteImport } from './routes/_authenticated/intelligence'
 import { Route as AuthenticatedIntegrationsRouteImport } from './routes/_authenticated/integrations'
@@ -93,6 +94,11 @@ const AuthenticatedPrivacyPolicyRoute =
     path: '/privacy-policy',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOutboundRoute = AuthenticatedOutboundRouteImport.update({
+  id: '/outbound',
+  path: '/outbound',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof AuthenticatedIntegrationsRoute
   '/intelligence': typeof AuthenticatedIntelligenceRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/outbound': typeof AuthenticatedOutboundRoute
   '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
   '/reporting': typeof AuthenticatedReportingRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof AuthenticatedIntegrationsRoute
   '/intelligence': typeof AuthenticatedIntelligenceRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/outbound': typeof AuthenticatedOutboundRoute
   '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/testing': typeof AuthenticatedTestingRoute
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/integrations': typeof AuthenticatedIntegrationsRoute
   '/_authenticated/intelligence': typeof AuthenticatedIntelligenceRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/outbound': typeof AuthenticatedOutboundRoute
   '/_authenticated/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
   '/_authenticated/reporting': typeof AuthenticatedReportingRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
@@ -339,6 +348,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/intelligence'
     | '/messages'
+    | '/outbound'
     | '/privacy-policy'
     | '/reporting'
     | '/settings'
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/intelligence'
     | '/messages'
+    | '/outbound'
     | '/privacy-policy'
     | '/templates'
     | '/testing'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/_authenticated/integrations'
     | '/_authenticated/intelligence'
     | '/_authenticated/messages'
+    | '/_authenticated/outbound'
     | '/_authenticated/privacy-policy'
     | '/_authenticated/reporting'
     | '/_authenticated/settings'
@@ -505,6 +517,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy-policy'
       fullPath: '/privacy-policy'
       preLoaderRoute: typeof AuthenticatedPrivacyPolicyRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/outbound': {
+      id: '/_authenticated/outbound'
+      path: '/outbound'
+      fullPath: '/outbound'
+      preLoaderRoute: typeof AuthenticatedOutboundRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/messages': {
@@ -771,6 +790,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIntegrationsRoute: typeof AuthenticatedIntegrationsRoute
   AuthenticatedIntelligenceRoute: typeof AuthenticatedIntelligenceRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedOutboundRoute: typeof AuthenticatedOutboundRoute
   AuthenticatedPrivacyPolicyRoute: typeof AuthenticatedPrivacyPolicyRoute
   AuthenticatedReportingRoute: typeof AuthenticatedReportingRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
@@ -787,6 +807,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIntegrationsRoute: AuthenticatedIntegrationsRoute,
   AuthenticatedIntelligenceRoute: AuthenticatedIntelligenceRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedOutboundRoute: AuthenticatedOutboundRoute,
   AuthenticatedPrivacyPolicyRoute: AuthenticatedPrivacyPolicyRoute,
   AuthenticatedReportingRoute: AuthenticatedReportingRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
