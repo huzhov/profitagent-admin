@@ -48,7 +48,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Tooltip, TooltipTrigger } from "../ui/tooltip";
 
 const schema = z.object({
-  templateId: z.string().min(1, "Template name is required"),
+  templateId: z.uuid(),
   to: z.string().refine((v) => isValidPhoneNumber(v), {
     message: "Invalid phone number",
   }),
@@ -74,10 +74,8 @@ export default function Outbound() {
     useMutation({
       mutationFn: sendTemplate,
       onSuccess: (data) => {
-        if (data.success) {
-          setStatus(data.success);
-          toast.success("Successfully sent!");
-        }
+        if (data.success) toast.success("Successfully sent!");
+        setStatus(data.success);
       },
     });
 
@@ -91,6 +89,9 @@ export default function Outbound() {
   });
 
   const formValues = form.getValues();
+
+  const isFormFieldDisabled =
+    isListTemplateLoading || !listTemplateData?.length;
 
   /*
    * Future feature for multiple phone numbers send
@@ -193,9 +194,7 @@ export default function Outbound() {
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
-                          disabled={
-                            isListTemplateLoading || !listTemplateData?.length
-                          }
+                          disabled={isFormFieldDisabled}
                         >
                           <FormControl>
                             <SelectTrigger className="mt-1.5 w-full">
@@ -234,9 +233,7 @@ export default function Outbound() {
                         </FormLabel>
                         <FormControl className="w-full">
                           <PhoneInput
-                            disabled={
-                              isListTemplateLoading || !listTemplateData?.length
-                            }
+                            disabled={isFormFieldDisabled}
                             {...field}
                             defaultCountry="GB"
                             placeholder="Enter phone number"

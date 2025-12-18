@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { AgentResponse } from "@/types/agents";
 
 type AgentPlayButtonProps = {
-  agent: Partial<AgentResponse>;
+  agent: Pick<AgentResponse, "id" | "name" | "status">;
   isRefetching: boolean;
   refetch: () => void;
 };
@@ -34,7 +34,7 @@ export default function AgentToggleButton({
       variant="outline"
       size="sm"
       className="cursor-pointer"
-      onClick={() => toggleAgentStatusFn(agent.id || "")}
+      onClick={() => toggleAgentStatusFn(agent.id)}
       disabled={isPendingToggleAgentStatus || isRefetching}
     >
       {isRefetching || isPendingToggleAgentStatus ? (
