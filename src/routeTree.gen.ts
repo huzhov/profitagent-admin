@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
@@ -18,7 +19,6 @@ import { Route as AuthenticatedTestingRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReportingRouteImport } from './routes/_authenticated/reporting'
-import { Route as AuthenticatedPrivacyPolicyRouteImport } from './routes/_authenticated/privacy-policy'
 import { Route as AuthenticatedOutboundRouteImport } from './routes/_authenticated/outbound'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedIntelligenceRouteImport } from './routes/_authenticated/intelligence'
@@ -47,6 +47,11 @@ import { Route as AuthenticatedAgentsIdEditRouteImport } from './routes/_authent
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -88,12 +93,6 @@ const AuthenticatedReportingRoute = AuthenticatedReportingRouteImport.update({
   path: '/reporting',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedPrivacyPolicyRoute =
-  AuthenticatedPrivacyPolicyRouteImport.update({
-    id: '/privacy-policy',
-    path: '/privacy-policy',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedOutboundRoute = AuthenticatedOutboundRouteImport.update({
   id: '/outbound',
   path: '/outbound',
@@ -237,6 +236,7 @@ const AuthenticatedAgentsIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/signup': typeof SignupRoute
   '/ab-testing': typeof AuthenticatedAbTestingRouteWithChildren
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
@@ -245,7 +245,6 @@ export interface FileRoutesByFullPath {
   '/intelligence': typeof AuthenticatedIntelligenceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/outbound': typeof AuthenticatedOutboundRoute
-  '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
   '/reporting': typeof AuthenticatedReportingRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/templates': typeof AuthenticatedTemplatesRoute
@@ -272,13 +271,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/signup': typeof SignupRoute
   '/business-settings': typeof AuthenticatedBusinessSettingsRoute
   '/integrations': typeof AuthenticatedIntegrationsRoute
   '/intelligence': typeof AuthenticatedIntelligenceRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/outbound': typeof AuthenticatedOutboundRoute
-  '/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
   '/templates': typeof AuthenticatedTemplatesRoute
   '/testing': typeof AuthenticatedTestingRoute
   '/': typeof AuthenticatedIndexRoute
@@ -304,6 +303,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/signup': typeof SignupRoute
   '/_authenticated/ab-testing': typeof AuthenticatedAbTestingRouteWithChildren
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
@@ -312,7 +312,6 @@ export interface FileRoutesById {
   '/_authenticated/intelligence': typeof AuthenticatedIntelligenceRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/outbound': typeof AuthenticatedOutboundRoute
-  '/_authenticated/privacy-policy': typeof AuthenticatedPrivacyPolicyRoute
   '/_authenticated/reporting': typeof AuthenticatedReportingRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
@@ -341,6 +340,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
+    | '/privacy-policy'
     | '/signup'
     | '/ab-testing'
     | '/agents'
@@ -349,7 +349,6 @@ export interface FileRouteTypes {
     | '/intelligence'
     | '/messages'
     | '/outbound'
-    | '/privacy-policy'
     | '/reporting'
     | '/settings'
     | '/templates'
@@ -376,13 +375,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/privacy-policy'
     | '/signup'
     | '/business-settings'
     | '/integrations'
     | '/intelligence'
     | '/messages'
     | '/outbound'
-    | '/privacy-policy'
     | '/templates'
     | '/testing'
     | '/'
@@ -407,6 +406,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/privacy-policy'
     | '/signup'
     | '/_authenticated/ab-testing'
     | '/_authenticated/agents'
@@ -415,7 +415,6 @@ export interface FileRouteTypes {
     | '/_authenticated/intelligence'
     | '/_authenticated/messages'
     | '/_authenticated/outbound'
-    | '/_authenticated/privacy-policy'
     | '/_authenticated/reporting'
     | '/_authenticated/settings'
     | '/_authenticated/templates'
@@ -444,6 +443,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SignupRoute: typeof SignupRoute
 }
 
@@ -454,6 +454,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -510,13 +517,6 @@ declare module '@tanstack/react-router' {
       path: '/reporting'
       fullPath: '/reporting'
       preLoaderRoute: typeof AuthenticatedReportingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/privacy-policy': {
-      id: '/_authenticated/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof AuthenticatedPrivacyPolicyRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/outbound': {
@@ -791,7 +791,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIntelligenceRoute: typeof AuthenticatedIntelligenceRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedOutboundRoute: typeof AuthenticatedOutboundRoute
-  AuthenticatedPrivacyPolicyRoute: typeof AuthenticatedPrivacyPolicyRoute
   AuthenticatedReportingRoute: typeof AuthenticatedReportingRouteWithChildren
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
   AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
@@ -808,7 +807,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIntelligenceRoute: AuthenticatedIntelligenceRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedOutboundRoute: AuthenticatedOutboundRoute,
-  AuthenticatedPrivacyPolicyRoute: AuthenticatedPrivacyPolicyRoute,
   AuthenticatedReportingRoute: AuthenticatedReportingRouteWithChildren,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
   AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
@@ -824,6 +822,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport

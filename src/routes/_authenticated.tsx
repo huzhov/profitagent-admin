@@ -7,7 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import Header from "@/components/header/Header";
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: async ({}) => {
+  beforeLoad: async () => {
     if (!getToken()) {
       localStorage.clear();
       throw redirect({
